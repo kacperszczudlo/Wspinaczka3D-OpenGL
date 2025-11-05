@@ -1,0 +1,22 @@
+# Pliki generowane przez Visual Studio i kompilator
+.vs/
+x64/
+Debug/
+Release/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.VC.db
+*.VC.VC.opendb
+*.ipch
+
+# Pliki binarne
+*.exe
+*.dll
+*.obj
+*.o
+*.lib
+*.pdb
+*.ilk
