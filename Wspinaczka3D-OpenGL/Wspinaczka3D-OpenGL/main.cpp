@@ -13,80 +13,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "Model.h"
+#include "Mesh.h"
+#include "Shader.h"
 
 
-// Klasa Shader
-class Shader {
-public:
-    unsigned int ID;
-    Shader(const char* vertexPath, const char* fragmentPath) {
-        std::string vertexCode;
-        std::string fragmentCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-        vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        try {
-            vShaderFile.open(vertexPath);
-            fShaderFile.open(fragmentPath);
-            std::stringstream vShaderStream, fShaderStream;
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();
-            vShaderFile.close();
-            fShaderFile.close();
-            vertexCode = vShaderStream.str();
-            fragmentCode = fShaderStream.str();
-        }
-        catch (std::ifstream::failure& e) {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
-        }
-        const char* vShaderCode = vertexCode.c_str();
-        const char* fShaderCode = fragmentCode.c_str();
-        unsigned int vertex, fragment;
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
-        glCompileShader(vertex);
-        checkCompileErrors(vertex, "VERTEX");
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
-        glCompileShader(fragment);
-        checkCompileErrors(fragment, "FRAGMENT");
-        ID = glCreateProgram();
-        glAttachShader(ID, vertex);
-        glAttachShader(ID, fragment);
-        glLinkProgram(ID);
-        checkCompileErrors(ID, "PROGRAM");
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-    }
-    void use() { glUseProgram(ID); }
-    void setMat4(const std::string& name, const glm::mat4& mat) const {
-        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-    }
-    void setVec3(const std::string& name, const glm::vec3& value) const {
-        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
-    }
-
-private:
-    void checkCompileErrors(unsigned int shader, std::string type) {
-        int success;
-        char infoLog[1024];
-        if (type != "PROGRAM") {
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-            if (!success) {
-                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
-        }
-        else {
-            glGetProgramiv(shader, GL_LINK_STATUS, &success);
-            if (!success) {
-                glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
-        }
-    }
-};
 
 // Prototypy funkcji
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -394,6 +328,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // === £ADOWANIE MODELU 3D (np. œciana wspinaczkowa) ===
+    Model tableModel("models/table.obj");  
+
     // Pêtla renderowania
     while (!glfwWindowShouldClose(window))
     {
@@ -466,21 +403,24 @@ int main()
 
         // Rysowanie pod³ogi
         glBindVertexArray(floorVAO);
+        ourShader.setInt("useTexture", 0);
         ourShader.setMat4("model", glm::mat4(1.0f));
         ourShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 0.1f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Rysowanie szeœcianu
-        glBindVertexArray(cubeVAO);
+        // Rysowanie modelu sto³u
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.2f, 0.0f));
-        model = glm::scale(model, glm::vec3(4.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -0.75f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f));
         ourShader.setMat4("model", model);
-        ourShader.setVec3("objectColor", glm::vec3(0.5f, 0.5f, 0.5f));
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // dla sto³u korzystamy z tekstury, kolor z objectColor jest ignorowany
+        ourShader.setInt("useTexture", 1);
+        tableModel.Draw(ourShader);
 
         // Rysowanie jajka
         glBindVertexArray(eggVAO);
+        ourShader.setInt("useTexture", 0);
         model = glm::translate(glm::mat4(1.0f), eggPosition);
         ourShader.setMat4("model", model);
         ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f));
@@ -488,6 +428,7 @@ int main()
 
         // Rysowanie chmur
         glBindVertexArray(sphereVAO);
+        ourShader.setInt("useTexture", 0);
         ourShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
         for (const auto& cloud : clouds) {
             for (const auto& component : cloud.components) {
