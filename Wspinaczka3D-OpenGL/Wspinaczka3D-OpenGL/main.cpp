@@ -45,6 +45,7 @@ unsigned int menuTexture;
 
 // Kamera i postaæ
 glm::vec3 eggPosition = glm::vec3(0.0f, 0.0f, 5.0f);
+glm::vec3 previousEggPosition = eggPosition;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float cameraDistance = 7.0f; // Lekko oddalamy kamerê, by lepiej widzieæ scenê
@@ -65,6 +66,32 @@ float velocityY = 0.0f;
 bool canJump = true;
 const float GRAVITY = -9.8f;
 const float JUMP_FORCE = 5.0f;
+
+// "Wysokoœæ" jajka – œrodek jajka jest na y=0, dó³ jest na ok. -0.7
+const float EGG_HALF_HEIGHT = 0.7f;
+
+struct TableHitbox {
+    float minX, maxX;
+    float minZ, maxZ;
+    float topY;
+};
+
+TableHitbox table1 = {
+    -0.8f, 0.8f,  // minX, maxX
+    -0.8f, 0.8f,  // minZ, maxZ
+    -0.02f        // topY
+};
+
+TableHitbox table2 = {
+    2.12f, 3.85f,   // minX, maxX
+    -0.84f, 0.86f,  // minZ, maxZ
+    0.75f        // topY
+};
+
+bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
+    return pos.x > t.minX && pos.x < t.maxX &&
+        pos.z > t.minZ && pos.z < t.maxZ;
+}
 
 // Struktury do zarz¹dzania chmurami
 struct CloudComponent {
@@ -159,7 +186,7 @@ int main()
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", primaryMonitor, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
     if (window == NULL) {
         std::cout << "Blad tworzenia okna GLFW!" << std::endl;
         glfwTerminate();
@@ -338,19 +365,59 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        previousEggPosition = eggPosition;
         processInput(window);
+
+        std::cout << "Egg: x=" << eggPosition.x
+            << " y=" << eggPosition.y
+            << " z=" << eggPosition.z << std::endl;
 
         // === FIZYKA I LOGIKA GRY (TYLKO W STANIE 'PLAYING') ===
         if (currentState == GAME_STATE_PLAYING)
         {
+            float oldY = eggPosition.y;
+
+            // --- GRAWITACJA ---
             velocityY += GRAVITY * deltaTime;
             eggPosition.y += velocityY * deltaTime;
-            if (eggPosition.y < 0.0f) {
-                eggPosition.y = 0.0f;
-                velocityY = 0.0f;
-                canJump = true;
+
+            bool standingOnSomething = false;
+
+            // === STO£Y – l¹dowanie TYLKO z góry ===
+            // STÓ£ 1
+            if (isInsideXZ(eggPosition, table1)) {
+                float desiredY1 = table1.topY + EGG_HALF_HEIGHT;
+
+                if (oldY >= desiredY1 - 0.05f && eggPosition.y <= desiredY1 && velocityY <= 0.0f) {
+                    eggPosition.y = desiredY1;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                }
             }
 
+            // STÓ£ 2
+            if (!standingOnSomething && isInsideXZ(eggPosition, table2)) {
+                float desiredY2 = table2.topY + EGG_HALF_HEIGHT;
+
+                if (oldY >= desiredY2 - 0.05f && eggPosition.y <= desiredY2 && velocityY <= 0.0f) {
+                    eggPosition.y = desiredY2;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                }
+            }
+
+            // === ZIEMIA – jeœli nie stoisz na ¿adnym stole ===
+            if (!standingOnSomething) {
+                if (eggPosition.y < 0.0f) {
+                    eggPosition.y = 0.0f;
+                    velocityY = 0.0f;
+                    canJump = true;
+                }
+            }
+
+            // --- CHMURY (jak mia³eœ) ---
             cloudSpawnTimer += deltaTime;
             if (cloudSpawnTimer > 2.0f && clouds.size() < 15) {
                 spawnCloud();
@@ -364,7 +431,11 @@ int main()
                     i--;
                 }
             }
-        } // === KONIEC BLOKU if (currentState == GAME_STATE_PLAYING) ===
+        }
+
+
+
+		// Renderowanie
 
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f); // Ta linijka zostaje bez zmian
 
@@ -408,15 +479,23 @@ int main()
         ourShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 0.1f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Rysowanie modelu sto³u
+        // === STO£Y ===
+        ourShader.setInt("useTexture", 1);
+
+        // STÓ£ 1 (jak do tej pory, na œrodku)
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -0.75f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f));
         ourShader.setMat4("model", model);
-
-        // dla sto³u korzystamy z tekstury, kolor z objectColor jest ignorowany
-        ourShader.setInt("useTexture", 1);
         tableModel.Draw(ourShader);
+
+        // STÓ£ 2 (np. w prawo, ¿eby mo¿na by³o doskoczyæ)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f)); // <- przesuniêty w X
+        model = glm::scale(model, glm::vec3(1.0f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
 
         // Rysowanie jajka
         glBindVertexArray(eggVAO);
@@ -526,6 +605,21 @@ void processInput(GLFWwindow* window) {
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && canJump) {
             velocityY = JUMP_FORCE;
             canJump = false;
+        }
+
+        // === BLOKOWANIE WEJŒCIA BOKIEM NA STO£Y ===
+        bool insideTable1XZ = isInsideXZ(eggPosition, table1);
+        bool insideTable2XZ = isInsideXZ(eggPosition, table2);
+
+        // je¿eli próbujemy wejœæ w hitbox sto³u, bêd¹c poni¿ej jego blatu,
+        // cofamy XZ – trzeba u¿yæ skoku, ¿eby znaleŸæ siê nad sto³em
+        if (insideTable1XZ && eggPosition.y < table1.topY + EGG_HALF_HEIGHT - 0.05f) {
+            eggPosition.x = previousEggPosition.x;
+            eggPosition.z = previousEggPosition.z;
+        }
+        if (insideTable2XZ && eggPosition.y < table2.topY + EGG_HALF_HEIGHT - 0.05f) {
+            eggPosition.x = previousEggPosition.x;
+            eggPosition.z = previousEggPosition.z;
         }
     }
 }
