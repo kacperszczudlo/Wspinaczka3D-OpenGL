@@ -1,73 +1,78 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
 #include <vector>
-#include <random> // Do generowania liczb losowych
+#include <random> 
+#include <cmath> 
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/constants.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include "Model.h"
-#include "Mesh.h"
 #include "Shader.h"
 
 
-
-// Prototypy funkcji
+// Prototypy
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void updateCrackGeometry(int currentCrackCount);
 
-// Ustawienia okna
+// Globalne ustawienia i stan
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
 
-// NOWE STANY GRY
 enum GameState {
     GAME_STATE_MENU,
-    GAME_STATE_PLAYING
+    GAME_STATE_PLAYING,
+    GAME_STATE_CRASHED
 };
 GameState currentState = GAME_STATE_MENU;
 
-// NOWE ZMIENNE GLOBALNE DLA UI
 Shader* uiShader = nullptr;
-unsigned int uiVAO, uiVBO;
-unsigned int menuTexture;
+// Zmiana: Inicjalizacja globalnych uchwytów GL na 0, aby unikn¹æ ostrze¿eñ "niezainicjowana zmienna"
+unsigned int uiVAO = 0, uiVBO = 0;
+unsigned int menuTexture = 0;
 
-// Kamera i postaæ
 glm::vec3 eggPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 glm::vec3 previousEggPosition = eggPosition;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float cameraDistance = 7.0f; // Lekko oddalamy kamerê, by lepiej widzieæ scenê
+float cameraDistance = 7.0f;
 
-// Myszka
 float lastX;
 float lastY;
 bool firstMouse = true;
 float yaw = -90.0f;
 float pitch = 0.0f;
 
-// Czas
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// Fizyka jajka
+// Fizyka
 float velocityY = 0.0f;
 bool canJump = true;
 const float GRAVITY = -9.8f;
-const float JUMP_FORCE = 5.0f;
+// ZMIANA: Zmniejszona si³a skoku, aby zwyk³y skok nie powodowa³ od razu rozbicia.
+const float JUMP_FORCE = 4.0f;
 
-// "Wysokoœæ" jajka – œrodek jajka jest na y=0, dó³ jest na ok. -0.7
+// Pêkniêcia i uszkodzenia
+float maxFallHeight = 0.0f;
+// ZMIANA: Zwiêkszone progi obra¿eñ, aby skok o sile 4.0f (dystans upadku ok. 0.82m) by³ bezpieczny.
+const float CRASH_HEIGHT_THRESHOLD = 1.5f; // Rozbicie powy¿ej 1.5m
+const float CRACK_HEIGHT_THRESHOLD = 0.9f;  // Pêkniêcie powy¿ej 0.9m
+int crackCount = 0;
+const int MAX_CRACKS = 3;
+std::vector<float> crackVertices;
+unsigned int crackVAO = 0, crackVBO = 0;
+
+// Animacja rozbicia
+float crashStartTime = 0.0f;
+const float CRASH_ANIMATION_DURATION = 0.7f;
+glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, -0.5f) };
 const float EGG_HALF_HEIGHT = 0.7f;
 
 struct TableHitbox {
@@ -76,56 +81,106 @@ struct TableHitbox {
     float topY;
 };
 
-TableHitbox table1 = {
-    -0.8f, 0.8f,  // minX, maxX
-    -0.8f, 0.8f,  // minZ, maxZ
-    -0.02f        // topY
-};
+TableHitbox table1 = { -0.8f, 0.8f, -0.8f, 0.8f, -0.02f };
+TableHitbox table2 = { 2.12f, 3.85f, -0.84f, 0.86f, 0.75f };
 
-TableHitbox table2 = {
-    2.12f, 3.85f,   // minX, maxX
-    -0.84f, 0.86f,  // minZ, maxZ
-    0.75f        // topY
-};
-
-bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
+static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
     return pos.x > t.minX && pos.x < t.maxX &&
         pos.z > t.minZ && pos.z < t.maxZ;
 }
 
-// Struktury do zarz¹dzania chmurami
-struct CloudComponent {
-    glm::vec3 offset; // Przesuniêcie wzglêdem œrodka chmury
-    float scale;
-};
+static void checkHorizontalCollisionAndRevert(const glm::vec3& newPos, const glm::vec3& oldPos, const TableHitbox& t) {
+    // Obliczamy Y, na którym spoczywa³by œrodek jajka (0.7f to EGG_HALF_HEIGHT)
+    float restingCenterY = t.topY + EGG_HALF_HEIGHT;
 
-struct Cloud {
-    glm::vec3 position;
-    glm::vec3 velocity;
-    std::vector<CloudComponent> components;
-};
+    // 1. Zezwalamy na ruch horyzontalny, jeœli jajko jest wystarczaj¹co wysoko, aby spoczywaæ na blacie.
+    if (newPos.y > restingCenterY - 0.01f) {
+        return;
+    }
 
-std::vector<Cloud> clouds; // Wektor przechowuj¹cy wszystkie aktywne chmury
+    // 2. Je¿eli jajko jest ni¿ej (spada, skacze, jest na pod³odze) i wesz³o w XZ granicê sto³u,
+    // to dosz³o do próby penetracji bocznej lub tunelowania. Cofamy ruch X i Z.
+    if (isInsideXZ(newPos, t)) {
+        eggPosition.x = oldPos.x;
+        eggPosition.z = oldPos.z;
+    }
+}
+
+// Chmury
+struct CloudComponent { glm::vec3 offset; float scale; };
+struct Cloud { glm::vec3 position = glm::vec3(0.0f); glm::vec3 velocity = glm::vec3(0.0f); std::vector<CloudComponent> components; };
+std::vector<Cloud> clouds;
 float cloudSpawnTimer = 0.0f;
 
-
-
-
-// Funkcja do generowania losowej liczby zmiennoprzecinkowej w zakresie
-float randomFloat(float min, float max) {
+static float randomFloat(float min, float max) {
     return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
 }
 
-// Funkcja do tworzenia nowej chmury
-void spawnCloud() {
+static float localRandomFloat(std::mt19937& generator, float min, float max) {
+    std::uniform_real_distribution<float> dist(min, max);
+    return dist(generator);
+}
+
+// === ZMODYFIKOWANA FUNKCJA GENERUJ¥CA PÊKNIÊCIA ===
+void updateCrackGeometry(int currentCrackCount) {
+    crackVertices.clear();
+    std::mt19937 generator;
+
+    for (int i = 0; i < currentCrackCount; ++i) {
+        unsigned int initialSeed = 100 + i * 10;
+        generator.seed(initialSeed);
+
+        float theta = localRandomFloat(generator, 0.0f, glm::pi<float>());
+        float phi = localRandomFloat(generator, 0.0f, 2.0f * glm::pi<float>());
+
+        glm::vec3 currentPoint;
+        currentPoint.x = 0.5f * std::sin(theta) * std::cos(phi);
+        currentPoint.y = 0.7f * std::cos(theta);
+        currentPoint.z = 0.5f * std::sin(theta) * std::sin(phi);
+
+        int numSegments = 5 + i * 3;
+
+        for (int j = 0; j < numSegments; ++j) {
+            crackVertices.push_back(currentPoint.x);
+            crackVertices.push_back(currentPoint.y);
+            crackVertices.push_back(currentPoint.z);
+
+            // Zwiêkszony krok dla bardziej dramatycznego i rozleg³ego pêkniêcia
+            float thetaStep = localRandomFloat(generator, -0.3f, 0.3f);
+            float phiStep = localRandomFloat(generator, -0.3f, 0.3f);
+
+            theta = glm::clamp(theta + thetaStep, 0.0f, glm::pi<float>());
+            phi += phiStep;
+
+            glm::vec3 nextPoint;
+            nextPoint.x = 0.5f * std::sin(theta) * std::cos(phi);
+            nextPoint.y = 0.7f * std::cos(theta);
+            nextPoint.z = 0.5f * std::sin(theta) * std::sin(phi);
+
+            crackVertices.push_back(nextPoint.x);
+            crackVertices.push_back(nextPoint.y);
+            crackVertices.push_back(nextPoint.z);
+
+            currentPoint = nextPoint;
+        }
+    }
+
+    const void* dataPtr = crackVertices.empty() ? nullptr : crackVertices.data();
+    size_t dataSize = crackVertices.size() * sizeof(float);
+
+    glBindBuffer(GL_ARRAY_BUFFER, crackVBO);
+    glBufferData(GL_ARRAY_BUFFER, dataSize, dataPtr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+// ===============================================
+
+
+static void spawnCloud() {
     Cloud newCloud;
-    // Pozycja startowa chmury (daleko, z boku)
     newCloud.position = glm::vec3(randomFloat(-50.0f, 50.0f), randomFloat(10.0f, 20.0f), -70.0f);
-    // Prêdkoœæ chmury (wolno do przodu)
     newCloud.velocity = glm::vec3(0.0f, 0.0f, randomFloat(1.5f, 3.0f));
 
-    // Generowanie losowych "kawa³ków" chmury
-    int numComponents = rand() % 4 + 3; // Od 3 do 6 kul na chmurê
+    int numComponents = rand() % 4 + 3;
     for (int i = 0; i < numComponents; ++i) {
         CloudComponent component;
         component.offset = glm::vec3(randomFloat(-2.5f, 2.5f), randomFloat(-1.0f, 1.0f), randomFloat(-1.5f, 1.5f));
@@ -136,43 +191,41 @@ void spawnCloud() {
 }
 
 
-// NOWA FUNKCJA DO £ADOWANIA TEKSTURY
-unsigned int loadTexture(const char* path) {
+static unsigned int loadTexture(const char* path) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA; // Nasz plik PNG powinien mieæ RGBA (przezroczystoœæ)
+    if (data) {
+        GLenum format = 0;
+        if (nrComponents == 1) format = GL_RED;
+        else if (nrComponents == 3) format = GL_RGB;
+        else if (nrComponents == 4) format = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (format != 0) {
+            glBindTexture(GL_TEXTURE_2D, textureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else {
+            std::cout << "Blad ladowania tekstury: Nieznana liczba komponentow (" << nrComponents << ")" << std::endl;
+        }
     }
-    else
-    {
+    else {
         std::cout << "Blad ladowania tekstury: " << path << std::endl;
     }
     stbi_image_free(data);
     return textureID;
 }
 
-int main()
-{
+
+int main() {
     // Inicjalizacja GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -195,7 +248,6 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    // Domyœlnie startujemy z widocznym kursorem dla menu
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Blad inicjalizacji GLAD!" << std::endl;
@@ -203,60 +255,45 @@ int main()
     }
 
     glEnable(GL_DEPTH_TEST);
-
-    // Inicjalizacja generatora liczb losowych
     srand(static_cast<unsigned int>(time(0)));
 
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
 
-    // === INICJALIZACJA UI (NOWY KOD) ===
+    // === INICJALIZACJA UI ===
     uiShader = new Shader("ui_vertex.glsl", "ui_fragment.glsl");
-    // Ustaw macierz projekcji ortograficznej
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     uiShader->use();
     uiShader->setMat4("projection", projection);
-    uiShader->use(); // U¿yj ponownie, aby ustawiæ uniform
-    glUniform1i(glGetUniformLocation(uiShader->ID, "uiTexture"), 0);
+    uiShader->setInt("uiTexture", 0);
 
+    float width_ui = 500.0f;
+    float height_ui = 500.0f;
+    float x_pos = (SCR_WIDTH / 2.0f) - (width_ui / 2.0f);
+    float y_pos = (SCR_HEIGHT / 2.0f) - (height_ui / 2.0f);
 
-    // Definiujemy prostok¹t (quad) na dole ekranu
-    // Mo¿esz dostosowaæ te wartoœci, aby zmieniæ pozycjê napisu
-    float width = 500.0f;
-    float height = 500.0f;
-
-    // Teraz oblicz pozycjê na podstawie rozmiaru
-    float x_pos = (SCR_WIDTH / 2.0f) - (width / 2.0f);
-    float y_pos = (SCR_HEIGHT / 2.0f) - (height / 2.0f);
-
-    // x, y, tex_u, tex_v
     float uiVertices[] = {
-        x_pos,       y_pos + height,   0.0f, 1.0f,
-        x_pos,       y_pos,            0.0f, 0.0f,
-        x_pos + width, y_pos,            1.0f, 0.0f,
-
-        x_pos,       y_pos + height,   0.0f, 1.0f,
-        x_pos + width, y_pos,            1.0f, 0.0f,
-        x_pos + width, y_pos + height,   1.0f, 1.0f
+        x_pos,       y_pos + height_ui,   0.0f, 1.0f,
+        x_pos,       y_pos,               0.0f, 0.0f,
+        x_pos + width_ui, y_pos,             1.0f, 0.0f,
+        x_pos,       y_pos + height_ui,   0.0f, 1.0f,
+        x_pos + width_ui, y_pos,             1.0f, 0.0f,
+        x_pos + width_ui, y_pos + height_ui,   1.0f, 1.0f
     };
 
     glGenVertexArrays(1, &uiVAO);
     glGenBuffers(1, &uiVBO);
     glBindVertexArray(uiVAO);
     glBindBuffer(GL_ARRAY_BUFFER, uiVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(uiVertices), &uiVertices, GL_STATIC_DRAW);
-    // atrybut pozycji (vec2)
+    glBufferData(GL_ARRAY_BUFFER, sizeof(uiVertices), uiVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // atrybut tekstury (vec2)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glBindVertexArray(0); // Od³¹cz VAO
+    glBindVertexArray(0);
 
-    // Wczytaj teksturê menu
     menuTexture = loadTexture("menu_prompt.png");
-    // === KONIEC INICJALIZACJI UI ===
 
-    // === Konfiguracja JAJKA ===
+    // === Konfiguracja Geometrii (Jajko) ===
     std::vector<float> eggVertices;
     std::vector<unsigned int> eggIndices;
     int eggSegments = 40;
@@ -264,12 +301,9 @@ int main()
         float theta = glm::pi<float>() * i / eggSegments;
         for (int j = 0; j <= eggSegments; ++j) {
             float phi = 2 * glm::pi<float>() * j / eggSegments;
-            float x = 0.5f * sin(theta) * cos(phi);
-            float y = 0.7f * cos(theta);
-            float z = 0.5f * sin(theta) * sin(phi);
-            eggVertices.push_back(x);
-            eggVertices.push_back(y);
-            eggVertices.push_back(z);
+            eggVertices.push_back(0.5f * std::sin(theta) * std::cos(phi));
+            eggVertices.push_back(0.7f * std::cos(theta));
+            eggVertices.push_back(0.5f * std::sin(theta) * std::sin(phi));
         }
     }
     for (int i = 0; i < eggSegments; ++i) {
@@ -290,25 +324,24 @@ int main()
     glGenBuffers(1, &eggEBO);
     glBindVertexArray(eggVAO);
     glBindBuffer(GL_ARRAY_BUFFER, eggVBO);
-    glBufferData(GL_ARRAY_BUFFER, eggVertices.size() * sizeof(float), &eggVertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, eggVertices.size() * sizeof(float), eggVertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eggEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, eggIndices.size() * sizeof(unsigned int), &eggIndices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, eggIndices.size() * sizeof(unsigned int), eggIndices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // === Konfiguracja POD£OGI ===
-    float floorVertices[] = { 50.0f, -0.7f,  50.0f, -50.0f, -0.7f,  50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f,  50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f, -50.0f };
+    // === Konfiguracja Geometrii (Pod³oga, Szeœcian, Pêkniêcia, Chmury) ===
+    float floorVertices[] = { 50.0f, -0.7f, 50.0f, -50.0f, -0.7f, 50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f, 50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f, -50.0f };
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO);
     glGenBuffers(1, &floorVBO);
     glBindVertexArray(floorVAO);
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), &floorVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // === Konfiguracja SZEŒCIANU ===
-    float cubeVertices[] = { -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f, -0.5f, -0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f,  0.5f,  0.5f,  0.5f, -0.5f,  0.5f,  0.5f, -0.5f,  0.5f, -0.5f };
+    float cubeVertices[] = { -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f };
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &cubeVBO);
@@ -318,17 +351,24 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // === Konfiguracja geometrii dla KULI (chmury) ===
+    glGenVertexArrays(1, &crackVAO);
+    glGenBuffers(1, &crackVBO);
+    glBindVertexArray(crackVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, crackVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
     std::vector<float> sphereVertices;
     std::vector<unsigned int> sphereIndices;
     int segments = 20;
     for (int i = 0; i <= segments; ++i) {
+        float theta = glm::pi<float>() * i / segments;
         for (int j = 0; j <= segments; ++j) {
-            float theta = glm::pi<float>() * i / segments;
             float phi = 2 * glm::pi<float>() * j / segments;
-            sphereVertices.push_back(cos(phi) * sin(theta));
-            sphereVertices.push_back(cos(theta));
-            sphereVertices.push_back(sin(phi) * sin(theta));
+            sphereVertices.push_back(std::cos(phi) * std::sin(theta));
+            sphereVertices.push_back(std::cos(theta));
+            sphereVertices.push_back(std::sin(phi) * std::sin(theta));
         }
     }
     for (int i = 0; i < segments; ++i) {
@@ -349,14 +389,14 @@ int main()
     glGenBuffers(1, &sphereEBO);
     glBindVertexArray(sphereVAO);
     glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
-    glBufferData(GL_ARRAY_BUFFER, sphereVertices.size() * sizeof(float), &sphereVertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sphereVertices.size() * sizeof(float), sphereVertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), sphereIndices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // === £ADOWANIE MODELU 3D (np. œciana wspinaczkowa) ===
-    Model tableModel("models/table.obj");  
+    // === £ADOWANIE MODELU 3D ===
+    Model tableModel("models/table.obj");
 
     // Pêtla renderowania
     while (!glfwWindowShouldClose(window))
@@ -365,30 +405,66 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // Zapis pozycji przed ruchem X/Z
         previousEggPosition = eggPosition;
+
         processInput(window);
 
-        std::cout << "Egg: x=" << eggPosition.x
-            << " y=" << eggPosition.y
-            << " z=" << eggPosition.z << std::endl;
+        // === KOREKCJA KOLIZJI HORYZONTALNEJ ===
+        if (currentState == GAME_STATE_PLAYING) {
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table1);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table2);
+        }
 
-        // === FIZYKA I LOGIKA GRY (TYLKO W STANIE 'PLAYING') ===
+        // === FIZYKA I LOGIKA GRY ===
         if (currentState == GAME_STATE_PLAYING)
         {
             float oldY = eggPosition.y;
 
-            // --- GRAWITACJA ---
+            if (velocityY >= 0.0f) {
+                // maxFallHeight powinien œledziæ najwy¿szy Y œrodka osi¹gniêty od ostatniego l¹dowania
+                maxFallHeight = eggPosition.y > maxFallHeight ? eggPosition.y : maxFallHeight;
+            }
+
+            // Grawitacja
             velocityY += GRAVITY * deltaTime;
             eggPosition.y += velocityY * deltaTime;
 
             bool standingOnSomething = false;
 
-            // === STO£Y – l¹dowanie TYLKO z góry ===
-            // STÓ£ 1
+            auto checkLandingAndDamage = [&](float landingY) {
+
+                // Dystans upadku to ró¿nica miêdzy najwy¿sz¹ osi¹gniêt¹ wysokoœci¹ (œrodek)
+                // a wysokoœci¹ œrodka po wyl¹dowaniu (landingY). 
+                float fallDistance = maxFallHeight - landingY;
+
+                // Upewniamy siê, ¿e nie ma obra¿eñ, jeœli l¹dujemy na wy¿szej powierzchni
+                if (fallDistance < 0.0f) {
+                    fallDistance = 0.0f;
+                }
+
+                if (fallDistance >= CRASH_HEIGHT_THRESHOLD) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = currentFrame;
+                    crackCount = MAX_CRACKS;
+                }
+                else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) {
+                    crackCount = glm::min(crackCount + 1, MAX_CRACKS);
+                    if (crackCount >= MAX_CRACKS) {
+                        currentState = GAME_STATE_CRASHED;
+                        crashStartTime = currentFrame;
+                    }
+                    updateCrackGeometry(crackCount);
+                }
+                // Resetowanie wysokoœci maksymalnego upadku do aktualnej wysokoœci spoczynku
+                maxFallHeight = landingY;
+                };
+
+            // Kolizje ze sto³ami (Wertykalne)
             if (isInsideXZ(eggPosition, table1)) {
                 float desiredY1 = table1.topY + EGG_HALF_HEIGHT;
-
-                if (oldY >= desiredY1 - 0.05f && eggPosition.y <= desiredY1 && velocityY <= 0.0f) {
+                if (oldY >= desiredY1 - 0.001f && eggPosition.y <= desiredY1 && velocityY <= 0.0f) {
+                    checkLandingAndDamage(desiredY1);
                     eggPosition.y = desiredY1;
                     velocityY = 0.0f;
                     canJump = true;
@@ -396,11 +472,10 @@ int main()
                 }
             }
 
-            // STÓ£ 2
             if (!standingOnSomething && isInsideXZ(eggPosition, table2)) {
                 float desiredY2 = table2.topY + EGG_HALF_HEIGHT;
-
-                if (oldY >= desiredY2 - 0.05f && eggPosition.y <= desiredY2 && velocityY <= 0.0f) {
+                if (oldY >= desiredY2 - 0.001f && eggPosition.y <= desiredY2 && velocityY <= 0.0f) {
+                    checkLandingAndDamage(desiredY2);
                     eggPosition.y = desiredY2;
                     velocityY = 0.0f;
                     canJump = true;
@@ -408,104 +483,123 @@ int main()
                 }
             }
 
-            // === ZIEMIA – jeœli nie stoisz na ¿adnym stole ===
+            // Kolizja z ziemi¹
             if (!standingOnSomething) {
                 if (eggPosition.y < 0.0f) {
+                    checkLandingAndDamage(0.0f);
                     eggPosition.y = 0.0f;
                     velocityY = 0.0f;
                     canJump = true;
                 }
             }
 
-            // --- CHMURY (jak mia³eœ) ---
+            // Chmury
             cloudSpawnTimer += deltaTime;
             if (cloudSpawnTimer > 2.0f && clouds.size() < 15) {
                 spawnCloud();
                 cloudSpawnTimer = 0.0f;
             }
 
-            for (int i = 0; i < clouds.size(); ++i) {
-                clouds[i].position += clouds[i].velocity * deltaTime;
-                if (clouds[i].position.z > 50.0f) {
-                    clouds.erase(clouds.begin() + i);
-                    i--;
+            for (auto it = clouds.begin(); it != clouds.end(); ) {
+                it->position += it->velocity * deltaTime;
+                if (it->position.z > 50.0f) {
+                    it = clouds.erase(it);
+                }
+                else {
+                    ++it;
                 }
             }
         }
+        // === KONIEC LOGIKI GRY ===
 
 
-
-		// Renderowanie
-
-        glClearColor(0.53f, 0.81f, 0.92f, 1.0f); // Ta linijka zostaje bez zmian
-
+        // === RENDEROWANIE ===
+        glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ourShader.use();
-
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 150.0f);
-
         glm::mat4 view;
-        if (currentState == GAME_STATE_PLAYING)
-        {
-            // Kamera pod¹¿aj¹ca za graczem
-            glm::vec3 cameraPos = eggPosition - cameraFront * cameraDistance;
 
-            // Twoja istniej¹ca poprawka kamery
+        if (currentState == GAME_STATE_PLAYING || currentState == GAME_STATE_CRASHED) {
+            glm::vec3 cameraPos = eggPosition - cameraFront * cameraDistance;
             const float minCameraHeight = -0.5f;
-            if (cameraPos.y < minCameraHeight)
-            {
-                cameraPos.y = minCameraHeight;
-            }
+            if (cameraPos.y < minCameraHeight) cameraPos.y = minCameraHeight;
             view = glm::lookAt(cameraPos, eggPosition, cameraUp);
         }
-        else // currentState == GAME_STATE_MENU
-        {
-            // Statyczna kamera w menu, patrz¹ca na scenê
-            glm::vec3 menuCameraPos = glm::vec3(0.0f, 5.0f, 15.0f); // Mo¿esz dostosowaæ
-            // Patrzymy na platformê startow¹ (szeœcian jest na y=-0.2)
+        else {
+            glm::vec3 menuCameraPos = glm::vec3(0.0f, 5.0f, 15.0f);
             view = glm::lookAt(menuCameraPos, glm::vec3(0.0f, 2.0f, 0.0f), cameraUp);
         }
 
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
-       
-
-        // Rysowanie pod³ogi
+        // Pod³oga
         glBindVertexArray(floorVAO);
         ourShader.setInt("useTexture", 0);
         ourShader.setMat4("model", glm::mat4(1.0f));
         ourShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 0.1f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // === STO£Y ===
+        // Sto³y
         ourShader.setInt("useTexture", 1);
-
-        // STÓ£ 1 (jak do tej pory, na œrodku)
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -0.75f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
-
-        // STÓ£ 2 (np. w prawo, ¿eby mo¿na by³o doskoczyæ)
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f)); // <- przesuniêty w X
-        model = glm::scale(model, glm::vec3(1.0f));
+        model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
 
-        // Rysowanie jajka
-        glBindVertexArray(eggVAO);
-        ourShader.setInt("useTexture", 0);
-        model = glm::translate(glm::mat4(1.0f), eggPosition);
-        ourShader.setMat4("model", model);
-        ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f));
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(eggIndices.size()), GL_UNSIGNED_INT, 0);
+        // Jajko / Fragmenty
+        if (currentState != GAME_STATE_CRASHED) {
+            glBindVertexArray(eggVAO);
+            ourShader.setInt("useTexture", 0);
+            model = glm::translate(glm::mat4(1.0f), eggPosition);
+            ourShader.setMat4("model", model);
+            ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f));
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(eggIndices.size()), GL_UNSIGNED_INT, 0);
 
-        // Rysowanie chmur
+            // Pêkniêcia
+            if (crackCount > 0 && !crackVertices.empty()) {
+                glBindVertexArray(crackVAO);
+                ourShader.setMat4("model", model);
+                ourShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+                glLineWidth(3.0f);
+                glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(crackVertices.size() / 3));
+                glLineWidth(1.0f);
+                glBindVertexArray(0);
+            }
+        }
+        else { // Animacja rozbicia
+            float timeElapsed = currentFrame - crashStartTime;
+            float ratio = timeElapsed / CRASH_ANIMATION_DURATION;
+
+            if (ratio < 1.0f) {
+                glBindVertexArray(cubeVAO);
+                ourShader.setInt("useTexture", 0);
+                ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f));
+
+                for (int i = 0; i < 5; ++i) {
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::translate(model, eggPosition);
+                    float explosionForce = 3.0f * (1.0f - ratio);
+                    glm::vec3 fragmentOffset = fragments[i] * explosionForce * timeElapsed;
+                    fragmentOffset.y -= 5.0f * timeElapsed * timeElapsed;
+                    model = glm::translate(model, fragmentOffset);
+                    float scaleFactor = glm::mix(0.1f, 0.0f, ratio);
+                    model = glm::scale(model, glm::vec3(scaleFactor));
+                    ourShader.setMat4("model", model);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+                glBindVertexArray(0);
+            }
+        }
+
+        // Chmury
         glBindVertexArray(sphereVAO);
         ourShader.setInt("useTexture", 0);
         ourShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -520,26 +614,26 @@ int main()
             }
         }
 
-        // === RENDEROWANIE UI 2D (NOWY KOD) ===
-// Musimy w³¹czyæ blending (przezroczystoœæ) i wy³¹czyæ test g³êbi
+        // Rysowanie UI
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST); // UI jest zawsze na wierzchu
+        glDisable(GL_DEPTH_TEST);
 
-        if (currentState == GAME_STATE_MENU)
-        {
+        if (currentState == GAME_STATE_MENU || currentState == GAME_STATE_CRASHED) {
             uiShader->use();
             glBindVertexArray(uiVAO);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, menuTexture);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
+
+            if (currentState == GAME_STATE_CRASHED) {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
         }
 
-        // Przywróæ stany OpenGL
         glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST); // W³¹cz z powrotem dla sceny 3D
-        // === KONIEC RENDEROWANIA UI ===
+        glEnable(GL_DEPTH_TEST);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -553,6 +647,8 @@ int main()
     glDeleteBuffers(1, &floorVBO);
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteBuffers(1, &cubeVBO);
+    glDeleteVertexArrays(1, &crackVAO);
+    glDeleteBuffers(1, &crackVBO);
     glDeleteVertexArrays(1, &sphereVAO);
     glDeleteBuffers(1, &sphereVBO);
     glDeleteBuffers(1, &sphereEBO);
@@ -569,23 +665,26 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    // --- LOGIKA DLA MENU ---
-    if (currentState == GAME_STATE_MENU)
-    {
-        // Jeœli wciœniêto Enter, przejdŸ do stanu gry
-        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-        {
+    if (currentState == GAME_STATE_MENU) {
+        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
             currentState = GAME_STATE_PLAYING;
-            // Ukryj kursor i zablokuj go w oknie
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            // Zresetuj pozycjê myszy, aby unikn¹æ "skoku" kamery
             firstMouse = true;
         }
     }
-    // --- LOGIKA DLA GRY ---
-    else if (currentState == GAME_STATE_PLAYING)
-    {
-        // Ca³a dotychczasowa obs³uga ruchu
+    else if (currentState == GAME_STATE_CRASHED) {
+        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+            currentState = GAME_STATE_MENU;
+            eggPosition = glm::vec3(0.0f, 0.0f, 5.0f);
+            velocityY = 0.0f;
+            canJump = true;
+            maxFallHeight = 0.0f;
+            crackCount = 0;
+            updateCrackGeometry(0);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+    }
+    else if (currentState == GAME_STATE_PLAYING) {
         const float WALK_SPEED = 2.5f;
         const float SPRINT_SPEED = 5.0f;
         float currentSpeed = WALK_SPEED;
@@ -606,57 +705,47 @@ void processInput(GLFWwindow* window) {
             velocityY = JUMP_FORCE;
             canJump = false;
         }
-
-        // === BLOKOWANIE WEJŒCIA BOKIEM NA STO£Y ===
-        bool insideTable1XZ = isInsideXZ(eggPosition, table1);
-        bool insideTable2XZ = isInsideXZ(eggPosition, table2);
-
-        // je¿eli próbujemy wejœæ w hitbox sto³u, bêd¹c poni¿ej jego blatu,
-        // cofamy XZ – trzeba u¿yæ skoku, ¿eby znaleŸæ siê nad sto³em
-        if (insideTable1XZ && eggPosition.y < table1.topY + EGG_HALF_HEIGHT - 0.05f) {
-            eggPosition.x = previousEggPosition.x;
-            eggPosition.z = previousEggPosition.z;
-        }
-        if (insideTable2XZ && eggPosition.y < table2.topY + EGG_HALF_HEIGHT - 0.05f) {
-            eggPosition.x = previousEggPosition.x;
-            eggPosition.z = previousEggPosition.z;
-        }
     }
-}
-
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
-    // Ignoruj ruch myszy, jeœli nie jesteœmy w grze
-    if (currentState != GAME_STATE_PLAYING) {
-        return;
-    }
-
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-    if (firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-    yaw += xoffset;
-    pitch += yoffset;
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(front);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
     glViewport(0, 0, width, height);
+    if (uiShader) {
+        glm::mat4 projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+        uiShader->use();
+        uiShader->setMat4("projection", projection);
+    }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (currentState != GAME_STATE_PLAYING) return;
+
+    if (firstMouse) {
+        lastX = static_cast<float>(xpos);
+        lastY = static_cast<float>(ypos);
+        firstMouse = false;
+    }
+
+    float xoffset = static_cast<float>(xpos) - lastX;
+    float yoffset = lastY - static_cast<float>(ypos);
+    lastX = static_cast<float>(xpos);
+    lastY = static_cast<float>(ypos);
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f) pitch = 89.0f;
+    if (pitch < -89.0f) pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+    direction.y = std::sin(glm::radians(pitch));
+    direction.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
 }
