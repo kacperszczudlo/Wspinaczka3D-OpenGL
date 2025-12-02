@@ -37,7 +37,8 @@ Shader* uiShader = nullptr;
 unsigned int uiVAO = 0, uiVBO = 0;
 unsigned int menuTexture = 0;
 
-glm::vec3 eggPosition = glm::vec3(0.0f, 0.0f, 5.0f);
+// EDYCJA: Startowa pozycja podniesiona na 0.7 (bo podloga jest na 0.0, a srodek jajka to 0.7)
+glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
 glm::vec3 previousEggPosition = eggPosition;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -81,8 +82,9 @@ struct TableHitbox {
     float topY;
 };
 
-TableHitbox table1 = { -0.8f, 0.8f, -0.8f, 0.8f, -0.02f };
-TableHitbox table2 = { 2.12f, 3.85f, -0.84f, 0.86f, 0.75f };
+// EDYCJA: Hitboxy podniesione o +0.7, aby pasowaly do nowej podlogi na 0.0
+TableHitbox table1 = { -0.8f, 0.8f, -0.8f, 0.8f, 0.68f }; // Bylo -0.02f
+TableHitbox table2 = { 2.12f, 3.85f, -0.84f, 0.86f, 1.45f }; // Bylo 0.75f
 
 static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
     return pos.x > t.minX && pos.x < t.maxX &&
@@ -331,7 +333,8 @@ int main() {
     glEnableVertexAttribArray(0);
 
     // === Konfiguracja Geometrii (Pod³oga, Szeœcian, Pêkniêcia, Chmury) ===
-    float floorVertices[] = { 50.0f, -0.7f, 50.0f, -50.0f, -0.7f, 50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f, 50.0f, -50.0f, -0.7f, -50.0f, 50.0f, -0.7f, -50.0f };
+    // EDYCJA: Poziom podlogi ustawiony na 0.0f (zamiast -0.7f)
+    float floorVertices[] = { 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, -50.0f };
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO);
     glGenBuffers(1, &floorVBO);
@@ -483,11 +486,11 @@ int main() {
                 }
             }
 
-            // Kolizja z ziemi¹
+            // Kolizja z ziemi¹ (EDYCJA: warunek zmieniony na 0.7f, bo to srodek jajka)
             if (!standingOnSomething) {
-                if (eggPosition.y < 0.0f) {
-                    checkLandingAndDamage(0.0f);
-                    eggPosition.y = 0.0f;
+                if (eggPosition.y < 0.7f) {
+                    checkLandingAndDamage(0.7f); // Przekazujemy prawidlowa wysokosc srodka
+                    eggPosition.y = 0.7f;        // Reset pozycji do wysokosci "na podlodze"
                     velocityY = 0.0f;
                     canJump = true;
                 }
@@ -542,14 +545,14 @@ int main() {
         ourShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 0.1f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Sto³y
+        // Sto³y (EDYCJA: Przesuniecie +0.7 w gore)
         ourShader.setInt("useTexture", 1);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.75f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -0.05f, 0.0f)); // Bylo -0.75f
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(3.0f, 0.7f, 0.0f));   // Bylo 0.0f
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
@@ -675,7 +678,8 @@ void processInput(GLFWwindow* window) {
     else if (currentState == GAME_STATE_CRASHED) {
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
             currentState = GAME_STATE_MENU;
-            eggPosition = glm::vec3(0.0f, 0.0f, 5.0f);
+            // EDYCJA: Reset na 0.7f (na podlogi)
+            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
             velocityY = 0.0f;
             canJump = true;
             maxFallHeight = 0.0f;
