@@ -1,0 +1,29 @@
+# Rampa pochylona o ok. 11.3 stopnia (20% nachylenia)
+mtllib ramp.mtl
+
+o Ramp_Element
+g Ramp_Element
+usemtl ramp_mat
+s 1
+
+# 4 wierzchołki: 4 metry długości w Z, 2 metry szerokości w X
+# Wierzchołki: (x, y, z)
+# Kąt 11.3 (współczynnik y ~ 0.2 dla każdego metra w z)
+
+v -1.0000 0.0000 0.0000   # lewy tylny dół
+v 1.0000 0.0000 0.0000    # prawy tylny dół
+v 1.0000 0.8000 4.0000    # prawy przedni góra (4m w Z * 0.2 nachylenia)
+v -1.0000 0.8000 4.0000   # lewy przedni góra
+
+# normala (wartość wektora normalnego powierzchni)
+vn 0.0000 0.9806 -0.1961
+
+# Współrzędne tekstury (UV)
+vt 0.0000 0.0000
+vt 1.0000 0.0000
+vt 1.0000 1.0000
+vt 0.0000 1.0000
+
+# Definicja powierzchni (kwadrat)
+# Format: v/vt/vn
+f 1/1/1 2/2/1 3/3/1 4/4/1
