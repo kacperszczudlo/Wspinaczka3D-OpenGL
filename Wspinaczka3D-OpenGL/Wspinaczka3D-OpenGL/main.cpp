@@ -120,9 +120,16 @@ glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0
 const float EGG_HALF_HEIGHT = 0.7f; // Po³owa wysokoœci jajka (wa¿ne do kolizji)
 
 // === DEFINICJE OBIEKTÓW (HITBOXY) ===
-TableHitbox table1 = { -0.8f, 0.8f, -0.8f, 0.8f, 0.68f };
-TableHitbox table2 = { 2.12f, 3.85f, -0.84f, 0.86f, 1.45f };
+// Stó³ 1 
+TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f };
 
+// Stó³ 2 
+
+TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f };
+
+// Stó³ 3 
+
+TableHitbox table3 = { 3.63f, 5.37f, -0.84f, 0.86f, 1.45f };
 // Rampa (schody):
 // startY = 2.05f (dó³), endY = 2.85f (góra)
 RampHitbox ramp = { 5.0f, 9.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
@@ -500,6 +507,7 @@ int main() {
         if (currentState == GAME_STATE_PLAYING) {
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table1);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table2);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table3);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, ramp_horizontal_box);
         }
 
@@ -587,6 +595,25 @@ int main() {
                     // L¹dowanie
                     maxFallHeight = desiredY2;
                     eggPosition.y = desiredY2;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                }
+            }
+            // Sprawdzamy stó³ 3
+            if (!standingOnSomething && isInsideXZ(eggPosition, table3)) {
+                float desiredY3 = table3.topY + EGG_HALF_HEIGHT;
+                if (oldY >= desiredY3 - 0.001f && eggPosition.y <= desiredY3 && velocityY <= 0.0f) {
+                    float fallDistance = maxFallHeight - desiredY3;
+                    if (fallDistance < 0.0f) { fallDistance = 0.0f; }
+
+                    // Logika uszkodzeñ - identyczna jak dla pozosta³ych
+                    if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
+                    else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) { crackCount = glm::min(crackCount + 1, MAX_CRACKS); if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } updateCrackGeometry(crackCount); }
+
+                    // L¹dowanie
+                    maxFallHeight = desiredY3;
+                    eggPosition.y = desiredY3;
                     velocityY = 0.0f;
                     canJump = true;
                     standingOnSomething = true;
@@ -689,19 +716,24 @@ int main() {
 
         // Stó³ 1
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.05f, 0.0f));
+        model = glm::translate(model, glm::vec3(-2.0f, -0.05f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
         // Stó³ 2
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, 0.7f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.77f, 0.0f)); // Y = 0.77f, Poprawne dla Y=1.45f
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+        // Stó³ 3 (Blat 1.45f, X: 4.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(4.5f, 0.77f, 0.0f)); // X=4.5f, Y=0.77f
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
         // --- RYSOWANIE RAMPY ---
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(5.0f, 2.05f, 0.0f));
+        model = glm::translate(model, glm::vec3(10.0f, 2.05f, 0.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // Obrót
         ourShader.setMat4("model", model);
         rampModel.Draw(ourShader);
