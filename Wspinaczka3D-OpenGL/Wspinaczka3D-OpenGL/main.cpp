@@ -120,14 +120,38 @@ glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0
 const float EGG_HALF_HEIGHT = 0.7f; // Po³owa wysokoœci jajka (wa¿ne do kolizji)
 
 // === DEFINICJE OBIEKTÓW (HITBOXY) ===
-TableHitbox table1 = { -0.8f, 0.8f, -0.8f, 0.8f, 0.68f };
-TableHitbox table2 = { 2.12f, 3.85f, -0.84f, 0.86f, 1.45f };
+// Stó³ 1 (Wymiary 1.6x1.6)
+TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f }; // Œrodek X=-2.0f
 
-// Rampa (schody):
-// startY = 2.05f (dó³), endY = 2.85f (góra)
-RampHitbox ramp = { 5.0f, 9.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
+// Stó³ 2 (Wymiary 1.6x1.6)
+TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=0.0f
+
+// Stó³ 3 (Wymiary 1.6x1.6)
+TableHitbox table3 = { 1.7f, 3.3f, -0.8f, 0.8f, 1.45f }; // Œrodek X=2.5f
+
+// Stó³ 4 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table4 = { 4.2f, 5.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=5.0f, Z=-1.5f
+
+// Stó³ 5 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table5 = { 6.7f, 8.3f, 0.7f, 2.3f, 1.45f }; // Œrodek X=7.5f, Z=1.5f
+
+// Stó³ 6 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table6 = { 9.2f, 10.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=10.0f, Z=-1.5f
+
+// Stó³ 7 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table7 = { 11.7f, 13.3f, 0.7f, 2.3f, 1.45f }; // Œrodek X=12.5f, Z=1.5f
+
+// Stó³ 8 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=15.0f, Z=-1.5f
+
+// Stó³ 9 (Podejœcie, Wymiary 1.6x1.6)
+TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=18.0f, Z=0.0f
+
+
+// Rampa (Przesuniêta na X=20.0f. D³ugoœæ 4m do X=24.0f)
+RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
 // Hitbox boczny rampy (¿eby nie przenikaæ przez jej boki na dole)
-TableHitbox ramp_horizontal_box = { 5.0f, 9.0f, -0.9f, 0.9f, 2.05f };
+TableHitbox ramp_horizontal_box = { 20.0f, 24.0f, -0.9f, 0.9f, 2.05f };
 
 // Chmury
 std::vector<Cloud> clouds;
@@ -500,6 +524,13 @@ int main() {
         if (currentState == GAME_STATE_PLAYING) {
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table1);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table2);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table3);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table4); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table5); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table6); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table7); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table8); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table9); // NOWY STÓ£
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, ramp_horizontal_box);
         }
 
@@ -574,24 +605,39 @@ int main() {
                 }
             }
 
-            // Sprawdzamy stó³ 2
-            if (!standingOnSomething && isInsideXZ(eggPosition, table2)) {
-                float desiredY2 = table2.topY + EGG_HALF_HEIGHT;
-                if (oldY >= desiredY2 - 0.001f && eggPosition.y <= desiredY2 && velocityY <= 0.0f) {
-                    float fallDistance = maxFallHeight - desiredY2;
-                    if (fallDistance < 0.0f) { fallDistance = 0.0f; }
-                    // Logika uszkodzeñ
-                    if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
-                    else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) { crackCount = glm::min(crackCount + 1, MAX_CRACKS); if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } updateCrackGeometry(crackCount); }
+            // Pozosta³e sto³y (2, 3, 4, 5, 6, 7, 8, 9) maj¹ blat 1.45f
+            float desiredY_high_tables = 1.45f + EGG_HALF_HEIGHT;
 
-                    // L¹dowanie
-                    maxFallHeight = desiredY2;
-                    eggPosition.y = desiredY2;
-                    velocityY = 0.0f;
-                    canJump = true;
-                    standingOnSomething = true;
+            // --- FUNKCJA WSPÓLNA DLA WYSOKICH STO£ÓW ---
+            auto checkHighTableCollision = [&](const TableHitbox& t) {
+                if (!standingOnSomething && isInsideXZ(eggPosition, t)) {
+                    if (oldY >= desiredY_high_tables - 0.001f && eggPosition.y <= desiredY_high_tables && velocityY <= 0.0f) {
+                        float fallDistance = maxFallHeight - desiredY_high_tables;
+                        if (fallDistance < 0.0f) { fallDistance = 0.0f; }
+
+                        // Logika uszkodzeñ
+                        if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
+                        else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) { crackCount = glm::min(crackCount + 1, MAX_CRACKS); if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } updateCrackGeometry(crackCount); }
+
+                        // L¹dowanie
+                        maxFallHeight = desiredY_high_tables;
+                        eggPosition.y = desiredY_high_tables;
+                        velocityY = 0.0f;
+                        canJump = true;
+                        standingOnSomething = true;
+                    }
                 }
-            }
+                };
+
+            // Sprawdzamy wszystkie sto³y o wysokoœci 1.45f
+            checkHighTableCollision(table2);
+            checkHighTableCollision(table3);
+            checkHighTableCollision(table4); 
+            checkHighTableCollision(table5); 
+            checkHighTableCollision(table6); 
+            checkHighTableCollision(table7); 
+            checkHighTableCollision(table8); 
+            checkHighTableCollision(table9); 
 
             // === KOLIZJA Z ZIEMI¥ (Pod³oga na 0.0f) ===
             if (!standingOnSomething) {
@@ -685,24 +731,66 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // --- RYSOWANIE STO£ÓW ---
-        ourShader.setInt("useTexture", 1); // U¿ycie tekstury drewna (jeœli za³adowana)
+        ourShader.setInt("useTexture", 1);
 
-        // Stó³ 1
+        // Stó³ 1 (Blat 0.68f, Œrodek X: -2.0f)
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -0.05f, 0.0f));
+        model = glm::translate(model, glm::vec3(-2.0f, -0.05f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // Stó³ 2
+        // Stó³ 2 (Blat 1.45f, Œrodek X: 0.0f)
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(3.0f, 0.7f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.77f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // --- RYSOWANIE RAMPY ---
+        // Stó³ 3 (Blat 1.45f, Œrodek X: 2.5f)
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(5.0f, 2.05f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // Obrót
+        model = glm::translate(model, glm::vec3(2.5f, 0.77f, 0.0f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 4 (Lewo, Œrodek X: 5.0f, Z: -1.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(5.0f, 0.77f, -1.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 5 (Prawo, Œrodek X: 7.5f, Z: 1.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(7.5f, 0.77f, 1.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 6 (Lewo, Œrodek X: 10.0f, Z: -1.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(10.0f, 0.77f, -1.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 7 (Prawo, Œrodek X: 12.5f, Z: 1.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(12.5f, 0.77f, 1.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 8 (Lewo, Œrodek X: 15.0f, Z: -1.5f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(15.0f, 0.77f, -1.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // Stó³ 9 (Podejœcie, Œrodek X: 18.0f, Z: 0.0f)
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(18.0f, 0.77f, 0.0f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
+        // --- RYSOWANIE RAMPY (Nowa pozycja startowa X=20.0f) ---
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(20.0f, 2.05f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         rampModel.Draw(ourShader);
 
