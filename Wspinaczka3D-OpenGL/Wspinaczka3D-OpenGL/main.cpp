@@ -120,43 +120,33 @@ glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0
 const float EGG_HALF_HEIGHT = 0.7f; // Po³owa wysokoœci jajka (wa¿ne do kolizji)
 
 // === DEFINICJE OBIEKTÓW (HITBOXY) ===
-// === DEFINICJE OBIEKTÓW (HITBOXY) ===
+// Stó³ 1 (Wymiary 1.6x1.6)
+TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f }; // Œrodek X=-2.0f
 
-// Stó³ 1 (Start)
-// Blat: 0.68f | Œrodek X: -2.0f
-TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f };
+// Stó³ 2 (Wymiary 1.6x1.6)
+TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=0.0f
 
-// Stó³ 2 (Pierwszy skok)
-// Blat: 1.45f | Œrodek X: 0.0f
-TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f };
+// Stó³ 3 (Wymiary 1.6x1.6)
+TableHitbox table3 = { 1.7f, 3.3f, -0.8f, 0.8f, 1.45f }; // Œrodek X=2.5f
 
-// Stó³ 3 (Pocz¹tek drogi)
-// Blat: 1.45f | Œrodek X: 2.5f (skok z 0.8f na 1.7f = 0.9m przerwy)
-TableHitbox table3 = { 1.7f, 3.3f, -0.8f, 0.8f, 1.45f };
+// Stó³ 4 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table4 = { 4.2f, 5.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=5.0f, Z=-1.5f
 
-// Stó³ 4 (Lewo)
-// Blat: 1.45f | Œrodek X: 5.0f | Œrodek Z: -1.5f
-TableHitbox table4 = { 4.2f, 5.8f, -2.3f, -0.7f, 1.45f };
+// Stó³ 5 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table5 = { 6.7f, 8.3f, 0.7f, 2.3f, 1.45f }; // Œrodek X=7.5f, Z=1.5f
 
-// Stó³ 5 (Prawo)
-// Blat: 1.45f | Œrodek X: 7.5f | Œrodek Z: 1.5f
-TableHitbox table5 = { 6.7f, 8.3f, 0.7f, 2.3f, 1.45f };
+// Stó³ 6 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table6 = { 9.2f, 10.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=10.0f, Z=-1.5f
 
-// Stó³ 6 (Lewo)
-// Blat: 1.45f | Œrodek X: 10.0f | Œrodek Z: -1.5f
-TableHitbox table6 = { 9.2f, 10.8f, -2.3f, -0.7f, 1.45f };
+// Stó³ 7 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table7 = { 11.7f, 13.3f, 0.7f, 2.3f, 1.45f }; // Œrodek X=12.5f, Z=1.5f
 
-// Stó³ 7 (Prawo)
-// Blat: 1.45f | Œrodek X: 12.5f | Œrodek Z: 1.5f
-TableHitbox table7 = { 11.7f, 13.3f, 0.7f, 2.3f, 1.45f };
+// Stó³ 8 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=15.0f, Z=-1.5f
 
-// Stó³ 8 (Lewo)
-// Blat: 1.45f | Œrodek X: 15.0f | Œrodek Z: -1.5f
-TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f };
+// Stó³ 9 (Podejœcie, Wymiary 1.6x1.6)
+TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=18.0f, Z=0.0f
 
-// Stó³ 9 (Podejœcie do rampy)
-// Blat: 1.45f | Œrodek X: 18.0f | Œrodek Z: 0.0f
-TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f };
 
 // Rampa (Przesuniêta na X=20.0f. D³ugoœæ 4m do X=24.0f)
 RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
