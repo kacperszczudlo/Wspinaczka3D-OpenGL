@@ -6,11 +6,11 @@ in vec2 TexCoords;
 
 uniform vec3 objectColor;
 uniform sampler2D texture_diffuse1;
-uniform bool useTexture;
+uniform int useTexture;
 
 void main()
 {
-    if (useTexture)
+    if (useTexture == 1)
     {
         FragColor = texture(texture_diffuse1, TexCoords);
     }

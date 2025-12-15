@@ -21,6 +21,13 @@
 // 1. STRUKTURY DANYCH
 // ==========================================
 
+// Struktura opisuj¹ca pu³apkê z kolcami (NOWE)
+struct TrapHitbox {
+    float minX, maxX;
+    float minZ, maxZ;
+    float damageHeight; // Wysokoœæ na której kolce s¹ niebezpieczne
+};
+
 // Struktura opisuj¹ca p³aski stó³ (prostopad³oœcian)
 struct TableHitbox {
     float minX, maxX; // Zakres w osi X
@@ -57,6 +64,8 @@ bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF
 
 // Funkcje pomocnicze do kolizji prostok¹tnych
 static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t);
+// Nowa funkcja do sprawdzenia czy jajko jest wewn¹trz hitboxa pu³apki (NOWE)
+static bool isInsideXZ(const glm::vec3& pos, const TrapHitbox& t);
 static void checkHorizontalCollisionAndRevert(const glm::vec3& newPos, const glm::vec3& oldPos, const TableHitbox& t);
 
 // ==========================================
@@ -120,6 +129,10 @@ glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0
 const float EGG_HALF_HEIGHT = 0.7f; // Po³owa wysokoœci jajka (wa¿ne do kolizji)
 
 // === DEFINICJE OBIEKTÓW (HITBOXY) ===
+
+// Definicja pu³apki z kolcami (POZYCJA X=-1.0f, miêdzy Stó³ 1 i Stó³ 2) (NOWE)
+TrapHitbox spikesTrap = { -1.5f, -0.5f, -0.5f, 0.5f, 0.6f };
+
 // Stó³ 1 (Wymiary 1.6x1.6)
 TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f }; // Œrodek X=-2.0f
 
@@ -163,6 +176,12 @@ float cloudSpawnTimer = 0.0f;
 
 // Sprawdza, czy punkt jest wewn¹trz prostok¹ta (tylko osie X i Z)
 static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
+    return pos.x > t.minX && pos.x < t.maxX &&
+        pos.z > t.minZ && pos.z < t.maxZ;
+}
+
+// NOWA FUNKCJA DLA PU£APKI
+static bool isInsideXZ(const glm::vec3& pos, const TrapHitbox& t) {
     return pos.x > t.minX && pos.x < t.maxX &&
         pos.z > t.minZ && pos.z < t.maxZ;
 }
@@ -299,8 +318,6 @@ void updateCrackGeometry(int currentCrackCount) {
 }
 
 // === LOGIKA KOLIZJI Z RAMP¥ ===
-// Sprawdza, czy gracz stoi na pochy³ej powierzchni.
-// Oblicza wysokoœæ pod³o¿a na podstawie pozycji X gracza.
 bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF_HEIGHT, float currentEggX, float& eggPositionY, bool& canJump, float& maxFallHeight, const float CRASH_HEIGHT_THRESHOLD, const float CRACK_HEIGHT_THRESHOLD, int& crackCount, const int MAX_CRACKS, float currentFrame, float& crashStartTime, const RampHitbox& ramp, void (*updateCrackGeom)(int)) {
     float distanceX = ramp.maxX - ramp.minX; // D³ugoœæ rampy
     float heightChange = ramp.endY - ramp.startY; // Ró¿nica wysokoœci
@@ -422,6 +439,8 @@ int main() {
     glBindVertexArray(0);
 
     menuTexture = loadTexture("menu_prompt.png");
+    // Wczytujemy teksturê drewna dla kolców (NOWE)
+    unsigned int woodTexture = loadTexture("models/wood19_diffuse.jpg");
 
     // === GEOMETRIA JAJKA (Gracza) ===
     // Generowanie sfery/elipsoidy
@@ -502,6 +521,8 @@ int main() {
     // £adowanie modeli 3D z plików .obj
     Model tableModel("models/table.obj");
     Model rampModel("models/ramp.obj");
+    // Wczytujemy model kolców (NOWE)
+    Model spikeModel("models/spikes.obj");
 
     // ==========================================
     // 6. G£ÓWNA PÊTLA GRY
@@ -584,6 +605,24 @@ int main() {
                 );
             }
 
+            // === KOLIZJA Z PU£APK¥ Z KOLCAMI (INSTA-KILL) === (NOWA LOGIKA)
+            if (!standingOnSomething && isInsideXZ(eggPosition, spikesTrap)) {
+                // Sprawdzamy wysokoœæ. Jeœli jajko dotyka kolców.
+                if (eggPosition.y < spikesTrap.damageHeight + EGG_HALF_HEIGHT) {
+
+                    // NATYCHMIASTOWA ŒMIERÆ
+                    currentState = GAME_STATE_CRASHED; // Przechodzimy w stan rozbicia
+                    crashStartTime = currentFrame;      // Zapamiêtujemy czas rozbicia
+                    crackCount = MAX_CRACKS;            // Maksymalnie rozwalona skorupka
+
+                    // Zerujemy prêdkoœæ wertykaln¹ (pionow¹)
+                    velocityY = 0.0f;
+
+                    standingOnSomething = true;
+                    std::cout << "KOLCE! Jajko rozbite!" << std::endl;
+                }
+            }
+
             // === KOLIZJE ZE STO£AMI (Wertykalne - l¹dowanie) ===
             // Sprawdzamy stó³ 1
             if (isInsideXZ(eggPosition, table1)) {
@@ -632,12 +671,12 @@ int main() {
             // Sprawdzamy wszystkie sto³y o wysokoœci 1.45f
             checkHighTableCollision(table2);
             checkHighTableCollision(table3);
-            checkHighTableCollision(table4); 
-            checkHighTableCollision(table5); 
-            checkHighTableCollision(table6); 
-            checkHighTableCollision(table7); 
-            checkHighTableCollision(table8); 
-            checkHighTableCollision(table9); 
+            checkHighTableCollision(table4);
+            checkHighTableCollision(table5);
+            checkHighTableCollision(table6);
+            checkHighTableCollision(table7);
+            checkHighTableCollision(table8);
+            checkHighTableCollision(table9);
 
             // === KOLIZJA Z ZIEMI¥ (Pod³oga na 0.0f) ===
             if (!standingOnSomething) {
@@ -794,6 +833,25 @@ int main() {
         ourShader.setMat4("model", model);
         rampModel.Draw(ourShader);
 
+        // --- RYSOWANIE PU£APKI Z KOLCAMI (NOWE RYSOWANIE) ---
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, woodTexture); // U¿ycie tekstury drewna
+        ourShader.setInt("useTexture", 1);          // Teraz prawid³owo ustawia int (1)
+
+        // KLUCZOWA LINIA DLA RÊCZNEGO £ADOWANIA TEKSTURY:
+        ourShader.setInt("texture_diffuse1", 0); // Mówimy shaderowi, ¿e tekstura jest w slocie GL_TEXTURE0
+
+        ourShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f)); // Kolor bia³y (bo u¿ywamy tekstury)
+
+        model = glm::mat4(1.0f);
+        // Ustawienie na œrodku hitboxa (X=-1.0f, Y=0.0f)
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
+        ourShader.setMat4("model", model);
+        spikeModel.Draw(ourShader);
+
+        ourShader.setInt("useTexture", 0); // Wy³¹czamy teksturowanie dla pozosta³ych obiektów
+
+
         // --- RYSOWANIE GRACZA (JAJKA) ---
         if (currentState != GAME_STATE_CRASHED) {
             glBindVertexArray(eggVAO);
@@ -890,6 +948,7 @@ int main() {
     glDeleteVertexArrays(1, &sphereVAO); glDeleteBuffers(1, &sphereVBO); glDeleteBuffers(1, &sphereEBO);
     glDeleteVertexArrays(1, &uiVAO); glDeleteBuffers(1, &uiVBO);
     glDeleteTextures(1, &menuTexture);
+    glDeleteTextures(1, &woodTexture); // Usuniêcie tekstury drewna
     delete uiShader;
 
     glfwTerminate(); // Zamkniêcie GLFW
