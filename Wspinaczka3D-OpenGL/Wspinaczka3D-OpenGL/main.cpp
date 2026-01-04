@@ -151,7 +151,7 @@ TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=18.0f, Z=
 // Stó³ do testow
 TableHitbox table10 = { 17.2f, 18.8f, 1.7f, 3.3f, 0.68f };
 
-// Rampa (Przesuniêta na X=20.0f. D³ugoœæ 4m do X=24.0f)
+// Rampa ( X=20.0f. D³ugoœæ 4m do X=24.0f)
 RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
 // Hitbox boczny rampy (¿eby nie przenikaæ przez jej boki na dole)
 TableHitbox ramp_horizontal_box = { 20.0f, 24.0f, -0.9f, 0.9f, 2.05f };
@@ -598,7 +598,7 @@ int main() {
                     eggPosition,
                     eggPosition.y, // referencja, zostanie zaktualizowana jeœli stoimy
                     velocityY,     // referencja, zostanie wyzerowana jeœli stoimy
-                    EGG_HALF_HEIGHT // u¿ywamy Twojej sta³ej 0.7f
+                    EGG_HALF_HEIGHT 
                 );
 
                 if (onBridge) {
@@ -920,12 +920,12 @@ int main() {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-            // Opcjonalnie: Wy³¹cz zapis g³êbokoœci, jeœli chcesz widzieæ obiekty za szk³em
-            // glDepthMask(GL_FALSE); 
+            // Jajko po Mce XD
+            //glDepthMask(GL_FALSE); 
 
             glassBridge->Draw(ourShader);
 
-            // glDepthMask(GL_TRUE);
+            //glDepthMask(GL_TRUE);
             glDisable(GL_BLEND);
         }
 
