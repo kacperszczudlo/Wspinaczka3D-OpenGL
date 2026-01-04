@@ -148,6 +148,8 @@ TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f }; // Œrodek X=15.0f, Z
 // Stó³ 9 (Podejœcie, Wymiary 1.6x1.6)
 TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=18.0f, Z=0.0f
 
+// Stó³ do testow
+TableHitbox table10 = { 17.2f, 18.8f, 1.7f, 3.3f, 0.68f };
 
 // Rampa (Przesuniêta na X=20.0f. D³ugoœæ 4m do X=24.0f)
 RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
@@ -537,6 +539,7 @@ int main() {
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table8); // NOWY STÓ£
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table9); // NOWY STÓ£
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, ramp_horizontal_box);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table10); //stol tylko do testow
         }
 
         // === OBS£UGA RESETU GRY ===
@@ -620,6 +623,29 @@ int main() {
                     // L¹dowanie
                     maxFallHeight = desiredY1;
                     eggPosition.y = desiredY1;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                }
+            }
+            // === KOLIZJA DLA STO£U 10 (TESTOWEGO) ===
+            if (isInsideXZ(eggPosition, table10)) {
+                float desiredY10 = table10.topY + EGG_HALF_HEIGHT;
+                if (oldY >= desiredY10 - 0.001f && eggPosition.y <= desiredY10 && velocityY <= 0.0f) {
+                    float fallDistance = maxFallHeight - desiredY10;
+                    if (fallDistance < 0.0f) fallDistance = 0.0f;
+
+                    // Obra¿enia
+                    if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
+                    else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) {
+                        crackCount = glm::min(crackCount + 1, MAX_CRACKS);
+                        if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; }
+                        updateCrackGeometry(crackCount);
+                    }
+
+                    // L¹dowanie
+                    maxFallHeight = desiredY10;
+                    eggPosition.y = desiredY10;
                     velocityY = 0.0f;
                     canJump = true;
                     standingOnSomething = true;
@@ -748,11 +774,12 @@ int main() {
         glBindVertexArray(floorVAO);
         ourShader.setInt("useTexture", 0);
         ourShader.setMat4("model", glm::mat4(1.0f));
-        ourShader.setVec3("objectColor", glm::vec3(0.2f, 0.6f, 0.1f)); // Zielony
+        ourShader.setVec4("objectColor", glm::vec4(0.2f, 0.6f, 0.1f, 1.0f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // --- RYSOWANIE STO£ÓW ---
         ourShader.setInt("useTexture", 1);
+        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         // Stó³ 1 (Blat 0.68f, Œrodek X: -2.0f)
         glm::mat4 model = glm::mat4(1.0f);
@@ -808,6 +835,13 @@ int main() {
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
+        // Stó³ 10 (Testowy, Œrodek X: 18.0f, Z: 2.5f, Niski)
+        model = glm::mat4(1.0f);
+        // Przesuwamy w dó³ (-0.05f), bo model jest tak wycentrowany dla niskich sto³ów (jak table1)
+        model = glm::translate(model, glm::vec3(18.0f, -0.05f, 2.5f));
+        ourShader.setMat4("model", model);
+        tableModel.Draw(ourShader);
+
         // --- RYSOWANIE RAMPY (Nowa pozycja startowa X=20.0f) ---
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(20.0f, 2.05f, 0.0f));
@@ -816,20 +850,7 @@ int main() {
         rampModel.Draw(ourShader);
 
 
-        // --- RYSOWANIE MOSTU ---
-        if (glassBridge) {
-            // W³¹czamy przezroczystoœæ (wa¿ne dla szk³a, nawet z tekstur¹)
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-            // Opcjonalnie: Wy³¹cz zapis g³êbokoœci, jeœli chcesz widzieæ obiekty za szk³em
-            // glDepthMask(GL_FALSE); 
-
-            glassBridge->Draw(ourShader);
-
-            // glDepthMask(GL_TRUE);
-            glDisable(GL_BLEND);
-        }
+        
 
         // --- RYSOWANIE GRACZA (JAJKA) ---
         if (currentState != GAME_STATE_CRASHED) {
@@ -837,14 +858,14 @@ int main() {
             ourShader.setInt("useTexture", 0);
             model = glm::translate(glm::mat4(1.0f), eggPosition);
             ourShader.setMat4("model", model);
-            ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f)); // Kolor jajka
+            ourShader.setVec4("objectColor", glm::vec4(1.0f, 0.9f, 0.7f, 1.0f));
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(eggIndices.size()), GL_UNSIGNED_INT, 0);
 
             // Rysowanie pêkniêæ (czarne linie)
             if (crackCount > 0 && !crackVertices.empty()) {
                 glBindVertexArray(crackVAO);
                 ourShader.setMat4("model", model);
-                ourShader.setVec3("objectColor", glm::vec3(0.0f, 0.0f, 0.0f));
+                ourShader.setVec4("objectColor", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
                 glLineWidth(3.0f);
                 glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(crackVertices.size() / 3));
                 glLineWidth(1.0f);
@@ -859,7 +880,7 @@ int main() {
             if (ratio < 1.0f) {
                 glBindVertexArray(cubeVAO);
                 ourShader.setInt("useTexture", 0);
-                ourShader.setVec3("objectColor", glm::vec3(1.0f, 0.9f, 0.7f));
+                ourShader.setVec4("objectColor", glm::vec4(1.0f, 0.9f, 0.7f, 1.0f));
 
                 for (int i = 0; i < 5; ++i) {
                     glm::mat4 model = glm::mat4(1.0f);
@@ -881,7 +902,7 @@ int main() {
         // --- RYSOWANIE CHMUR ---
         glBindVertexArray(sphereVAO);
         ourShader.setInt("useTexture", 0);
-        ourShader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f)); // Bia³e chmury
+        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Bia³e chmury
         for (const auto& cloud : clouds) {
             for (const auto& component : cloud.components) {
                 model = glm::mat4(1.0f);
@@ -891,6 +912,21 @@ int main() {
                 ourShader.setMat4("model", model);
                 glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sphereIndices.size()), GL_UNSIGNED_INT, 0);
             }
+        }
+
+        // --- RYSOWANIE MOSTU ---
+        if (glassBridge) {
+            // W³¹czamy przezroczystoœæ (wa¿ne dla szk³a, nawet z tekstur¹)
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            // Opcjonalnie: Wy³¹cz zapis g³êbokoœci, jeœli chcesz widzieæ obiekty za szk³em
+            // glDepthMask(GL_FALSE); 
+
+            glassBridge->Draw(ourShader);
+
+            // glDepthMask(GL_TRUE);
+            glDisable(GL_BLEND);
         }
 
         // --- RYSOWANIE UI (MENU) ---

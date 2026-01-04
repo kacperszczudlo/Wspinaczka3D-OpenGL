@@ -57,13 +57,15 @@ public:
         tile.maxZ = tile.position.z + 0.5f;
     }
 
-    // Standardowa funkcja Draw - model sam ogarnia tekstury
+    // Zaktualizowana funkcja Draw z obs³ug¹ przezroczystoœci
     void Draw(Shader& shader) {
-        // Mówimy shaderowi: "Teraz u¿ywamy tekstur z modelu"
+        // W³¹czamy tekstury
         shader.setInt("useTexture", 1);
 
-        // Resetujemy kolor na bia³y (¿eby tekstura mia³a swoje oryginalne barwy)
-        shader.setVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        // --- KLUCZOWA ZMIANA ---
+        // Ustawiamy kolor na Bia³y (1.0, 1.0, 1.0), ale Alpha na 0.5 (50% widocznoœci)
+        // Mo¿esz zmieniæ 0.5f na 0.3f (bardziej przezroczyste) lub 0.7f (mniej przezroczyste)
+        shader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.5f));
 
         for (const auto& tile : tiles) {
             if (!tile.isBroken) {
@@ -71,11 +73,14 @@ public:
                 model = glm::translate(model, glm::vec3(tile.position.x, yLevel, tile.position.z));
                 shader.setMat4("model", model);
 
-                // Tutaj Model.h zrobi ca³¹ magiê:
-                // sam aktywuje GL_TEXTURE0 i podepnie glass-texture-3.jpg
                 tileModel->Draw(shader);
             }
         }
+
+        // --- BARDZO WA¯NE ---
+        // Po narysowaniu mostu musimy przywróciæ Alpha na 1.0 (100% widocznoœci).
+        // Inaczej wszystko inne rysowane po moœcie (np. gracz, jeœli by³by rysowany póŸniej) te¿ by³oby duchem!
+        shader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     bool checkCollision(glm::vec3 playerPos, float& playerY, float& velocityY, float playerHalfHeight) {
