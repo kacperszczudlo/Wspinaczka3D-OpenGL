@@ -7,6 +7,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "GlassBridge.h" 
 
 // Biblioteki matematyczne GLM
 #include <glm/glm.hpp>
@@ -152,6 +153,8 @@ TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // Œrodek X=18.0f, Z=
 RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
 // Hitbox boczny rampy (¿eby nie przenikaæ przez jej boki na dole)
 TableHitbox ramp_horizontal_box = { 20.0f, 24.0f, -0.9f, 0.9f, 2.05f };
+
+GlassBridge* glassBridge = nullptr; // WskaŸnik na most
 
 // Chmury
 std::vector<Cloud> clouds;
@@ -502,6 +505,8 @@ int main() {
     // £adowanie modeli 3D z plików .obj
     Model tableModel("models/table.obj");
     Model rampModel("models/ramp.obj");
+    Model tileModel("models/glass_tile.obj"); 
+    glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
 
     // ==========================================
     // 6. G£ÓWNA PÊTLA GRY
@@ -542,6 +547,7 @@ int main() {
             maxFallHeight = 0.7f;
             crackCount = 0;
             updateCrackGeometry(0);
+            if (glassBridge) glassBridge->Reset();
             needsReset = false;
         }
 
@@ -582,6 +588,21 @@ int main() {
                     ramp,
                     updateCrackGeometry
                 );
+            }
+            // === KOLIZJA Z SZKLANYM MOSTEM ===
+            if (!standingOnSomething && glassBridge) {
+                bool onBridge = glassBridge->checkCollision(
+                    eggPosition,
+                    eggPosition.y, // referencja, zostanie zaktualizowana jeœli stoimy
+                    velocityY,     // referencja, zostanie wyzerowana jeœli stoimy
+                    EGG_HALF_HEIGHT // u¿ywamy Twojej sta³ej 0.7f
+                );
+
+                if (onBridge) {
+                    standingOnSomething = true;
+                    canJump = true;
+                    maxFallHeight = eggPosition.y; // reset obra¿eñ
+                }
             }
 
             // === KOLIZJE ZE STO£AMI (Wertykalne - l¹dowanie) ===
@@ -793,6 +814,22 @@ int main() {
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         rampModel.Draw(ourShader);
+
+
+        // --- RYSOWANIE MOSTU ---
+        if (glassBridge) {
+            // W³¹czamy przezroczystoœæ (wa¿ne dla szk³a, nawet z tekstur¹)
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            // Opcjonalnie: Wy³¹cz zapis g³êbokoœci, jeœli chcesz widzieæ obiekty za szk³em
+            // glDepthMask(GL_FALSE); 
+
+            glassBridge->Draw(ourShader);
+
+            // glDepthMask(GL_TRUE);
+            glDisable(GL_BLEND);
+        }
 
         // --- RYSOWANIE GRACZA (JAJKA) ---
         if (currentState != GAME_STATE_CRASHED) {
