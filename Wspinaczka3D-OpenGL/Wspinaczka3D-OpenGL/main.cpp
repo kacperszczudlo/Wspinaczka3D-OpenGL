@@ -460,11 +460,11 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);
 
     // === GEOMETRIA POD£OGI ===
-    float floorVertices[] = { 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, -50.0f };
+    /*float floorVertices[] = { 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, -50.0f };
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO); glGenBuffers(1, &floorVBO); glBindVertexArray(floorVAO);
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO); glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);*/
 
     // === GEOMETRIA SZEŒCIANU (Fragmenty rozbicia) ===
     float cubeVertices[] = { -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f };
@@ -508,6 +508,7 @@ int main() {
     Model tableModel("models/table.obj");
     Model rampModel("models/ramp.obj");
     Model tileModel("models/glass_tile.obj"); 
+    Model floorModel("models/floor.obj");
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
 
     // ==========================================
@@ -770,19 +771,30 @@ int main() {
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
-        // --- RYSOWANIE POD£OGI ---
-        glBindVertexArray(floorVAO);
-        ourShader.setInt("useTexture", 0);
-        ourShader.setMat4("model", glm::mat4(1.0f));
-        ourShader.setVec4("objectColor", glm::vec4(0.2f, 0.6f, 0.1f, 1.0f));
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // --- RYSOWANIE POD£OGI (U¯YCIE MODELU) ---
+        // Zmieniamy na 1, ¿eby model u¿ywa³ swojej tekstury (zdefiniowanej w pliku .mtl/.obj)
+        ourShader.setInt("useTexture", 1);
+
+        // Zmieniamy kolor na bia³y, aby nie "farbowaæ" tekstury trawy na zielono
+        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        // Deklarujemy zmienn¹ 'model' PIERWSZY RAZ tutaj
+        glm::mat4 model = glm::mat4(1.0f);
+        // Opcjonalnie: Przesuwamy pod³ogê minimalnie w dó³, ¿eby nie migota³a z podstawami sto³ów
+        model = glm::translate(model, glm::vec3(0.0f, -0.01f, 0.0f));
+        ourShader.setMat4("model", model);
+
+        // Rysujemy model za³adowany z pliku (zamiast rêcznego glDrawArrays)
+        floorModel.Draw(ourShader);
+
 
         // --- RYSOWANIE STO£ÓW ---
         ourShader.setInt("useTexture", 1);
         ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         // Stó³ 1 (Blat 0.68f, Œrodek X: -2.0f)
-        glm::mat4 model = glm::mat4(1.0f);
+        // UWAGA: Tutaj usuwamy "glm::mat4" z pocz¹tku, bo zmienna 'model' zosta³a utworzona wy¿ej (przy pod³odze)
+        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-2.0f, -0.05f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
@@ -957,7 +969,7 @@ int main() {
 
     // === ZWOLNIENIE ZASOBÓW (CLEANUP) ===
     glDeleteVertexArrays(1, &eggVAO); glDeleteBuffers(1, &eggVBO); glDeleteBuffers(1, &eggEBO);
-    glDeleteVertexArrays(1, &floorVAO); glDeleteBuffers(1, &floorVBO);
+    //glDeleteVertexArrays(1, &floorVAO); glDeleteBuffers(1, &floorVBO);
     glDeleteVertexArrays(1, &cubeVAO); glDeleteBuffers(1, &cubeVBO);
     glDeleteVertexArrays(1, &crackVAO); glDeleteBuffers(1, &crackVBO);
     glDeleteVertexArrays(1, &sphereVAO); glDeleteBuffers(1, &sphereVBO); glDeleteBuffers(1, &sphereEBO);
