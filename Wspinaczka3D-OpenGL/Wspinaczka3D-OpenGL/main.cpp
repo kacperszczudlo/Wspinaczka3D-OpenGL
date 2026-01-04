@@ -8,6 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "GlassBridge.h" 
+#include "Trampoline.h"
 
 // Biblioteki matematyczne GLM
 #include <glm/glm.hpp>
@@ -157,6 +158,13 @@ RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
 TableHitbox ramp_horizontal_box = { 20.0f, 24.0f, -0.9f, 0.9f, 2.05f };
 
 GlassBridge* glassBridge = nullptr; // WskaŸnik na most
+
+// Trampolina
+Trampoline* bouncyTrampoline = nullptr;
+
+// Definicja Bezpiecznej Strefy (wysoko w górze)
+// Za³ó¿my, ¿e trampolina jest na X=40, wybija nas na X=45, Y=20
+TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 
 // Chmury
 std::vector<Cloud> clouds;
@@ -348,6 +356,43 @@ bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF
     return false; // Brak kolizji
 }
 
+// Funkcja blokuj¹ca przenikanie przez boki trampoliny
+static void checkTrampolineSideCollision(glm::vec3& currentPos, const glm::vec3& oldPos, Trampoline* t) {
+    if (!t) return;
+
+    float playerFeetY = currentPos.y - 0.7f; // Poziom stóp
+
+    // === ZMIANA LOGIKI WYSOKOŒCI ===
+    // Zamiast sprawdzaæ 't->height' (poziom maty), ustawiamy barierê wy¿ej.
+    // Trampolina jest w dole (Y=-2.0), pod³oga na Y=0.0.
+    // Ustawiamy barierê na Y = 1.0f.
+    // To oznacza, ¿e "œciana" trampoliny wystaje 1 metr ponad zwyk³¹ pod³ogê.
+    // Zwyk³y skok z pod³ogi nie pozwoli tego przeskoczyæ, ale spadaj¹c z mostu (Y=2.85) przelecisz nad ni¹.
+
+    float barrierCeiling = 1.0f;
+
+    // Jeœli jesteœmy NAD barier¹, pozwalamy na ruch (spadamy z góry)
+    if (playerFeetY > barrierCeiling) {
+        return;
+    }
+
+    // === KOLIZJA POZIOMA (XZ) ===
+    glm::vec3 flatPlayer = glm::vec3(currentPos.x, 0.0f, currentPos.z);
+    glm::vec3 flatTrampoline = glm::vec3(t->position.x, 0.0f, t->position.z);
+
+    float distance = glm::distance(flatPlayer, flatTrampoline);
+
+    // Twoja wartoœæ 1.1f jest dobra, jeœli model jest szeroki.
+    // Blokujemy wejœcie, jeœli gracz jest za blisko œrodka, a nie jest nad barier¹.
+    float collisionDist = t->radius + 1.1f;
+
+    if (distance < collisionDist) {
+        // Cofamy ruch
+        currentPos.x = oldPos.x;
+        currentPos.z = oldPos.z;
+    }
+}
+
 // ==========================================
 // 5. FUNKCJA MAIN
 // ==========================================
@@ -507,9 +552,27 @@ int main() {
     // £adowanie modeli 3D z plików .obj
     Model tableModel("models/table.obj");
     Model rampModel("models/ramp.obj");
-    Model tileModel("models/glass_tile.obj"); 
+    Model tileModel("models/glass_tile.obj");
     Model floorModel("models/floor.obj");
+    Model trampolineModel("models/trampoline.obj");
+    Model pillowModel("models/pillow.obj");
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
+    glm::vec3 trampolinePos = glm::vec3(41.0f, 0.0, 0.0f);
+    // Trampolina hitbox
+    glm::vec3 scale = glm::vec3(0.2f);
+    glm::vec3 offset = glm::vec3(0.0f, 0.0f, 0.0f);
+    float hitHeight = 0.5f;
+    float force = 35.0f;
+    float hitRadius = 0.4f;
+    bouncyTrampoline = new Trampoline(
+        trampolinePos,
+        hitRadius,
+        hitHeight,
+        force,
+        &trampolineModel,
+        scale,
+        offset
+    );
 
     // ==========================================
     // 6. G£ÓWNA PÊTLA GRY
@@ -533,19 +596,24 @@ int main() {
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table1);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table2);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table3);
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table4); // NOWY STÓ£
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table5); // NOWY STÓ£
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table6); // NOWY STÓ£
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table7); // NOWY STÓ£
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table8); // NOWY STÓ£
-            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table9); // NOWY STÓ£
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table4);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table5);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table6);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table7);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table8);
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table9);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, ramp_horizontal_box);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table10); //stol tylko do testow
+            if (bouncyTrampoline) {
+                checkTrampolineSideCollision(eggPosition, previousEggPosition, bouncyTrampoline);
+            }
+            // <--- DODANO: Kolizja boczna z bezpieczn¹ stref¹ (met¹)
+            checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, safeZone);
         }
 
         // === OBS£UGA RESETU GRY ===
         if (needsReset) {
-            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f); // Powrót na start
+            eggPosition = glm::vec3(40.0f, 0.7f, 5.0f); // Powrót na start
             velocityY = 0.0f;
             canJump = true;
             maxFallHeight = 0.7f;
@@ -599,13 +667,51 @@ int main() {
                     eggPosition,
                     eggPosition.y, // referencja, zostanie zaktualizowana jeœli stoimy
                     velocityY,     // referencja, zostanie wyzerowana jeœli stoimy
-                    EGG_HALF_HEIGHT 
+                    EGG_HALF_HEIGHT
                 );
 
                 if (onBridge) {
                     standingOnSomething = true;
                     canJump = true;
                     maxFallHeight = eggPosition.y; // reset obra¿eñ
+                }
+            }
+
+            // <--- DODANO: KOLIZJA Z TRAMPOLIN¥ ===
+            if (!standingOnSomething && bouncyTrampoline) {
+                // checkCollision aktualizuje velocityY, jeœli trafimy
+                bool bounced = bouncyTrampoline->checkCollision(
+                    eggPosition,
+                    eggPosition.y, // referencja
+                    velocityY,     // referencja (tu zostanie wpisane 25.0f)
+                    EGG_HALF_HEIGHT
+                );
+
+                if (bounced) {
+                    canJump = false; // Nie mo¿na skoczyæ w powietrzu po wybiciu
+                    // WA¯NE: Resetujemy maxFallHeight do obecnej wysokoœci,
+                    // ¿eby gra nie myœla³a, ¿e spadamy z kosmosu przy l¹dowaniu.
+                    maxFallHeight = eggPosition.y;
+
+                    // Opcjonalnie: DŸwiêk "Boing!" :)
+                }
+            }
+
+            // <--- DODANO: KOLIZJA Z BEZPIECZN¥ STREF¥  ===
+            if (!standingOnSomething && isInsideXZ(eggPosition, safeZone)) {
+                float desiredY_Safe = safeZone.topY + EGG_HALF_HEIGHT;
+
+                // Sprawdzamy czy l¹dujemy na powierzchni
+                if (oldY >= desiredY_Safe - 0.001f && eggPosition.y <= desiredY_Safe && velocityY <= 0.0f) {
+
+
+
+                    // Fizyka l¹dowania
+                    maxFallHeight = desiredY_Safe;
+                    eggPosition.y = desiredY_Safe;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
                 }
             }
 
@@ -680,12 +786,12 @@ int main() {
             // Sprawdzamy wszystkie sto³y o wysokoœci 1.45f
             checkHighTableCollision(table2);
             checkHighTableCollision(table3);
-            checkHighTableCollision(table4); 
-            checkHighTableCollision(table5); 
-            checkHighTableCollision(table6); 
-            checkHighTableCollision(table7); 
-            checkHighTableCollision(table8); 
-            checkHighTableCollision(table9); 
+            checkHighTableCollision(table4);
+            checkHighTableCollision(table5);
+            checkHighTableCollision(table6);
+            checkHighTableCollision(table7);
+            checkHighTableCollision(table8);
+            checkHighTableCollision(table9);
 
             // === KOLIZJA Z ZIEMI¥ (Pod³oga na 0.0f) ===
             if (!standingOnSomething) {
@@ -862,7 +968,7 @@ int main() {
         rampModel.Draw(ourShader);
 
 
-        
+
 
         // --- RYSOWANIE GRACZA (JAJKA) ---
         if (currentState != GAME_STATE_CRASHED) {
@@ -941,6 +1047,39 @@ int main() {
             glDisable(GL_BLEND);
         }
 
+        // <--- DODANO: RYSOWANIE TRAMPOLINY
+        if (bouncyTrampoline) {
+            bouncyTrampoline->Draw(ourShader);
+        }
+
+        // <--- RYSOWANIE PODUSZKI (BEZPIECZNA STREFA)
+        // Hitbox safeZone: X od 43 do 47 (Szerokoœæ 4), Z od -2 do 2 (G³êbokoœæ 4), Y=15
+
+        // 1. Ustawienia shadera
+        ourShader.setInt("useTexture", 1); // W³¹cz tekstury (u¿yje pillow.jpg z mtl)
+        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        // 2. Obliczanie pozycji (œrodek hitboxa)
+        float pillowCenterX = (safeZone.minX + safeZone.maxX) / 2.0f; // Powinno wyjœæ 45.0f
+        float pillowCenterZ = (safeZone.minZ + safeZone.maxZ) / 2.0f; // Powinno wyjœæ 0.0f
+        float pillowY = safeZone.topY; // Powierzchnia na 15.0f
+
+        // 3. Macierz modelu
+        model = glm::mat4(1.0f);
+
+        // Przesuwamy w miejsce docelowe. 
+        // Dodajemy +0.15f do Y, bo model poduszki ma œrodek w 0,0,0, a wysokoœæ 0.3. 
+        // Chcemy ¿eby le¿a³a NA stole (o ile tam jest stó³) lub wisia³a w powietrzu jako magiczna platforma.
+        model = glm::translate(model, glm::vec3(pillowCenterX, pillowY - 0.15f, pillowCenterZ));
+
+        // Skalujemy! Model ma wymiary 1x1. SafeZone ma 4x4.
+        // Zrobimy j¹ trochê mniejsz¹ ni¿ hitbox, ¿eby nie wystawa³a dziwnie
+        model = glm::scale(model, glm::vec3(4.0f, 1.0f, 4.0f));
+
+        ourShader.setMat4("model", model);
+        pillowModel.Draw(ourShader);
+
+
         // --- RYSOWANIE UI (MENU) ---
         // W³¹czamy przezroczystoœæ dla tekstury menu (kana³ Alpha)
         glEnable(GL_BLEND);
@@ -976,6 +1115,8 @@ int main() {
     glDeleteVertexArrays(1, &uiVAO); glDeleteBuffers(1, &uiVBO);
     glDeleteTextures(1, &menuTexture);
     delete uiShader;
+    // <--- DODANO: Usuwanie wskaŸnika
+    delete bouncyTrampoline;
 
     glfwTerminate(); // Zamkniêcie GLFW
     return 0;
