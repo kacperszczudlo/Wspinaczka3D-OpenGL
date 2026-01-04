@@ -613,7 +613,7 @@ int main() {
 
         // === OBS£UGA RESETU GRY ===
         if (needsReset) {
-            eggPosition = glm::vec3(40.0f, 0.7f, 5.0f); // Powrót na start
+            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f); // Powrót na start
             velocityY = 0.0f;
             canJump = true;
             maxFallHeight = 0.7f;
