@@ -23,28 +23,40 @@
 // 1. STRUKTURY DANYCH
 // ==========================================
 
-// Struktura opisujπca p≥aski stÛ≥ (prostopad≥oúcian)
+// Struktura opisujƒÖca p≈Çaski st√≥≈Ç (prostopad≈Ço≈õcian)
 struct TableHitbox {
     float minX, maxX; // Zakres w osi X
     float minZ, maxZ; // Zakres w osi Z
-    float topY;       // WysokoúÊ blatu (powierzchnia, na ktÛrej siÍ stoi)
+    float topY;       // Wysoko≈õƒá blatu (powierzchnia, na kt√≥rej siƒô stoi)
 };
 
-// Struktura opisujπca rampÍ (pochy≥π powierzchniÍ)
+// Struktura opisujƒÖca rampƒô (pochy≈ÇƒÖ powierzchniƒô)
 struct RampHitbox {
     float minX, maxX;
     float minZ, maxZ;
-    float startY, endY; // WysokoúÊ poczπtkowa i koÒcowa rampy
+    float startY, endY; // Wysoko≈õƒá poczƒÖtkowa i ko≈Ñcowa rampy
     float lengthZ;
 };
 
-// Struktury dla systemu chmur (ozdoba t≥a)
+// Struktury dla systemu chmur (ozdoba t≈Ça)
 struct CloudComponent { glm::vec3 offset; float scale; };
 struct Cloud {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 velocity = glm::vec3(0.0f);
     std::vector<CloudComponent> components;
 };
+
+// Struktura dla ruchomej platformy
+struct MovingPlatform {
+    TableHitbox hitbox;
+    glm::vec3 startPos;
+    glm::vec3 endPos;
+    float speed;
+    float progress; // Od 0.0 do 1.0
+    int direction;  // 1 (w stronƒô end), -1 (w stronƒô start)
+    glm::vec3 currentOffset; // O ile platforma przesunƒô≈Ça siƒô w tej klatce
+};
+
 
 // ==========================================
 // 2. PROTOTYPY FUNKCJI (Deklaracje)
@@ -54,10 +66,10 @@ void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void updateCrackGeometry(int currentCrackCount);
 
-// G≥Ûwna funkcja kolizji rampy - oblicza wysokoúÊ gracza na pochy≥oúci
+// G≈Ç√≥wna funkcja kolizji rampy - oblicza wysoko≈õƒá gracza na pochy≈Ço≈õci
 bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF_HEIGHT, float currentEggX, float& eggPositionY, bool& canJump, float& maxFallHeight, const float CRASH_HEIGHT_THRESHOLD, const float CRACK_HEIGHT_THRESHOLD, int& crackCount, const int MAX_CRACKS, float currentFrame, float& crashStartTime, const RampHitbox& ramp, void (*updateCrackGeom)(int));
 
-// Funkcje pomocnicze do kolizji prostokπtnych
+// Funkcje pomocnicze do kolizji prostokƒÖtnych
 static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t);
 static void checkHorizontalCollisionAndRevert(const glm::vec3& newPos, const glm::vec3& oldPos, const TableHitbox& t);
 
@@ -67,16 +79,16 @@ static void checkHorizontalCollisionAndRevert(const glm::vec3& newPos, const glm
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
 
-// Stany gry - zarzπdzanie menu i rozgrywkπ
+// Stany gry - zarzƒÖdzanie menu i rozgrywkƒÖ
 enum GameState {
     GAME_STATE_MENU,
     GAME_STATE_PLAYING,
     GAME_STATE_CRASHED
 };
 GameState currentState = GAME_STATE_MENU;
-bool needsReset = false; // Flaga informujπca, øe trzeba zresetowaÊ pozycjÍ gracza
+bool needsReset = false; // Flaga informujƒÖca, ≈ºe trzeba zresetowaƒá pozycjƒô gracza
 
-// Zmienne do obs≥ugi UI (Menu)
+// Zmienne do obs≈Çugi UI (Menu)
 Shader* uiShader = nullptr;
 unsigned int uiVAO = 0, uiVBO = 0;
 unsigned int menuTexture = 0;
@@ -88,30 +100,30 @@ glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float cameraDistance = 7.0f;
 
-// Obs≥uga myszy
+// Obs≈Çuga myszy
 float lastX;
 float lastY;
 bool firstMouse = true;
 float yaw = -90.0f;
 float pitch = 0.0f;
 
-// Czas klatki (dla p≥ynnego ruchu niezaleønie od FPS)
+// Czas klatki (dla p≈Çynnego ruchu niezale≈ºnie od FPS)
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // === FIZYKA ===
-float velocityY = 0.0f; // PrÍdkoúÊ wertykalna (skok/upadek)
+float velocityY = 0.0f; // Prƒôdko≈õƒá wertykalna (skok/upadek)
 bool canJump = true;    // Czy gracz stoi na ziemi?
 const float GRAVITY = -9.8f;
 const float JUMP_FORCE = 4.0f;
 
-// === SYSTEM USZKODZE— ===
-float maxFallHeight = 0.0f;       // Najwyøszy punkt osiπgniÍty podczas skoku
-const float CRASH_HEIGHT_THRESHOLD = 1.5f; // WysokoúÊ upadku powodujπca úmierÊ
-const float CRACK_HEIGHT_THRESHOLD = 0.9f; // WysokoúÊ upadku powodujπca pÍkniÍcie
+// === SYSTEM USZKODZE≈É ===
+float maxFallHeight = 0.0f;       // Najwy≈ºszy punkt osiƒÖgniƒôty podczas skoku
+const float CRASH_HEIGHT_THRESHOLD = 1.5f; // Wysoko≈õƒá upadku powodujƒÖca ≈õmierƒá
+const float CRACK_HEIGHT_THRESHOLD = 0.9f; // Wysoko≈õƒá upadku powodujƒÖca pƒôkniƒôcie
 int crackCount = 0;
 const int MAX_CRACKS = 3;
-std::vector<float> crackVertices; // Wierzcho≥ki rysowanych pÍkniÍÊ
+std::vector<float> crackVertices; // Wierzcho≈Çki rysowanych pƒôkniƒôƒá
 unsigned int crackVAO = 0, crackVBO = 0;
 
 // Animacja rozbicia jajka
@@ -119,52 +131,62 @@ float crashStartTime = 0.0f;
 const float CRASH_ANIMATION_DURATION = 0.7f;
 // Fragmenty skorupki do animacji wybuchu
 glm::vec3 fragments[5] = { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, -0.5f) };
-const float EGG_HALF_HEIGHT = 0.7f; // Po≥owa wysokoúci jajka (waøne do kolizji)
+const float EGG_HALF_HEIGHT = 0.7f; // Po≈Çowa wysoko≈õci jajka (wa≈ºne do kolizji)
 
-// === DEFINICJE OBIEKT”W (HITBOXY) ===
-// StÛ≥ 1 (Wymiary 1.6x1.6)
-TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f }; // årodek X=-2.0f
+// === DEFINICJE OBIEKT√ìW (HITBOXY) ===
+// St√≥≈Ç 1 (Wymiary 1.6x1.6)
+TableHitbox table1 = { -2.8f, -1.2f, -0.8f, 0.8f, 0.68f }; // ≈örodek X=-2.0f
 
-// StÛ≥ 2 (Wymiary 1.6x1.6)
-TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f }; // årodek X=0.0f
+// St√≥≈Ç 2 (Wymiary 1.6x1.6)
+TableHitbox table2 = { -0.8f, 0.8f, -0.8f, 0.8f, 1.45f }; // ≈örodek X=0.0f
 
-// StÛ≥ 3 (Wymiary 1.6x1.6)
-TableHitbox table3 = { 1.7f, 3.3f, -0.8f, 0.8f, 1.45f }; // årodek X=2.5f
+// St√≥≈Ç 3 (Wymiary 1.6x1.6)
+TableHitbox table3 = { 1.7f, 3.3f, -0.8f, 0.8f, 1.45f }; // ≈örodek X=2.5f
 
-// StÛ≥ 4 (Lewo, Wymiary 1.6x1.6)
-TableHitbox table4 = { 4.2f, 5.8f, -2.3f, -0.7f, 1.45f }; // årodek X=5.0f, Z=-1.5f
+// St√≥≈Ç 4 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table4 = { 4.2f, 5.8f, -2.3f, -0.7f, 1.45f }; // ≈örodek X=5.0f, Z=-1.5f
 
-// StÛ≥ 5 (Prawo, Wymiary 1.6x1.6)
-TableHitbox table5 = { 6.7f, 8.3f, 0.7f, 2.3f, 1.45f }; // årodek X=7.5f, Z=1.5f
+// St√≥≈Ç 5 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table5 = { 6.7f, 8.3f, 0.7f, 2.3f, 1.45f }; // ≈örodek X=7.5f, Z=1.5f
 
-// StÛ≥ 6 (Lewo, Wymiary 1.6x1.6)
-TableHitbox table6 = { 9.2f, 10.8f, -2.3f, -0.7f, 1.45f }; // årodek X=10.0f, Z=-1.5f
+// St√≥≈Ç 6 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table6 = { 9.2f, 10.8f, -2.3f, -0.7f, 1.45f }; // ≈örodek X=10.0f, Z=-1.5f
 
-// StÛ≥ 7 (Prawo, Wymiary 1.6x1.6)
-TableHitbox table7 = { 11.7f, 13.3f, 0.7f, 2.3f, 1.45f }; // årodek X=12.5f, Z=1.5f
+// St√≥≈Ç 7 (Prawo, Wymiary 1.6x1.6)
+TableHitbox table7 = { 11.7f, 13.3f, 0.7f, 2.3f, 1.45f }; // ≈örodek X=12.5f, Z=1.5f
 
-// StÛ≥ 8 (Lewo, Wymiary 1.6x1.6)
-TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f }; // årodek X=15.0f, Z=-1.5f
+// St√≥≈Ç 8 (Lewo, Wymiary 1.6x1.6)
+TableHitbox table8 = { 14.2f, 15.8f, -2.3f, -0.7f, 1.45f }; // ≈örodek X=15.0f, Z=-1.5f
 
-// StÛ≥ 9 (Podejúcie, Wymiary 1.6x1.6)
-TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // årodek X=18.0f, Z=0.0f
+// St√≥≈Ç 9 (Podej≈õcie, Wymiary 1.6x1.6)
+TableHitbox table9 = { 17.2f, 18.8f, -0.8f, 0.8f, 1.45f }; // ≈örodek X=18.0f, Z=0.0f
 
-// StÛ≥ do testow
+// St√≥≈Ç do testow
 TableHitbox table10 = { 17.2f, 18.8f, 1.7f, 3.3f, 0.68f };
 
-// Rampa ( X=20.0f. D≥ugoúÊ 4m do X=24.0f)
+// Rampa ( X=20.0f. D≈Çugo≈õƒá 4m do X=24.0f)
 RampHitbox ramp = { 20.0f, 24.0f, -1.2f, 1.2f, 2.05f, 2.85f, 4.0f };
-// Hitbox boczny rampy (øeby nie przenikaÊ przez jej boki na dole)
+// Hitbox boczny rampy (≈ºeby nie przenikaƒá przez jej boki na dole)
 TableHitbox ramp_horizontal_box = { 20.0f, 24.0f, -0.9f, 0.9f, 2.05f };
 
-GlassBridge* glassBridge = nullptr; // Wskaünik na most
+GlassBridge* glassBridge = nullptr; // Wska≈∫nik na most
 
 // Trampolina
 Trampoline* bouncyTrampoline = nullptr;
 
-// Definicja Bezpiecznej Strefy (wysoko w gÛrze)
-// Za≥Ûømy, øe trampolina jest na X=40, wybija nas na X=45, Y=20
+// Definicja Bezpiecznej Strefy (wysoko w g√≥rze)
+// Za≈Ç√≥≈ºmy, ≈ºe trampolina jest na X=40, wybija nas na X=45, Y=20
 TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
+
+// Definicja ruchomej platformy (Start Poziomu 2)
+// Porusza siƒô od Z=-4.5 do Z=4.5 na wysoko≈õci Y=15.0, pozycja X=52.0 (za poduszkƒÖ)
+MovingPlatform level2Platform = {
+    { 50.5f, 53.5f, -1.5f, 1.5f, 15.0f }, // Wstƒôpny hitbox (bƒôdzie aktualizowany w pƒôtli)
+    glm::vec3(52.0f, 15.0f, -4.5f),       // Pozycja Startowa (Lewa strona)
+    glm::vec3(52.0f, 15.0f, 4.5f),        // Pozycja Ko≈Ñcowa (Prawa strona)
+    2.0f,                                 // Prƒôdko≈õƒá
+    0.0f, 1, glm::vec3(0.0f)              // Zmienne techniczne (nie zmieniaƒá)
+};
 
 // Chmury
 std::vector<Cloud> clouds;
@@ -174,24 +196,24 @@ float cloudSpawnTimer = 0.0f;
 // 4. IMPLEMENTACJA FUNKCJI POMOCNICZYCH
 // ==========================================
 
-// Sprawdza, czy punkt jest wewnπtrz prostokπta (tylko osie X i Z)
+// Sprawdza, czy punkt jest wewnƒÖtrz prostokƒÖta (tylko osie X i Z)
 static bool isInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
     return pos.x > t.minX && pos.x < t.maxX &&
         pos.z > t.minZ && pos.z < t.maxZ;
 }
 
-// Sprawdza kolizjÍ "bocznπ" (chodzenie w úciany) i cofa ruch, jeúli nastπpi≥a
+// Sprawdza kolizjƒô "bocznƒÖ" (chodzenie w ≈õciany) i cofa ruch, je≈õli nastƒÖpi≈Ça
 static void checkHorizontalCollisionAndRevert(const glm::vec3& newPos, const glm::vec3& oldPos, const TableHitbox& t) {
-    // Obliczamy poziom, na ktÛrym spoczywa≥by úrodek jajka stojπc na blacie
+    // Obliczamy poziom, na kt√≥rym spoczywa≈Çby ≈õrodek jajka stojƒÖc na blacie
     float restingCenterY = t.topY + EGG_HALF_HEIGHT;
 
-    // Jeúli jajko jest WYØEJ niø blat (minus margines tolerancji), to znaczy, øe wchodzimy NA stÛ≥, a nie W stÛ≥.
-    // 0.10f to tolerancja u≥atwiajπca wskakiwanie.
+    // Je≈õli jajko jest WY≈ªEJ ni≈º blat (minus margines tolerancji), to znaczy, ≈ºe wchodzimy NA st√≥≈Ç, a nie W st√≥≈Ç.
+    // 0.10f to tolerancja u≈ÇatwiajƒÖca wskakiwanie.
     if (newPos.y > restingCenterY - 0.10f) {
-        return; // Brak kolizji bocznej, jesteúmy nad obiektem
+        return; // Brak kolizji bocznej, jeste≈õmy nad obiektem
     }
 
-    // Jeúli jesteúmy niøej i weszliúmy w obrys XZ sto≥u -> cofamy ruch X i Z
+    // Je≈õli jeste≈õmy ni≈ºej i weszli≈õmy w obrys XZ sto≈Çu -> cofamy ruch X i Z
     if (isInsideXZ(newPos, t)) {
         eggPosition.x = oldPos.x;
         eggPosition.z = oldPos.z;
@@ -208,13 +230,13 @@ static float localRandomFloat(std::mt19937& generator, float min, float max) {
     return dist(generator);
 }
 
-// £adowanie tekstur z pliku za pomocπ biblioteki stb_image
+// ≈Åadowanie tekstur z pliku za pomocƒÖ biblioteki stb_image
 static unsigned int loadTexture(const char* path) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    stbi_set_flip_vertically_on_load(true); // Odwracamy teksturÍ (OpenGL ma Y=0 na dole)
+    stbi_set_flip_vertically_on_load(true); // Odwracamy teksturƒô (OpenGL ma Y=0 na dole)
     unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format = 0;
@@ -246,7 +268,7 @@ static void spawnCloud() {
     newCloud.position = glm::vec3(randomFloat(-50.0f, 50.0f), randomFloat(10.0f, 20.0f), -70.0f);
     newCloud.velocity = glm::vec3(0.0f, 0.0f, randomFloat(1.5f, 3.0f));
 
-    // Kaøda chmura sk≥ada siÍ z kilku sfer (komponentÛw)
+    // Ka≈ºda chmura sk≈Çada siƒô z kilku sfer (komponent√≥w)
     int numComponents = rand() % 4 + 3;
     for (int i = 0; i < numComponents; ++i) {
         CloudComponent component;
@@ -257,7 +279,7 @@ static void spawnCloud() {
     clouds.push_back(newCloud);
 }
 
-// Proceduralne generowanie pÍkniÍÊ na skorupce jajka
+// Proceduralne generowanie pƒôkniƒôƒá na skorupce jajka
 void updateCrackGeometry(int currentCrackCount) {
     crackVertices.clear();
     std::mt19937 generator;
@@ -275,9 +297,9 @@ void updateCrackGeometry(int currentCrackCount) {
         currentPoint.y = 0.7f * std::cos(theta);
         currentPoint.z = 0.5f * std::sin(theta) * std::sin(phi);
 
-        int numSegments = 5 + i * 3; // Im wiÍcej pÍkniÍÊ, tym d≥uøsze
+        int numSegments = 5 + i * 3; // Im wiƒôcej pƒôkniƒôƒá, tym d≈Çu≈ºsze
 
-        // Generowanie linii pÍkniÍcia (b≥πdzenie losowe)
+        // Generowanie linii pƒôkniƒôcia (b≈ÇƒÖdzenie losowe)
         for (int j = 0; j < numSegments; ++j) {
             crackVertices.push_back(currentPoint.x);
             crackVertices.push_back(currentPoint.y);
@@ -302,7 +324,7 @@ void updateCrackGeometry(int currentCrackCount) {
         }
     }
 
-    // Przes≥anie danych do bufora graficznego (VBO)
+    // Przes≈Çanie danych do bufora graficznego (VBO)
     const void* dataPtr = crackVertices.empty() ? nullptr : crackVertices.data();
     size_t dataSize = crackVertices.size() * sizeof(float);
 
@@ -311,34 +333,34 @@ void updateCrackGeometry(int currentCrackCount) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-// === LOGIKA KOLIZJI Z RAMP• ===
-// Sprawdza, czy gracz stoi na pochy≥ej powierzchni.
-// Oblicza wysokoúÊ pod≥oøa na podstawie pozycji X gracza.
+// === LOGIKA KOLIZJI Z RAMPƒÑ ===
+// Sprawdza, czy gracz stoi na pochy≈Çej powierzchni.
+// Oblicza wysoko≈õƒá pod≈Ço≈ºa na podstawie pozycji X gracza.
 bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF_HEIGHT, float currentEggX, float& eggPositionY, bool& canJump, float& maxFallHeight, const float CRASH_HEIGHT_THRESHOLD, const float CRACK_HEIGHT_THRESHOLD, int& crackCount, const int MAX_CRACKS, float currentFrame, float& crashStartTime, const RampHitbox& ramp, void (*updateCrackGeom)(int)) {
-    float distanceX = ramp.maxX - ramp.minX; // D≥ugoúÊ rampy
-    float heightChange = ramp.endY - ramp.startY; // RÛønica wysokoúci
+    float distanceX = ramp.maxX - ramp.minX; // D≈Çugo≈õƒá rampy
+    float heightChange = ramp.endY - ramp.startY; // R√≥≈ºnica wysoko≈õci
 
-    // Obliczamy procent, jak daleko gracz jest na rampie (0.0 = poczπtek, 1.0 = koniec)
+    // Obliczamy procent, jak daleko gracz jest na rampie (0.0 = poczƒÖtek, 1.0 = koniec)
     float rampRatio = glm::clamp((currentEggX - ramp.minX) / distanceX, 0.0f, 1.0f);
 
-    // Wyliczamy wysokoúÊ pod≥ogi w tym konkretnym punkcie X
+    // Wyliczamy wysoko≈õƒá pod≈Çogi w tym konkretnym punkcie X
     float surfaceY = ramp.startY + heightChange * rampRatio;
-    float desiredCenterY = surfaceY + EGG_HALF_HEIGHT; // Tu powinien byÊ úrodek jajka
+    float desiredCenterY = surfaceY + EGG_HALF_HEIGHT; // Tu powinien byƒá ≈õrodek jajka
 
-    // Sprawdzamy, czy gracz dotyka powierzchni rampy (z tolerancjπ 0.5f na wejúcie)
+    // Sprawdzamy, czy gracz dotyka powierzchni rampy (z tolerancjƒÖ 0.5f na wej≈õcie)
     if (oldY >= desiredCenterY - 0.5f && newY <= desiredCenterY && velocityY <= 0.0f) {
 
-        // Obliczamy obraøenia od upadku
+        // Obliczamy obra≈ºenia od upadku
         float fallDistance = maxFallHeight - desiredCenterY;
         if (fallDistance < 0.0f) { fallDistance = 0.0f; }
 
         if (fallDistance >= CRASH_HEIGHT_THRESHOLD) {
-            currentState = GAME_STATE_CRASHED; // åmierÊ
+            currentState = GAME_STATE_CRASHED; // ≈ömierƒá
             crashStartTime = currentFrame;
             crackCount = MAX_CRACKS;
         }
         else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) {
-            crackCount = glm::min(crackCount + 1, MAX_CRACKS); // PÍkniÍcie
+            crackCount = glm::min(crackCount + 1, MAX_CRACKS); // Pƒôkniƒôcie
             if (crackCount >= MAX_CRACKS) {
                 currentState = GAME_STATE_CRASHED;
             }
@@ -356,22 +378,22 @@ bool checkRampCollision(float oldY, float newY, float& velocityY, float EGG_HALF
     return false; // Brak kolizji
 }
 
-// Funkcja blokujπca przenikanie przez boki trampoliny
+// Funkcja blokujƒÖca przenikanie przez boki trampoliny
 static void checkTrampolineSideCollision(glm::vec3& currentPos, const glm::vec3& oldPos, Trampoline* t) {
     if (!t) return;
 
-    float playerFeetY = currentPos.y - 0.7f; // Poziom stÛp
+    float playerFeetY = currentPos.y - 0.7f; // Poziom st√≥p
 
-    // === ZMIANA LOGIKI WYSOKOåCI ===
-    // Zamiast sprawdzaÊ 't->height' (poziom maty), ustawiamy barierÍ wyøej.
-    // Trampolina jest w dole (Y=-2.0), pod≥oga na Y=0.0.
-    // Ustawiamy barierÍ na Y = 1.0f.
-    // To oznacza, øe "úciana" trampoliny wystaje 1 metr ponad zwyk≥π pod≥ogÍ.
-    // Zwyk≥y skok z pod≥ogi nie pozwoli tego przeskoczyÊ, ale spadajπc z mostu (Y=2.85) przelecisz nad niπ.
+    // === ZMIANA LOGIKI WYSOKO≈öCI ===
+    // Zamiast sprawdzaƒá 't->height' (poziom maty), ustawiamy barierƒô wy≈ºej.
+    // Trampolina jest w dole (Y=-2.0), pod≈Çoga na Y=0.0.
+    // Ustawiamy barierƒô na Y = 1.0f.
+    // To oznacza, ≈ºe "≈õciana" trampoliny wystaje 1 metr ponad zwyk≈ÇƒÖ pod≈Çogƒô.
+    // Zwyk≈Çy skok z pod≈Çogi nie pozwoli tego przeskoczyƒá, ale spadajƒÖc z mostu (Y=2.85) przelecisz nad niƒÖ.
 
     float barrierCeiling = 1.0f;
 
-    // Jeúli jesteúmy NAD barierπ, pozwalamy na ruch (spadamy z gÛry)
+    // Je≈õli jeste≈õmy NAD barierƒÖ, pozwalamy na ruch (spadamy z g√≥ry)
     if (playerFeetY > barrierCeiling) {
         return;
     }
@@ -382,8 +404,8 @@ static void checkTrampolineSideCollision(glm::vec3& currentPos, const glm::vec3&
 
     float distance = glm::distance(flatPlayer, flatTrampoline);
 
-    // Twoja wartoúÊ 1.1f jest dobra, jeúli model jest szeroki.
-    // Blokujemy wejúcie, jeúli gracz jest za blisko úrodka, a nie jest nad barierπ.
+    // Twoja warto≈õƒá 1.1f jest dobra, je≈õli model jest szeroki.
+    // Blokujemy wej≈õcie, je≈õli gracz jest za blisko ≈õrodka, a nie jest nad barierƒÖ.
     float collisionDist = t->radius + 1.1f;
 
     if (distance < collisionDist) {
@@ -403,7 +425,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Pobranie rozdzielczoúci monitora
+    // Pobranie rozdzielczo≈õci monitora
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
     SCR_WIDTH = mode->width;
@@ -423,18 +445,18 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Kursor widoczny w menu
 
-    // Inicjalizacja GLAD (wskaüniki do funkcji OpenGL)
+    // Inicjalizacja GLAD (wska≈∫niki do funkcji OpenGL)
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Blad inicjalizacji GLAD!" << std::endl;
         return -1;
     }
 
     // Ustawienia globalne OpenGL
-    glEnable(GL_DEPTH_TEST); // W≥πczenie bufora g≥Íbokoúci (Z-buffer)
-    glDisable(GL_CULL_FACE); // Wy≥πczenie ukrywania tylnych úcianek (widocznoúÊ rampy od spodu)
+    glEnable(GL_DEPTH_TEST); // W≈ÇƒÖczenie bufora g≈Çƒôboko≈õci (Z-buffer)
+    glDisable(GL_CULL_FACE); // Wy≈ÇƒÖczenie ukrywania tylnych ≈õcianek (widoczno≈õƒá rampy od spodu)
     srand(static_cast<unsigned int>(time(0)));
 
-    // Kompilacja ShaderÛw (z plikÛw .glsl)
+    // Kompilacja Shader√≥w (z plik√≥w .glsl)
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
 
     // === KONFIGURACJA UI (MENU) ===
@@ -444,7 +466,7 @@ int main() {
     uiShader->setMat4("projection", projection);
     uiShader->setInt("uiTexture", 0);
 
-    // WspÛ≥rzÍdne prostokπta menu (wycentrowanego)
+    // Wsp√≥≈Çrzƒôdne prostokƒÖta menu (wycentrowanego)
     float width_ui = 500.0f;
     float height_ui = 500.0f;
     float x_pos = (SCR_WIDTH / 2.0f) - (width_ui / 2.0f);
@@ -482,13 +504,13 @@ int main() {
         float theta = glm::pi<float>() * i / eggSegments;
         for (int j = 0; j <= eggSegments; ++j) {
             float phi = 2 * glm::pi<float>() * j / eggSegments;
-            // RÛwnania parametryczne elipsoidy
-            eggVertices.push_back(0.5f * std::sin(theta) * std::cos(phi)); // X (szerokoúÊ)
-            eggVertices.push_back(0.7f * std::cos(theta));               // Y (wysokoúÊ)
-            eggVertices.push_back(0.5f * std::sin(theta) * std::sin(phi)); // Z (g≥ÍbokoúÊ)
+            // R√≥wnania parametryczne elipsoidy
+            eggVertices.push_back(0.5f * std::sin(theta) * std::cos(phi)); // X (szeroko≈õƒá)
+            eggVertices.push_back(0.7f * std::cos(theta));               // Y (wysoko≈õƒá)
+            eggVertices.push_back(0.5f * std::sin(theta) * std::sin(phi)); // Z (g≈Çƒôboko≈õƒá)
         }
     }
-    // Generowanie indeksÛw (trÛjkπtÛw) dla siatki jajka
+    // Generowanie indeks√≥w (tr√≥jkƒÖt√≥w) dla siatki jajka
     for (int i = 0; i < eggSegments; ++i) {
         for (int j = 0; j < eggSegments; ++j) {
             int first = (i * (eggSegments + 1)) + j;
@@ -504,21 +526,21 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eggEBO); glBufferData(GL_ELEMENT_ARRAY_BUFFER, eggIndices.size() * sizeof(unsigned int), eggIndices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);
 
-    // === GEOMETRIA POD£OGI ===
+    // === GEOMETRIA POD≈ÅOGI ===
     /*float floorVertices[] = { 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, 50.0f, -50.0f, 0.0f, -50.0f, 50.0f, 0.0f, -50.0f };
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO); glGenBuffers(1, &floorVBO); glBindVertexArray(floorVAO);
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO); glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);*/
 
-    // === GEOMETRIA SZEåCIANU (Fragmenty rozbicia) ===
+    // === GEOMETRIA SZE≈öCIANU (Fragmenty rozbicia) ===
     float cubeVertices[] = { -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f };
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO); glGenBuffers(1, &cubeVBO); glBindVertexArray(cubeVAO);
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO); glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);
 
-    // === GEOMETRIA P KNI ∆ (Linie) ===
+    // === GEOMETRIA PƒòKNIƒòƒÜ (Linie) ===
     glGenVertexArrays(1, &crackVAO); glGenBuffers(1, &crackVBO); glBindVertexArray(crackVAO);
     glBindBuffer(GL_ARRAY_BUFFER, crackVBO); glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0); glBindVertexArray(0);
 
@@ -549,7 +571,7 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereEBO); glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), sphereIndices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); glEnableVertexAttribArray(0);
 
-    // £adowanie modeli 3D z plikÛw .obj
+    // ≈Åadowanie modeli 3D z plik√≥w .obj
     Model tableModel("models/table.obj");
     Model rampModel("models/ramp.obj");
     Model tileModel("models/glass_tile.obj");
@@ -575,7 +597,7 @@ int main() {
     );
 
     // ==========================================
-    // 6. G£”WNA P TLA GRY
+    // 6. G≈Å√ìWNA PƒòTLA GRY
     // ==========================================
     while (!glfwWindowShouldClose(window))
     {
@@ -584,14 +606,14 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // ZapamiÍtanie pozycji przed ruchem (do kolizji bocznych)
+        // Zapamiƒôtanie pozycji przed ruchem (do kolizji bocznych)
         previousEggPosition = eggPosition;
 
-        // Obs≥uga wejúcia (klawiatura)
+        // Obs≈Çuga wej≈õcia (klawiatura)
         processInput(window);
 
         // === FIZYKA: KOREKCJA KOLIZJI HORYZONTALNEJ ===
-        // Najpierw ruszamy gracza (w processInput), a teraz sprawdzamy, czy wszed≥ w úcianÍ
+        // Najpierw ruszamy gracza (w processInput), a teraz sprawdzamy, czy wszed≈Ç w ≈õcianƒô
         if (currentState == GAME_STATE_PLAYING) {
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table1);
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, table2);
@@ -607,13 +629,13 @@ int main() {
             if (bouncyTrampoline) {
                 checkTrampolineSideCollision(eggPosition, previousEggPosition, bouncyTrampoline);
             }
-            // <--- DODANO: Kolizja boczna z bezpiecznπ strefπ (metπ)
+            // <--- DODANO: Kolizja boczna z bezpiecznƒÖ strefƒÖ (metƒÖ)
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, safeZone);
         }
 
-        // === OBS£UGA RESETU GRY ===
+        // === OBS≈ÅUGA RESETU GRY ===
         if (needsReset) {
-            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f); // PowrÛt na start
+            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f); // Powr√≥t na start
             velocityY = 0.0f;
             canJump = true;
             maxFallHeight = 0.7f;
@@ -626,9 +648,9 @@ int main() {
         // === FIZYKA I LOGIKA GRY (Ruch w pionie) ===
         if (currentState == GAME_STATE_PLAYING)
         {
-            float oldY = eggPosition.y; // ZapamiÍtujemy wysokoúÊ przed grawitacjπ
+            float oldY = eggPosition.y; // Zapamiƒôtujemy wysoko≈õƒá przed grawitacjƒÖ
 
-            // Aktualizacja maksymalnej wysokoúci (do obliczania obraøeÒ)
+            // Aktualizacja maksymalnej wysoko≈õci (do obliczania obra≈ºe≈Ñ)
             if (velocityY >= 0.0f) {
                 maxFallHeight = eggPosition.y > maxFallHeight ? eggPosition.y : maxFallHeight;
             }
@@ -639,8 +661,44 @@ int main() {
 
             bool standingOnSomething = false;
 
-            // === KOLIZJA Z RAMP• ===
-            // Sprawdzamy, czy jesteúmy w obszarze rampy XZ
+            // --- LOGIKA RUCHOMEJ PLATFORMY ---
+            // 1. Obliczanie nowej pozycji platformy
+            float platDist = glm::distance(level2Platform.startPos, level2Platform.endPos);
+            level2Platform.progress += (level2Platform.speed * deltaTime / platDist) * level2Platform.direction;
+            if (level2Platform.progress >= 1.0f || level2Platform.progress <= 0.0f) level2Platform.direction *= -1;
+            level2Platform.progress = glm::clamp(level2Platform.progress, 0.0f, 1.0f);
+
+            // 2. Obliczanie przesuniƒôcia (offsetu)
+            glm::vec3 lastPlatPos = glm::mix(level2Platform.startPos, level2Platform.endPos,
+                glm::clamp(level2Platform.progress - (level2Platform.speed * deltaTime * level2Platform.direction / platDist), 0.0f, 1.0f));
+            glm::vec3 currPlatPos = glm::mix(level2Platform.startPos, level2Platform.endPos, level2Platform.progress);
+            level2Platform.currentOffset = currPlatPos - lastPlatPos;
+
+            // 3. Aktualizacja Hitboxa (≈ºeby kolizja podƒÖ≈ºa≈Ça za modelem)
+            float platRadius = 1.5f; // Po≈Çowa szeroko≈õci platformy
+            level2Platform.hitbox.minX = currPlatPos.x - platRadius;
+            level2Platform.hitbox.maxX = currPlatPos.x + platRadius;
+            level2Platform.hitbox.minZ = currPlatPos.z - platRadius;
+            level2Platform.hitbox.maxZ = currPlatPos.z + platRadius;
+            level2Platform.hitbox.topY = currPlatPos.y;
+
+            // 4. Sprawdzanie kolizji z graczem
+            if (!standingOnSomething && isInsideXZ(eggPosition, level2Platform.hitbox)) {
+                float dY = level2Platform.hitbox.topY + EGG_HALF_HEIGHT;
+                // Je≈õli lƒÖdujemy na platformie
+                if (oldY >= dY - 0.1f && eggPosition.y <= dY && velocityY <= 0.0f) {
+                    eggPosition.y = dY;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                    maxFallHeight = dY;
+                    // PRZYKLEJENIE: Przesuwamy jajko razem z platformƒÖ
+                    eggPosition += level2Platform.currentOffset;
+                }
+            }
+
+            // === KOLIZJA Z RAMPƒÑ ===
+            // Sprawdzamy, czy jeste≈õmy w obszarze rampy XZ
             if (!standingOnSomething && eggPosition.x > ramp.minX && eggPosition.x < ramp.maxX && eggPosition.z > ramp.minZ && eggPosition.z < ramp.maxZ) {
                 standingOnSomething = checkRampCollision(
                     oldY,
@@ -665,21 +723,21 @@ int main() {
             if (!standingOnSomething && glassBridge) {
                 bool onBridge = glassBridge->checkCollision(
                     eggPosition,
-                    eggPosition.y, // referencja, zostanie zaktualizowana jeúli stoimy
-                    velocityY,     // referencja, zostanie wyzerowana jeúli stoimy
+                    eggPosition.y, // referencja, zostanie zaktualizowana je≈õli stoimy
+                    velocityY,     // referencja, zostanie wyzerowana je≈õli stoimy
                     EGG_HALF_HEIGHT
                 );
 
                 if (onBridge) {
                     standingOnSomething = true;
                     canJump = true;
-                    maxFallHeight = eggPosition.y; // reset obraøeÒ
+                    maxFallHeight = eggPosition.y; // reset obra≈ºe≈Ñ
                 }
             }
 
-            // <--- DODANO: KOLIZJA Z TRAMPOLIN• ===
+            // <--- DODANO: KOLIZJA Z TRAMPOLINƒÑ ===
             if (!standingOnSomething && bouncyTrampoline) {
-                // checkCollision aktualizuje velocityY, jeúli trafimy
+                // checkCollision aktualizuje velocityY, je≈õli trafimy
                 bool bounced = bouncyTrampoline->checkCollision(
                     eggPosition,
                     eggPosition.y, // referencja
@@ -688,25 +746,25 @@ int main() {
                 );
 
                 if (bounced) {
-                    canJump = false; // Nie moøna skoczyÊ w powietrzu po wybiciu
-                    // WAØNE: Resetujemy maxFallHeight do obecnej wysokoúci,
-                    // øeby gra nie myúla≥a, øe spadamy z kosmosu przy lπdowaniu.
+                    canJump = false; // Nie mo≈ºna skoczyƒá w powietrzu po wybiciu
+                    // WA≈ªNE: Resetujemy maxFallHeight do obecnej wysoko≈õci,
+                    // ≈ºeby gra nie my≈õla≈Ça, ≈ºe spadamy z kosmosu przy lƒÖdowaniu.
                     maxFallHeight = eggPosition.y;
 
-                    // Opcjonalnie: DüwiÍk "Boing!" :)
+                    // Opcjonalnie: D≈∫wiƒôk "Boing!" :)
                 }
             }
 
-            // <--- DODANO: KOLIZJA Z BEZPIECZN• STREF•  ===
+            // <--- DODANO: KOLIZJA Z BEZPIECZNƒÑ STREFƒÑ  ===
             if (!standingOnSomething && isInsideXZ(eggPosition, safeZone)) {
                 float desiredY_Safe = safeZone.topY + EGG_HALF_HEIGHT;
 
-                // Sprawdzamy czy lπdujemy na powierzchni
+                // Sprawdzamy czy lƒÖdujemy na powierzchni
                 if (oldY >= desiredY_Safe - 0.001f && eggPosition.y <= desiredY_Safe && velocityY <= 0.0f) {
 
 
 
-                    // Fizyka lπdowania
+                    // Fizyka lƒÖdowania
                     maxFallHeight = desiredY_Safe;
                     eggPosition.y = desiredY_Safe;
                     velocityY = 0.0f;
@@ -715,19 +773,19 @@ int main() {
                 }
             }
 
-            // === KOLIZJE ZE STO£AMI (Wertykalne - lπdowanie) ===
-            // Sprawdzamy stÛ≥ 1
+            // === KOLIZJE ZE STO≈ÅAMI (Wertykalne - lƒÖdowanie) ===
+            // Sprawdzamy st√≥≈Ç 1
             if (isInsideXZ(eggPosition, table1)) {
                 float desiredY1 = table1.topY + EGG_HALF_HEIGHT;
-                // Jeúli opadaliúmy i przeciÍliúmy poziom blatu
+                // Je≈õli opadali≈õmy i przeciƒôli≈õmy poziom blatu
                 if (oldY >= desiredY1 - 0.001f && eggPosition.y <= desiredY1 && velocityY <= 0.0f) {
                     float fallDistance = maxFallHeight - desiredY1;
                     if (fallDistance < 0.0f) { fallDistance = 0.0f; }
-                    // Logika uszkodzeÒ
+                    // Logika uszkodze≈Ñ
                     if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
                     else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) { crackCount = glm::min(crackCount + 1, MAX_CRACKS); if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } updateCrackGeometry(crackCount); }
 
-                    // Lπdowanie
+                    // LƒÖdowanie
                     maxFallHeight = desiredY1;
                     eggPosition.y = desiredY1;
                     velocityY = 0.0f;
@@ -735,14 +793,14 @@ int main() {
                     standingOnSomething = true;
                 }
             }
-            // === KOLIZJA DLA STO£U 10 (TESTOWEGO) ===
+            // === KOLIZJA DLA STO≈ÅU 10 (TESTOWEGO) ===
             if (isInsideXZ(eggPosition, table10)) {
                 float desiredY10 = table10.topY + EGG_HALF_HEIGHT;
                 if (oldY >= desiredY10 - 0.001f && eggPosition.y <= desiredY10 && velocityY <= 0.0f) {
                     float fallDistance = maxFallHeight - desiredY10;
                     if (fallDistance < 0.0f) fallDistance = 0.0f;
 
-                    // Obraøenia
+                    // Obra≈ºenia
                     if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
                     else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) {
                         crackCount = glm::min(crackCount + 1, MAX_CRACKS);
@@ -750,7 +808,7 @@ int main() {
                         updateCrackGeometry(crackCount);
                     }
 
-                    // Lπdowanie
+                    // LƒÖdowanie
                     maxFallHeight = desiredY10;
                     eggPosition.y = desiredY10;
                     velocityY = 0.0f;
@@ -759,21 +817,21 @@ int main() {
                 }
             }
 
-            // Pozosta≥e sto≥y (2, 3, 4, 5, 6, 7, 8, 9) majπ blat 1.45f
+            // Pozosta≈Çe sto≈Çy (2, 3, 4, 5, 6, 7, 8, 9) majƒÖ blat 1.45f
             float desiredY_high_tables = 1.45f + EGG_HALF_HEIGHT;
 
-            // --- FUNKCJA WSP”LNA DLA WYSOKICH STO£”W ---
+            // --- FUNKCJA WSP√ìLNA DLA WYSOKICH STO≈Å√ìW ---
             auto checkHighTableCollision = [&](const TableHitbox& t) {
                 if (!standingOnSomething && isInsideXZ(eggPosition, t)) {
                     if (oldY >= desiredY_high_tables - 0.001f && eggPosition.y <= desiredY_high_tables && velocityY <= 0.0f) {
                         float fallDistance = maxFallHeight - desiredY_high_tables;
                         if (fallDistance < 0.0f) { fallDistance = 0.0f; }
 
-                        // Logika uszkodzeÒ
+                        // Logika uszkodze≈Ñ
                         if (fallDistance >= CRASH_HEIGHT_THRESHOLD) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = MAX_CRACKS; }
                         else if (fallDistance >= CRACK_HEIGHT_THRESHOLD) { crackCount = glm::min(crackCount + 1, MAX_CRACKS); if (crackCount >= MAX_CRACKS) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } updateCrackGeometry(crackCount); }
 
-                        // Lπdowanie
+                        // LƒÖdowanie
                         maxFallHeight = desiredY_high_tables;
                         eggPosition.y = desiredY_high_tables;
                         velocityY = 0.0f;
@@ -783,7 +841,7 @@ int main() {
                 }
                 };
 
-            // Sprawdzamy wszystkie sto≥y o wysokoúci 1.45f
+            // Sprawdzamy wszystkie sto≈Çy o wysoko≈õci 1.45f
             checkHighTableCollision(table2);
             checkHighTableCollision(table3);
             checkHighTableCollision(table4);
@@ -793,9 +851,9 @@ int main() {
             checkHighTableCollision(table8);
             checkHighTableCollision(table9);
 
-            // === KOLIZJA Z ZIEMI• (Pod≥oga na 0.0f) ===
+            // === KOLIZJA Z ZIEMIƒÑ (Pod≈Çoga na 0.0f) ===
             if (!standingOnSomething) {
-                if (eggPosition.y < 0.7f) { // 0.7f to úrodek jajka stojπcego na Y=0
+                if (eggPosition.y < 0.7f) { // 0.7f to ≈õrodek jajka stojƒÖcego na Y=0
                     if (oldY >= 0.7f - 0.001f && eggPosition.y < 0.7f && velocityY <= 0.0f) {
                         float desiredY = 0.7f;
                         float fallDistance = maxFallHeight - desiredY;
@@ -844,8 +902,8 @@ int main() {
         // 7. RENDEROWANIE (RYSOWANIE)
         // ==========================================
 
-        // Czyszczenie ekranu (kolor t≥a i bufor g≥Íbokoúci)
-        glClearColor(0.53f, 0.81f, 0.92f, 1.0f); // Jasny b≥Íkit
+        // Czyszczenie ekranu (kolor t≈Ça i bufor g≈Çƒôboko≈õci)
+        glClearColor(0.53f, 0.81f, 0.92f, 1.0f); // Jasny b≈Çƒôkit
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ourShader.use();
@@ -861,7 +919,7 @@ int main() {
             // Podniesienie kamery nad gracza
             cameraPos += glm::vec3(0.0f, 1.5f, 0.0f);
 
-            // Zabezpieczenie przed wchodzeniem kamery pod pod≥ogÍ
+            // Zabezpieczenie przed wchodzeniem kamery pod pod≈Çogƒô
             const float minCameraHeight = 0.5f;
             if (cameraPos.y < minCameraHeight) cameraPos.y = minCameraHeight;
 
@@ -877,85 +935,85 @@ int main() {
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
-        // --- RYSOWANIE POD£OGI (UØYCIE MODELU) ---
-        // Zmieniamy na 1, øeby model uøywa≥ swojej tekstury (zdefiniowanej w pliku .mtl/.obj)
+        // --- RYSOWANIE POD≈ÅOGI (U≈ªYCIE MODELU) ---
+        // Zmieniamy na 1, ≈ºeby model u≈ºywa≈Ç swojej tekstury (zdefiniowanej w pliku .mtl/.obj)
         ourShader.setInt("useTexture", 1);
 
-        // Zmieniamy kolor na bia≥y, aby nie "farbowaÊ" tekstury trawy na zielono
+        // Zmieniamy kolor na bia≈Çy, aby nie "farbowaƒá" tekstury trawy na zielono
         ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-        // Deklarujemy zmiennπ 'model' PIERWSZY RAZ tutaj
+        // Deklarujemy zmiennƒÖ 'model' PIERWSZY RAZ tutaj
         glm::mat4 model = glm::mat4(1.0f);
-        // Opcjonalnie: Przesuwamy pod≥ogÍ minimalnie w dÛ≥, øeby nie migota≥a z podstawami sto≥Ûw
+        // Opcjonalnie: Przesuwamy pod≈Çogƒô minimalnie w d√≥≈Ç, ≈ºeby nie migota≈Ça z podstawami sto≈Ç√≥w
         model = glm::translate(model, glm::vec3(0.0f, -0.01f, 0.0f));
         ourShader.setMat4("model", model);
 
-        // Rysujemy model za≥adowany z pliku (zamiast rÍcznego glDrawArrays)
+        // Rysujemy model za≈Çadowany z pliku (zamiast rƒôcznego glDrawArrays)
         floorModel.Draw(ourShader);
 
 
-        // --- RYSOWANIE STO£”W ---
+        // --- RYSOWANIE STO≈Å√ìW ---
         ourShader.setInt("useTexture", 1);
         ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-        // StÛ≥ 1 (Blat 0.68f, årodek X: -2.0f)
-        // UWAGA: Tutaj usuwamy "glm::mat4" z poczπtku, bo zmienna 'model' zosta≥a utworzona wyøej (przy pod≥odze)
+        // St√≥≈Ç 1 (Blat 0.68f, ≈örodek X: -2.0f)
+        // UWAGA: Tutaj usuwamy "glm::mat4" z poczƒÖtku, bo zmienna 'model' zosta≈Ça utworzona wy≈ºej (przy pod≈Çodze)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-2.0f, -0.05f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 2 (Blat 1.45f, årodek X: 0.0f)
+        // St√≥≈Ç 2 (Blat 1.45f, ≈örodek X: 0.0f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.77f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 3 (Blat 1.45f, årodek X: 2.5f)
+        // St√≥≈Ç 3 (Blat 1.45f, ≈örodek X: 2.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.5f, 0.77f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 4 (Lewo, årodek X: 5.0f, Z: -1.5f)
+        // St√≥≈Ç 4 (Lewo, ≈örodek X: 5.0f, Z: -1.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(5.0f, 0.77f, -1.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 5 (Prawo, årodek X: 7.5f, Z: 1.5f)
+        // St√≥≈Ç 5 (Prawo, ≈örodek X: 7.5f, Z: 1.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(7.5f, 0.77f, 1.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 6 (Lewo, årodek X: 10.0f, Z: -1.5f)
+        // St√≥≈Ç 6 (Lewo, ≈örodek X: 10.0f, Z: -1.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(10.0f, 0.77f, -1.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 7 (Prawo, årodek X: 12.5f, Z: 1.5f)
+        // St√≥≈Ç 7 (Prawo, ≈örodek X: 12.5f, Z: 1.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(12.5f, 0.77f, 1.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 8 (Lewo, årodek X: 15.0f, Z: -1.5f)
+        // St√≥≈Ç 8 (Lewo, ≈örodek X: 15.0f, Z: -1.5f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(15.0f, 0.77f, -1.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 9 (Podejúcie, årodek X: 18.0f, Z: 0.0f)
+        // St√≥≈Ç 9 (Podej≈õcie, ≈örodek X: 18.0f, Z: 0.0f)
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(18.0f, 0.77f, 0.0f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
 
-        // StÛ≥ 10 (Testowy, årodek X: 18.0f, Z: 2.5f, Niski)
+        // St√≥≈Ç 10 (Testowy, ≈örodek X: 18.0f, Z: 2.5f, Niski)
         model = glm::mat4(1.0f);
-        // Przesuwamy w dÛ≥ (-0.05f), bo model jest tak wycentrowany dla niskich sto≥Ûw (jak table1)
+        // Przesuwamy w d√≥≈Ç (-0.05f), bo model jest tak wycentrowany dla niskich sto≈Ç√≥w (jak table1)
         model = glm::translate(model, glm::vec3(18.0f, -0.05f, 2.5f));
         ourShader.setMat4("model", model);
         tableModel.Draw(ourShader);
@@ -979,7 +1037,7 @@ int main() {
             ourShader.setVec4("objectColor", glm::vec4(1.0f, 0.9f, 0.7f, 1.0f));
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(eggIndices.size()), GL_UNSIGNED_INT, 0);
 
-            // Rysowanie pÍkniÍÊ (czarne linie)
+            // Rysowanie pƒôkniƒôƒá (czarne linie)
             if (crackCount > 0 && !crackVertices.empty()) {
                 glBindVertexArray(crackVAO);
                 ourShader.setMat4("model", model);
@@ -1003,12 +1061,12 @@ int main() {
                 for (int i = 0; i < 5; ++i) {
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::translate(model, eggPosition);
-                    // Fizyka wybuchu fragmentÛw
+                    // Fizyka wybuchu fragment√≥w
                     float explosionForce = 3.0f * (1.0f - ratio);
                     glm::vec3 fragmentOffset = fragments[i] * explosionForce * timeElapsed;
-                    fragmentOffset.y -= 5.0f * timeElapsed * timeElapsed; // Grawitacja fragmentÛw
+                    fragmentOffset.y -= 5.0f * timeElapsed * timeElapsed; // Grawitacja fragment√≥w
                     model = glm::translate(model, fragmentOffset);
-                    float scaleFactor = glm::mix(0.1f, 0.0f, ratio); // Fragmenty znikajπ
+                    float scaleFactor = glm::mix(0.1f, 0.0f, ratio); // Fragmenty znikajƒÖ
                     model = glm::scale(model, glm::vec3(scaleFactor));
                     ourShader.setMat4("model", model);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -1020,7 +1078,7 @@ int main() {
         // --- RYSOWANIE CHMUR ---
         glBindVertexArray(sphereVAO);
         ourShader.setInt("useTexture", 0);
-        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Bia≥e chmury
+        ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Bia≈Çe chmury
         for (const auto& cloud : clouds) {
             for (const auto& component : cloud.components) {
                 model = glm::mat4(1.0f);
@@ -1034,7 +1092,7 @@ int main() {
 
         // --- RYSOWANIE MOSTU ---
         if (glassBridge) {
-            // W≥πczamy przezroczystoúÊ (waøne dla szk≥a, nawet z teksturπ)
+            // W≈ÇƒÖczamy przezroczysto≈õƒá (wa≈ºne dla szk≈Ça, nawet z teksturƒÖ)
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -1053,35 +1111,49 @@ int main() {
         }
 
         // <--- RYSOWANIE PODUSZKI (BEZPIECZNA STREFA)
-        // Hitbox safeZone: X od 43 do 47 (SzerokoúÊ 4), Z od -2 do 2 (G≥ÍbokoúÊ 4), Y=15
+        // Hitbox safeZone: X od 43 do 47 (Szeroko≈õƒá 4), Z od -2 do 2 (G≈Çƒôboko≈õƒá 4), Y=15
 
         // 1. Ustawienia shadera
-        ourShader.setInt("useTexture", 1); // W≥πcz tekstury (uøyje pillow.jpg z mtl)
+        ourShader.setInt("useTexture", 1); // W≈ÇƒÖcz tekstury (u≈ºyje pillow.jpg z mtl)
         ourShader.setVec4("objectColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-        // 2. Obliczanie pozycji (úrodek hitboxa)
-        float pillowCenterX = (safeZone.minX + safeZone.maxX) / 2.0f; // Powinno wyjúÊ 45.0f
-        float pillowCenterZ = (safeZone.minZ + safeZone.maxZ) / 2.0f; // Powinno wyjúÊ 0.0f
+        // 2. Obliczanie pozycji (≈õrodek hitboxa)
+        float pillowCenterX = (safeZone.minX + safeZone.maxX) / 2.0f; // Powinno wyj≈õƒá 45.0f
+        float pillowCenterZ = (safeZone.minZ + safeZone.maxZ) / 2.0f; // Powinno wyj≈õƒá 0.0f
         float pillowY = safeZone.topY; // Powierzchnia na 15.0f
 
         // 3. Macierz modelu
         model = glm::mat4(1.0f);
 
         // Przesuwamy w miejsce docelowe. 
-        // Dodajemy +0.15f do Y, bo model poduszki ma úrodek w 0,0,0, a wysokoúÊ 0.3. 
-        // Chcemy øeby leøa≥a NA stole (o ile tam jest stÛ≥) lub wisia≥a w powietrzu jako magiczna platforma.
+        // Dodajemy +0.15f do Y, bo model poduszki ma ≈õrodek w 0,0,0, a wysoko≈õƒá 0.3. 
+        // Chcemy ≈ºeby le≈ºa≈Ça NA stole (o ile tam jest st√≥≈Ç) lub wisia≈Ça w powietrzu jako magiczna platforma.
         model = glm::translate(model, glm::vec3(pillowCenterX, pillowY - 0.15f, pillowCenterZ));
 
         // Skalujemy! Model ma wymiary 1x1. SafeZone ma 4x4.
-        // Zrobimy jπ trochÍ mniejszπ niø hitbox, øeby nie wystawa≥a dziwnie
+        // Zrobimy jƒÖ trochƒô mniejszƒÖ ni≈º hitbox, ≈ºeby nie wystawa≈Ça dziwnie
         model = glm::scale(model, glm::vec3(4.0f, 1.0f, 4.0f));
 
         ourShader.setMat4("model", model);
         pillowModel.Draw(ourShader);
 
+        // --- RYSOWANIE RUCHOMEJ PLATFORMY ---
+        // Obliczamy aktualnƒÖ pozycjƒô do rysowania
+        glm::vec3 drawPos = glm::mix(level2Platform.startPos, level2Platform.endPos, level2Platform.progress);
+
+        model = glm::mat4(1.0f);
+        // Przesuwamy model tam gdzie jest platforma + korekta wysoko≈õci modelu sto≈Çu (-0.68f)
+        model = glm::translate(model, glm::vec3(drawPos.x, drawPos.y - 0.68f, drawPos.z));
+
+        // Skalujemy x2, ≈ºeby by≈Ça du≈ºa i ≈Çatwo by≈Ço trafiƒá (wymiar ok 3.2 x 3.2)
+        model = glm::scale(model, glm::vec3(2.0f, 1.0f, 2.0f));
+
+        ourShader.setMat4("model", model);
+        ourShader.setInt("useTexture", 1); // U≈ºyj tekstury drewna ze sto≈Çu
+        tableModel.Draw(ourShader);
 
         // --- RYSOWANIE UI (MENU) ---
-        // W≥πczamy przezroczystoúÊ dla tekstury menu (kana≥ Alpha)
+        // W≈ÇƒÖczamy przezroczysto≈õƒá dla tekstury menu (kana≈Ç Alpha)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_DEPTH_TEST); // UI rysowane zawsze na wierzchu
@@ -1095,18 +1167,18 @@ int main() {
             glBindVertexArray(0);
 
             if (currentState == GAME_STATE_CRASHED) {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Pokaø kursor
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Poka≈º kursor
             }
         }
 
         glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST); // Przywracamy sprawdzanie g≥Íbokoúci dla 3D
+        glEnable(GL_DEPTH_TEST); // Przywracamy sprawdzanie g≈Çƒôboko≈õci dla 3D
 
-        glfwSwapBuffers(window); // Podmiana buforÛw ekranu
-        glfwPollEvents();        // Sprawdzenie zdarzeÒ systemowych (klawiatura, mysz)
+        glfwSwapBuffers(window); // Podmiana bufor√≥w ekranu
+        glfwPollEvents();        // Sprawdzenie zdarze≈Ñ systemowych (klawiatura, mysz)
     }
 
-    // === ZWOLNIENIE ZASOB”W (CLEANUP) ===
+    // === ZWOLNIENIE ZASOB√ìW (CLEANUP) ===
     glDeleteVertexArrays(1, &eggVAO); glDeleteBuffers(1, &eggVBO); glDeleteBuffers(1, &eggEBO);
     //glDeleteVertexArrays(1, &floorVAO); glDeleteBuffers(1, &floorVBO);
     glDeleteVertexArrays(1, &cubeVAO); glDeleteBuffers(1, &cubeVBO);
@@ -1115,14 +1187,14 @@ int main() {
     glDeleteVertexArrays(1, &uiVAO); glDeleteBuffers(1, &uiVBO);
     glDeleteTextures(1, &menuTexture);
     delete uiShader;
-    // <--- DODANO: Usuwanie wskaünika
+    // <--- DODANO: Usuwanie wska≈∫nika
     delete bouncyTrampoline;
 
-    glfwTerminate(); // ZamkniÍcie GLFW
+    glfwTerminate(); // Zamkniƒôcie GLFW
     return 0;
 }
 
-// Funkcja obs≥ugujπca wejúcie z klawiatury
+// Funkcja obs≈ÇugujƒÖca wej≈õcie z klawiatury
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -1131,12 +1203,12 @@ void processInput(GLFWwindow* window) {
     if (currentState == GAME_STATE_MENU) {
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
             currentState = GAME_STATE_PLAYING;
-            needsReset = true; // Zresetuj pozycjÍ przy starcie
+            needsReset = true; // Zresetuj pozycjƒô przy starcie
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Ukryj kursor
             firstMouse = true;
         }
     }
-    // åMIER∆ -> MENU
+    // ≈öMIERƒÜ -> MENU
     else if (currentState == GAME_STATE_CRASHED) {
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
             currentState = GAME_STATE_MENU;
@@ -1159,8 +1231,8 @@ void processInput(GLFWwindow* window) {
             currentSpeed = SPRINT_SPEED;
         }
 
-        // Obliczanie kierunkÛw ruchu wzglÍdem kamery
-        glm::vec3 forward = glm::normalize(glm::vec3(cameraFront.x, 0.0f, cameraFront.z)); // Ruch tylko w p≥aszczyünie poziomej
+        // Obliczanie kierunk√≥w ruchu wzglƒôdem kamery
+        glm::vec3 forward = glm::normalize(glm::vec3(cameraFront.x, 0.0f, cameraFront.z)); // Ruch tylko w p≈Çaszczy≈∫nie poziomej
         glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) eggPosition += forward * currentSpeed * deltaTime;
@@ -1189,7 +1261,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     }
 }
 
-// Callback ruchu myszkπ (obracanie kamerπ)
+// Callback ruchu myszkƒÖ (obracanie kamerƒÖ)
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (currentState != GAME_STATE_PLAYING) return;
 
@@ -1200,7 +1272,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     }
 
     float xoffset = static_cast<float>(xpos) - lastX;
-    float yoffset = lastY - static_cast<float>(ypos); // OdwrÛcone, bo Y roúnie w dÛ≥ ekranu
+    float yoffset = lastY - static_cast<float>(ypos); // Odwr√≥cone, bo Y ro≈õnie w d√≥≈Ç ekranu
     lastX = static_cast<float>(xpos);
     lastY = static_cast<float>(ypos);
 
@@ -1211,7 +1283,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     yaw += xoffset;
     pitch += yoffset;
 
-    // Blokada kamery gÛra/dÛ≥ (øeby nie zrobiÊ fiko≥ka)
+    // Blokada kamery g√≥ra/d√≥≈Ç (≈ºeby nie zrobiƒá fiko≈Çka)
     if (pitch > 89.0f) pitch = 89.0f;
     if (pitch < -89.0f) pitch = -89.0f;
 
