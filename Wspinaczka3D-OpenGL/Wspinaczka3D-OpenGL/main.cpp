@@ -9,6 +9,7 @@
 #include "stb_image.h"
 #include "GlassBridge.h" 
 #include "Trampoline.h"
+#include "Maze.h"
 
 // Biblioteki matematyczne GLM
 #include <glm/glm.hpp>
@@ -180,13 +181,15 @@ TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 
 // Definicja ruchomej platformy (Start Poziomu 2)
 // Porusza się od Z=-4.5 do Z=4.5 na wysokości Y=15.0, pozycja X=52.0 (za poduszką)
-MovingPlatform level2Platform = {
-    { 50.5f, 53.5f, -1.5f, 1.5f, 15.0f }, // Wstępny hitbox (będzie aktualizowany w pętli)
-    glm::vec3(52.0f, 15.0f, -4.5f),       // Pozycja Startowa (Lewa strona)
-    glm::vec3(52.0f, 15.0f, 4.5f),        // Pozycja Końcowa (Prawa strona)
-    2.0f,                                 // Prędkość
-    0.0f, 1, glm::vec3(0.0f)              // Zmienne techniczne (nie zmieniać)
+std::vector<MovingPlatform> platforms = {
+    // X=39 (4j od safe zone), X=35 (8j), X=31 (12j), X=27 (16j)
+    { {37.5f, 40.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(39.0f, 15.0f, -4.5f), glm::vec3(39.0f, 15.0f, 4.5f), 2.5f, 0.0f, 1, glm::vec3(0.0f) },
+    { {33.5f, 36.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(35.0f, 15.0f, -5.0f), glm::vec3(35.0f, 15.0f, 5.0f), 4.0f, 0.2f, -1, glm::vec3(0.0f) },
+    { {29.5f, 32.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(31.0f, 15.0f, -6.0f), glm::vec3(31.0f, 15.0f, 6.0f), 3.0f, 0.5f, 1, glm::vec3(0.0f) },
+    { {25.5f, 28.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(27.0f, 15.0f, -4.0f), glm::vec3(27.0f, 15.0f, 4.0f), 5.5f, 0.8f, -1, glm::vec3(0.0f) }
 };
+
+Maze* myMaze = nullptr; // Wskaźnik na nasz labirynt
 
 // Chmury
 std::vector<Cloud> clouds;
@@ -595,6 +598,12 @@ int main() {
         scale,
         offset
     );
+    // === PODŁOGA POD LABIRYNTEM (Hitbox Fizyczny - Idealnie dopasowany) ===
+    // Obliczone na podstawie: Start X=11(-1), Koniec X=11+19(+1) | Start Z=7(-1), Koniec Z=7+19(+1)
+    TableHitbox mazeFloorHitbox = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
+
+    // Tę linijkę zostawiasz bez zmian (powinna być zaraz pod spodem):
+    myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
 
     // ==========================================
     // 6. GŁÓWNA PĘTLA GRY
@@ -631,6 +640,10 @@ int main() {
             }
             // <--- DODANO: Kolizja boczna z bezpieczną strefą (metą)
             checkHorizontalCollisionAndRevert(eggPosition, previousEggPosition, safeZone);
+            // === KOLIZJA Z LABIRYNTEM ===
+            if (myMaze) {
+                myMaze->checkCollision(eggPosition, previousEggPosition);
+            }
         }
 
         // === OBSŁUGA RESETU GRY ===
@@ -661,39 +674,59 @@ int main() {
 
             bool standingOnSomething = false;
 
-            // --- LOGIKA RUCHOMEJ PLATFORMY ---
-            // 1. Obliczanie nowej pozycji platformy
-            float platDist = glm::distance(level2Platform.startPos, level2Platform.endPos);
-            level2Platform.progress += (level2Platform.speed * deltaTime / platDist) * level2Platform.direction;
-            if (level2Platform.progress >= 1.0f || level2Platform.progress <= 0.0f) level2Platform.direction *= -1;
-            level2Platform.progress = glm::clamp(level2Platform.progress, 0.0f, 1.0f);
+            // --- LOGIKA RUCHOMYCH PLATFORM (POPRAWIONA) ---
+            for (auto& plat : platforms) {
+                float platDist = glm::distance(plat.startPos, plat.endPos);
 
-            // 2. Obliczanie przesunięcia (offsetu)
-            glm::vec3 lastPlatPos = glm::mix(level2Platform.startPos, level2Platform.endPos,
-                glm::clamp(level2Platform.progress - (level2Platform.speed * deltaTime * level2Platform.direction / platDist), 0.0f, 1.0f));
-            glm::vec3 currPlatPos = glm::mix(level2Platform.startPos, level2Platform.endPos, level2Platform.progress);
-            level2Platform.currentOffset = currPlatPos - lastPlatPos;
+                // Zabezpieczenie przed dzieleniem przez zero
+                if (platDist <= 0.001f) continue;
 
-            // 3. Aktualizacja Hitboxa (żeby kolizja podążała za modelem)
-            float platRadius = 1.5f; // Połowa szerokości platformy
-            level2Platform.hitbox.minX = currPlatPos.x - platRadius;
-            level2Platform.hitbox.maxX = currPlatPos.x + platRadius;
-            level2Platform.hitbox.minZ = currPlatPos.z - platRadius;
-            level2Platform.hitbox.maxZ = currPlatPos.z + platRadius;
-            level2Platform.hitbox.topY = currPlatPos.y;
+                // Aktualizacja postępu
+                plat.progress += (plat.speed * deltaTime / platDist) * plat.direction;
 
-            // 4. Sprawdzanie kolizji z graczem
-            if (!standingOnSomething && isInsideXZ(eggPosition, level2Platform.hitbox)) {
-                float dY = level2Platform.hitbox.topY + EGG_HALF_HEIGHT;
-                // Jeśli lądujemy na platformie
-                if (oldY >= dY - 0.1f && eggPosition.y <= dY && velocityY <= 0.0f) {
-                    eggPosition.y = dY;
-                    velocityY = 0.0f;
-                    canJump = true;
-                    standingOnSomething = true;
-                    maxFallHeight = dY;
-                    // PRZYKLEJENIE: Przesuwamy jajko razem z platformą
-                    eggPosition += level2Platform.currentOffset;
+                // Ping-pong (odbijanie się od końców)
+                if (plat.progress >= 1.0f) {
+                    plat.progress = 1.0f;
+                    plat.direction = -1;
+                }
+                else if (plat.progress <= 0.0f) {
+                    plat.progress = 0.0f;
+                    plat.direction = 1;
+                }
+
+                // Obliczanie poprzedniej pozycji (do wyliczenia przesunięcia)
+                // TU BYŁ BŁĄD: brakowało gwiazdki (*) między speed a deltaTime
+                float prevProgress = glm::clamp(plat.progress - (plat.speed * deltaTime * plat.direction / platDist), 0.0f, 1.0f);
+
+                glm::vec3 lastPos = glm::mix(plat.startPos, plat.endPos, prevProgress);
+                glm::vec3 currPos = glm::mix(plat.startPos, plat.endPos, plat.progress);
+
+                // Wektor przesunięcia w tej klatce
+                plat.currentOffset = currPos - lastPos;
+
+                // Aktualizacja Hitboxa (musi podążać za modelem)
+                // Zakładamy, że platforma jest dość szeroka (np. 1.5 w każdą stronę)
+                float platWidth = 1.5f;
+                plat.hitbox.minX = currPos.x - platWidth;
+                plat.hitbox.maxX = currPos.x + platWidth;
+                plat.hitbox.minZ = currPos.z - platWidth;
+                plat.hitbox.maxZ = currPos.z + platWidth;
+                plat.hitbox.topY = currPos.y;
+
+                // Sprawdzanie kolizji z graczem
+                if (!standingOnSomething && isInsideXZ(eggPosition, plat.hitbox)) {
+                    float dY = plat.hitbox.topY + EGG_HALF_HEIGHT;
+                    // Jeśli gracz ląduje na platformie
+                    if (oldY >= dY - 0.2f && eggPosition.y <= dY + 0.1f && velocityY <= 0.0f) {
+                        eggPosition.y = dY;
+                        velocityY = 0.0f;
+                        canJump = true;
+                        standingOnSomething = true;
+                        maxFallHeight = dY;
+
+                        // PRZYKLEJENIE: Przesuwamy gracza razem z platformą
+                        eggPosition += plat.currentOffset;
+                    }
                 }
             }
 
@@ -850,6 +883,26 @@ int main() {
             checkHighTableCollision(table7);
             checkHighTableCollision(table8);
             checkHighTableCollision(table9);
+
+            // === KOLIZJA Z PODŁOGĄ LABIRYNTU (Wysokość 15.0) ===
+            // Sprawdzamy, czy gracz jest w obrysie podłogi labiryntu
+            if (!standingOnSomething && isInsideXZ(eggPosition, mazeFloorHitbox)) {
+                float dY = mazeFloorHitbox.topY + EGG_HALF_HEIGHT;
+                // Tolerancja 0.2f pozwala na płynne wejście na platformę przy skoku
+                if (oldY >= dY - 0.2f && eggPosition.y <= dY + 0.1f && velocityY <= 0.0f) {
+                    eggPosition.y = dY;
+                    velocityY = 0.0f;
+                    canJump = true;
+                    standingOnSomething = true;
+                    maxFallHeight = dY;
+                }
+            }
+
+            // === KOLIZJA ZE ŚCIANAMI LABIRYNTU ===
+            // Blokuje przechodzenie przez ściany
+            if (myMaze) {
+                myMaze->checkCollision(eggPosition, previousEggPosition);
+            }
 
             // === KOLIZJA Z ZIEMIĄ (Podłoga na 0.0f) ===
             if (!standingOnSomething) {
@@ -1025,7 +1078,14 @@ int main() {
         ourShader.setMat4("model", model);
         rampModel.Draw(ourShader);
 
-
+        // === RYSOWANIE LABIRYNTU I JEGO PODŁOGI ===
+        if (myMaze) {
+            ourShader.use();
+            // Najpierw podłoga (automatycznie dopasowana)
+            myMaze->DrawFloor(ourShader);
+            // Potem ściany
+            myMaze->Draw(ourShader);
+        }
 
 
         // --- RYSOWANIE GRACZA (JAJKA) ---
@@ -1137,20 +1197,19 @@ int main() {
         ourShader.setMat4("model", model);
         pillowModel.Draw(ourShader);
 
-        // --- RYSOWANIE RUCHOMEJ PLATFORMY ---
-        // Obliczamy aktualną pozycję do rysowania
-        glm::vec3 drawPos = glm::mix(level2Platform.startPos, level2Platform.endPos, level2Platform.progress);
+        // --- RYSOWANIE RUCHOMYCH PLATFORM ---
+        for (const auto& plat : platforms) {
+            glm::vec3 drawPos = glm::mix(plat.startPos, plat.endPos, plat.progress);
 
-        model = glm::mat4(1.0f);
-        // Przesuwamy model tam gdzie jest platforma + korekta wysokości modelu stołu (-0.68f)
-        model = glm::translate(model, glm::vec3(drawPos.x, drawPos.y - 0.68f, drawPos.z));
+            glm::mat4 model = glm::mat4(1.0f);
+            // Przesuwamy model tam gdzie jest platforma + korekta wysokości stołu (-0.68f)
+            model = glm::translate(model, glm::vec3(drawPos.x, drawPos.y - 0.68f, drawPos.z));
+            model = glm::scale(model, glm::vec3(2.0f, 1.0f, 2.0f)); // Skalujemy, żeby była duża
 
-        // Skalujemy x2, żeby była duża i łatwo było trafić (wymiar ok 3.2 x 3.2)
-        model = glm::scale(model, glm::vec3(2.0f, 1.0f, 2.0f));
-
-        ourShader.setMat4("model", model);
-        ourShader.setInt("useTexture", 1); // Użyj tekstury drewna ze stołu
-        tableModel.Draw(ourShader);
+            ourShader.setMat4("model", model);
+            ourShader.setInt("useTexture", 1); // Tekstura drewna
+            tableModel.Draw(ourShader);
+        }
 
         // --- RYSOWANIE UI (MENU) ---
         // Włączamy przezroczystość dla tekstury menu (kanał Alpha)
@@ -1191,6 +1250,7 @@ int main() {
     delete bouncyTrampoline;
 
     glfwTerminate(); // Zamknięcie GLFW
+    delete myMaze;
     return 0;
 }
 
