@@ -15,11 +15,11 @@
 #include "Physics.h"
 #include "Camera.h"
 #include "UIManager.h" 
-#include "Player.h"     
+#include "Player.h"      
 #include "Model.h"
 #include "Shader.h"
 #include "Ladder.h"
-#include "FlyoverBridge.h" //
+#include "FlyoverBridge.h"
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -33,7 +33,10 @@ Physics physics;
 Player* player = nullptr;
 UIManager* uiManager = nullptr;
 
-glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+//OG SCIEZKA NIE USUWAC
+//glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 float maxFallHeight = 0.7f;
@@ -64,8 +67,19 @@ TableHitbox tables[] = {
 TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 TableHitbox mazeFloor = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
 
-// <--- HITBOX PODUSZKI (BLIŻEJ): Z=27.0 do 30.0 (środek 28.5)
-TableHitbox ladderPillow = { 21.5f, 24.5f, 27.0f, 30.0f, 24.0f };
+// <--- HITBOX PODUSZKI (MOSTU) - PODŁOGA
+// Twoje sprawdzone wartości
+TableHitbox ladderPillow = { 10.0f, 30.0f, 27.8f, 32.9f, 22.9f };
+
+// <--- HITBOXY BARIEREK (POPRAWIONE - WZDŁUŻ DROGI)
+// Teraz idą wzdłuż długości mostu (oś X od 10 do 30), a są wąskie w osi Z.
+// "Back" to barierka od strony drabiny. "Front" to barierka po przeciwnej stronie.
+
+TableHitbox barrierBack = { 10.0f, 30.0f, 28.1f, 28.5f, 23.6f };
+
+// Barierka PRZEDNIA (bliżej Z=33.0) - przesunięta na 32.3f - 32.7f
+TableHitbox barrierFront = { 10.0f, 30.0f, 31.6f, 32.7f, 23.6f };
+
 
 void framebuffer_size_callback(GLFWwindow* w, int width, int height);
 void mouse_callback(GLFWwindow* w, double xpos, double ypos);
@@ -78,10 +92,11 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    SCR_WIDTH = mode->width; SCR_HEIGHT = mode->height;
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", monitor, NULL);
+    SCR_WIDTH = 1280;
+    SCR_HEIGHT = 720;
+
+    // NULL jako 4. argument oznacza tryb okienkowy!
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
 
     if (!window) return -1;
     glfwMakeContextCurrent(window);
@@ -116,26 +131,41 @@ int main() {
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
-        // Pozycja: Zmieniamy Z z 45.0f na 34.0f (zaraz za poduszką)
-        // Y zostawiamy na 24.5f (wysokość poduszki to ok. 24.0f + jej grubość)
-        glm::vec3(23.0f, 24.0f, 34.0f),
+        // Pozycja: 
+        // X = 20.0f 
+        // Y = 23.8f 
+        // Z = 30.0f (Przesunięte lekko w tył, żeby środek modelu pasował do nowego hitboxa)
+        glm::vec3(20.0f, 21.8f, 30.0f),
 
-        // Obrót: 0 stopni
+        // Obrót
         glm::vec3(0.0f, 0.0f, 0.0f),
 
-        // Skala: Zwiększamy z 0.1 na 0.4
-        glm::vec3(0.4f, 0.4f, 0.4f),
+        // Skala (szeroki na boki)
+        glm::vec3(3.0f, 0.4f, 0.8f),
         &flyoverModel
     );
+    float titleTimer = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame; lastFrame = currentFrame;
 
+        titleTimer += deltaTime;
+        if (titleTimer >= 0.1f) { // Aktualizuj co 100ms
+            std::string title = "Wspinaczka3D | X: " + std::to_string(eggPosition.x) +
+                " | Y: " + std::to_string(eggPosition.y) +
+                " | Z: " + std::to_string(eggPosition.z);
+            glfwSetWindowTitle(window, title.c_str());
+            titleTimer = 0.0f;
+        }
+
         if (needsReset) {
-            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+            //og nie usuwac
+            //eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+            eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
             physics.Reset();
-            maxFallHeight = 0.7f;
+            //maxFallHeight = 0.7f;
+            maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);
             if (glassBridge) glassBridge->Reset();
@@ -152,7 +182,12 @@ int main() {
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, winZone.rampHorizontalBox);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, safeZone);
 
+            // Kolizja z podłogą mostu (nie spadamy)
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, ladderPillow);
+
+            // Kolizja z BARIERKAMI (poręcze wzdłuż mostu)
+            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierBack);
+            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierFront);
 
             if (myMaze) myMaze->checkCollision(eggPosition, previousEggPosition);
             if (bouncyTrampoline && eggPosition.y - 0.7f <= 1.0f && glm::distance(glm::vec3(eggPosition.x, 0, eggPosition.z), bouncyTrampoline->position) < bouncyTrampoline->radius + 1.1f) {
@@ -196,6 +231,15 @@ int main() {
             if (!standing && Physics::IsInsideXZ(eggPosition, ladderPillow) && oldY >= ladderPillow.topY + 0.6f && eggPosition.y <= ladderPillow.topY + 0.7f && physics.velocityY <= 0.0f) {
                 maxFallHeight = ladderPillow.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
+
+            // Obsługa stania na barierkach (jeśli ktoś na nie wskoczy)
+            if (!standing && Physics::IsInsideXZ(eggPosition, barrierBack) && oldY >= barrierBack.topY + 0.6f && eggPosition.y <= barrierBack.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = barrierBack.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            }
+            if (!standing && Physics::IsInsideXZ(eggPosition, barrierFront) && oldY >= barrierFront.topY + 0.6f && eggPosition.y <= barrierFront.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = barrierFront.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            }
+
 
             if (!standing && Physics::IsInsideXZ(eggPosition, mazeFloor) && oldY >= mazeFloor.topY + 0.5f && eggPosition.y <= mazeFloor.topY + 0.8f && physics.velocityY <= 0.0f) {
                 maxFallHeight = mazeFloor.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
@@ -242,15 +286,11 @@ int main() {
         if (bouncyTrampoline) bouncyTrampoline->Draw(ourShader);
 
         ourShader.setInt("useTexture", 1);
-        ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(45.0f, 14.85f, 0.0f)), glm::vec3(4.0f, 1.0f, 4.0f))); pillowModel.Draw(ourShader);
-
-        // RYSOWANIE PODUSZKI (Z=28.5)
-        ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(23.0f, 24.0f, 28.5f)), glm::vec3(3.0f, 1.0f, 3.0f)));
-        pillowModel.Draw(ourShader);
+        // ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(45.0f, 14.85f, 0.0f)), glm::vec3(4.0f, 1.0f, 4.0f))); pillowModel.Draw(ourShader);
 
         for (auto& p : platforms) { ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(p.startPos, p.endPos, p.progress) - glm::vec3(0, 0.68f, 0)), glm::vec3(2, 1, 2))); tableModel.Draw(ourShader); }
 
-        // --- POPRAWIONE: Rysowanie mostu wewnątrz pętli renderującej (PRZED UI i SwapBuffers) ---
+        // --- Rysowanie mostu ---
         if (myFlyover) {
             myFlyover->Draw(ourShader);
         }
