@@ -68,17 +68,17 @@ TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 TableHitbox mazeFloor = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
 
 // <--- HITBOX PODUSZKI (MOSTU) - PODŁOGA
-// Twoje sprawdzone wartości
-TableHitbox ladderPillow = { 10.0f, 30.0f, 27.8f, 32.9f, 22.9f };
+// WYDŁUŻONA W LEWO (aż do -60.0f)
+TableHitbox ladderPillow = { -40.5f, 28.0f, 27.8f, 33.0f, 22.9f };
 
-// <--- HITBOXY BARIEREK (POPRAWIONE - WZDŁUŻ DROGI)
-// Teraz idą wzdłuż długości mostu (oś X od 10 do 30), a są wąskie w osi Z.
-// "Back" to barierka od strony drabiny. "Front" to barierka po przeciwnej stronie.
+// <--- HITBOXY BARIEREK (WYDŁUŻONE)
+// Też ciągną się od -60.0f do 28.0f
 
-TableHitbox barrierBack = { 10.0f, 30.0f, 28.1f, 28.5f, 23.6f };
+// Barierka TYLNA
+TableHitbox barrierBack = { -40.5f, 28.0f, 28.1f, 28.5f, 23.6f };
 
-// Barierka PRZEDNIA (bliżej Z=33.0) - przesunięta na 32.3f - 32.7f
-TableHitbox barrierFront = { 10.0f, 30.0f, 31.6f, 32.7f, 23.6f };
+// Barierka PRZEDNIA
+TableHitbox barrierFront = { -40.5f, 28.0f, 31.6f, 32.0f, 23.6f };
 
 
 void framebuffer_size_callback(GLFWwindow* w, int width, int height);
@@ -131,17 +131,15 @@ int main() {
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
-        // Pozycja: 
-        // X = 20.0f 
-        // Y = 23.8f 
-        // Z = 30.0f (Przesunięte lekko w tył, żeby środek modelu pasował do nowego hitboxa)
-        glm::vec3(20.0f, 21.8f, 30.0f),
+        // Pozycja: PRZESUNIĘTA MOCNO W X (-16.0f), żeby środek był na długiej trasie
+        // Z=30.0f, Y=21.8f bez zmian
+        glm::vec3(-9.0, 21.8f, 30.0f),
 
         // Obrót
         glm::vec3(0.0f, 0.0f, 0.0f),
 
-        // Skala (szeroki na boki)
-        glm::vec3(3.0f, 0.4f, 0.8f),
+        // Skala: WYDŁUŻONA DO 13.0f (bardzo długa trasa)
+        glm::vec3(5.0f, 0.4f, 0.8f),
         &flyoverModel
     );
     float titleTimer = 0.0f;
