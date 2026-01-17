@@ -151,12 +151,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Downloads\stb_image.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Clouds.h" />
     <ClInclude Include="GlassBridge.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Physics.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Trampoline.h" />
+    <ClInclude Include="UIManager.h" />
+    <ClInclude Include="WinZone.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\menu_prompt.png" />
