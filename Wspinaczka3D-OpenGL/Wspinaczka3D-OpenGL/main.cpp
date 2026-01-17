@@ -15,10 +15,11 @@
 #include "Physics.h"
 #include "Camera.h"
 #include "UIManager.h" 
-#include "Player.h"    
+#include "Player.h"     
 #include "Model.h"
 #include "Shader.h"
 #include "Ladder.h"
+#include "FlyoverBridge.h" //
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -103,6 +104,7 @@ int main() {
     Model trampolineModel("models/trampoline.obj");
     Model pillowModel("models/pillow.obj");
     Model rampModel("models/ramp.obj");
+    Model flyoverModel("models/flyover.obj"); //
 
     ladderTexture = loadTexture("models/wood_ladder.jpg");
 
@@ -112,6 +114,19 @@ int main() {
     myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
+
+    FlyoverBridge* myFlyover = new FlyoverBridge(
+        // Pozycja: Zmieniamy Z z 45.0f na 34.0f (zaraz za poduszką)
+        // Y zostawiamy na 24.5f (wysokość poduszki to ok. 24.0f + jej grubość)
+        glm::vec3(23.0f, 24.0f, 34.0f),
+
+        // Obrót: 0 stopni
+        glm::vec3(0.0f, 0.0f, 0.0f),
+
+        // Skala: Zwiększamy z 0.1 na 0.4
+        glm::vec3(0.4f, 0.4f, 0.4f),
+        &flyoverModel
+    );
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
@@ -235,9 +250,18 @@ int main() {
 
         for (auto& p : platforms) { ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(p.startPos, p.endPos, p.progress) - glm::vec3(0, 0.68f, 0)), glm::vec3(2, 1, 2))); tableModel.Draw(ourShader); }
 
+        // --- POPRAWIONE: Rysowanie mostu wewnątrz pętli renderującej (PRZED UI i SwapBuffers) ---
+        if (myFlyover) {
+            myFlyover->Draw(ourShader);
+        }
+
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
         glfwSwapBuffers(window); glfwPollEvents();
     }
+
+    // Czyszczenie pamięci
+    delete myFlyover;
+
     glfwTerminate(); return 0;
 }
 

@@ -153,6 +153,7 @@
     <ClInclude Include="..\..\..\..\Downloads\stb_image.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Clouds.h" />
+    <ClInclude Include="FlyoverBridge.h" />
     <ClInclude Include="GlassBridge.h" />
     <ClInclude Include="Ladder.h" />
     <ClInclude Include="Maze.h" />
