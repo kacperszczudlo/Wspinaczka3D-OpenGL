@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\GLAD\src\glad.c">
+      <Filter>Vendor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Maze.h">
+      <Filter>GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="GlassBridge.h">
+      <Filter>GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Trampoline.h">
+      <Filter>GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="WinZone.h">
+      <Filter>GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Clouds.h">
+      <Filter>GameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Player_and_Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player_and_Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Downloads\stb_image.h">
+      <Filter>Vendor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertex_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="fragment_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="ui_fragment.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="ui_vertex.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{64c84426-7c05-4f50-a453-08d460048f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{07b93c2e-c96f-4c06-9426-97e3feb07f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameWorld">
+      <UniqueIdentifier>{5b8b86d4-8937-40a2-8121-437d901ff777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player_and_Logic">
+      <UniqueIdentifier>{0aaf1503-7cf6-4a4b-b1f3-4fce691871b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{32b88045-70d5-4ac1-b121-3b93a256f460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vendor">
+      <UniqueIdentifier>{e6ce44ca-f770-40af-ae4f-13d373121b17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{fd05a50b-d92e-4664-9f4f-96a1a9a180f6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\menu_prompt.png">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
