@@ -154,6 +154,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Clouds.h" />
     <ClInclude Include="GlassBridge.h" />
+    <ClInclude Include="Ladder.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

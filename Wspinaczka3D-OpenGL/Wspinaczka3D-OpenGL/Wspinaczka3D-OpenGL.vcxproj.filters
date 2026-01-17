@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dependencies\GLAD\src\glad.c">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Downloads\stb_image.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Ladder.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="GlassBridge.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Trampoline.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Maze.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Clouds.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="WinZone.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertex_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="fragment_shader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="ui_fragment.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="ui_vertex.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{55081a08-188e-4ef6-a360-49eb1ddcbde2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{2ff277bb-c553-4007-b026-0210c26bba6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{0166b0e6-db8f-41a4-86a8-2e0e89537ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{c4a3cd95-231d-4ee2-9d31-8edc463a99fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{861b8896-344d-451b-adc0-44f86073eb9d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\menu_prompt.png">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
