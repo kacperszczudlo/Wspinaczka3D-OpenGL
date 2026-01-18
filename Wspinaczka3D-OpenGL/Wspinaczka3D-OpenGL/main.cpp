@@ -2,24 +2,26 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
-#include <random> 
-#include <cmath> 
+#include <random>
+#include <cmath>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "GlassBridge.h" 
+#include "GlassBridge.h"
 #include "Trampoline.h"
 #include "Maze.h"
-#include "Clouds.h" 
-#include "WinZone.h" 
+#include "Clouds.h"
+#include "WinZone.h"
 #include "Physics.h"
 #include "Camera.h"
-#include "UIManager.h" 
-#include "Player.h"      
+#include "UIManager.h"
+#include "Player.h"
 #include "Model.h"
 #include "Shader.h"
 #include "Ladder.h"
 #include "FlyoverBridge.h"
+#include "WindParticles.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -32,11 +34,9 @@ Camera* gameCamera = nullptr;
 Physics physics;
 Player* player = nullptr;
 UIManager* uiManager = nullptr;
+WindParticles* windParticles = nullptr;
 
-//OG SCIEZKA NIE USUWAC
-//glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
 glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 float maxFallHeight = 0.7f;
@@ -66,20 +66,9 @@ TableHitbox tables[] = {
 };
 TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 TableHitbox mazeFloor = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
-
-// <--- HITBOX PODUSZKI (MOSTU) - PODŁOGA
-// WYDŁUŻONA W LEWO (aż do -60.0f)
 TableHitbox ladderPillow = { -40.5f, 28.0f, 27.8f, 33.0f, 22.9f };
-
-// <--- HITBOXY BARIEREK (WYDŁUŻONE)
-// Też ciągną się od -60.0f do 28.0f
-
-// Barierka TYLNA
 TableHitbox barrierBack = { -40.5f, 28.0f, 28.1f, 28.5f, 23.6f };
-
-// Barierka PRZEDNIA
 TableHitbox barrierFront = { -40.5f, 28.0f, 31.6f, 32.0f, 23.6f };
-
 
 void framebuffer_size_callback(GLFWwindow* w, int width, int height);
 void mouse_callback(GLFWwindow* w, double xpos, double ypos);
@@ -91,26 +80,21 @@ int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    SCR_WIDTH = 1280;
-    SCR_HEIGHT = 720;
-
-    // NULL jako 4. argument oznacza tryb okienkowy!
+    SCR_WIDTH = 1280; SCR_HEIGHT = 720;
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
-
     if (!window) return -1;
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
     glEnable(GL_DEPTH_TEST);
+
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
     gameCamera = new Camera((float)SCR_WIDTH, (float)SCR_HEIGHT);
     uiManager = new UIManager((float)SCR_WIDTH, (float)SCR_HEIGHT, loadTexture("menu_prompt.png"));
     player = new Player();
-    CloudManager cloudManager;
-    WinZone winZone;
+    windParticles = new WindParticles();
+    CloudManager cloudManager; WinZone winZone;
 
     Model tableModel("models/table.obj");
     Model ladderModel("models/Ladder.fbx");
@@ -119,37 +103,27 @@ int main() {
     Model trampolineModel("models/trampoline.obj");
     Model pillowModel("models/pillow.obj");
     Model rampModel("models/ramp.obj");
-    Model flyoverModel("models/flyover.obj"); //
-
+    Model flyoverModel("models/flyover.obj");
     ladderTexture = loadTexture("models/wood_ladder.jpg");
 
-    // Drabina (23, 15, 27)
     myLadder = new Ladder(glm::vec3(23.0f, 15.0f, 27.0f), 10.0f, &ladderModel);
-
     myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
-        // Pozycja: PRZESUNIĘTA MOCNO W X (-16.0f), żeby środek był na długiej trasie
-        // Z=30.0f, Y=21.8f bez zmian
         glm::vec3(-9.0, 21.8f, 30.0f),
-
-        // Obrót
         glm::vec3(0.0f, 0.0f, 0.0f),
-
-        // Skala: WYDŁUŻONA DO 13.0f (bardzo długa trasa)
         glm::vec3(5.0f, 0.4f, 0.8f),
         &flyoverModel
     );
-    float titleTimer = 0.0f;
 
+    float titleTimer = 0.0f;
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame; lastFrame = currentFrame;
-
         titleTimer += deltaTime;
-        if (titleTimer >= 0.1f) { // Aktualizuj co 100ms
+        if (titleTimer >= 0.1f) {
             std::string title = "Wspinaczka3D | X: " + std::to_string(eggPosition.x) +
                 " | Y: " + std::to_string(eggPosition.y) +
                 " | Z: " + std::to_string(eggPosition.z);
@@ -158,14 +132,9 @@ int main() {
         }
 
         if (needsReset) {
-            //og nie usuwac
-            //eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
             eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-            physics.Reset();
-            //maxFallHeight = 0.7f;
-            maxFallHeight = eggPosition.y;
-            crackCount = 0;
-            player->UpdateCracks(0);
+            physics.Reset(); maxFallHeight = eggPosition.y;
+            crackCount = 0; player->UpdateCracks(0);
             if (glassBridge) glassBridge->Reset();
             needsReset = false;
         }
@@ -173,17 +142,29 @@ int main() {
         if (currentState == GAME_STATE_PLAYING) previousEggPosition = eggPosition;
         processInput(window);
 
+        // GENERUJ WIATR na flyover (TUŻ PRZED ruchem)
+        glm::vec3 flyoverCenter = glm::vec3(-9.0f, 21.8f, 30.0f);
+        float flyoverRadius = 10.0f;
+        float distFromCenter = glm::distance(glm::vec2(eggPosition.x, eggPosition.z), glm::vec2(flyoverCenter.x, flyoverCenter.z));
+
+        if (distFromCenter < flyoverRadius) {
+            float time = (float)glfwGetTime();
+            float windStrength = 8.0f; // MOCNIEJSZY WIATR
+            physics.windForce.x = windStrength * sin(time * 0.4f); // Szybsza oscylacja
+            physics.windForce.z = windStrength * cos(time * 0.3f) * 0.4f;
+        }
+        else {
+            physics.windForce = glm::vec3(0.0f);
+        }
+
         if (currentState == GAME_STATE_PLAYING) {
+            bool standing = physics.isClimbing;
             if (myLadder) physics.isClimbing = myLadder->CheckCollision(eggPosition);
 
             for (auto& t : tables) physics.CheckHorizontalCollision(eggPosition, previousEggPosition, t);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, winZone.rampHorizontalBox);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, safeZone);
-
-            // Kolizja z podłogą mostu (nie spadamy)
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, ladderPillow);
-
-            // Kolizja z BARIERKAMI (poręcze wzdłuż mostu)
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierBack);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierFront);
 
@@ -196,7 +177,6 @@ int main() {
             physics.ApplyGravity(deltaTime, eggPosition.y);
             if (!physics.isClimbing && physics.velocityY >= 0.0f) maxFallHeight = glm::max(eggPosition.y, maxFallHeight);
 
-            bool standing = physics.isClimbing;
             if (standing) { maxFallHeight = eggPosition.y; physics.velocityY = 0.0f; }
 
             for (auto& plat : platforms) {
@@ -229,16 +209,6 @@ int main() {
             if (!standing && Physics::IsInsideXZ(eggPosition, ladderPillow) && oldY >= ladderPillow.topY + 0.6f && eggPosition.y <= ladderPillow.topY + 0.7f && physics.velocityY <= 0.0f) {
                 maxFallHeight = ladderPillow.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
-
-            // Obsługa stania na barierkach (jeśli ktoś na nie wskoczy)
-            if (!standing && Physics::IsInsideXZ(eggPosition, barrierBack) && oldY >= barrierBack.topY + 0.6f && eggPosition.y <= barrierBack.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = barrierBack.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
-            }
-            if (!standing && Physics::IsInsideXZ(eggPosition, barrierFront) && oldY >= barrierFront.topY + 0.6f && eggPosition.y <= barrierFront.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = barrierFront.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
-            }
-
-
             if (!standing && Physics::IsInsideXZ(eggPosition, mazeFloor) && oldY >= mazeFloor.topY + 0.5f && eggPosition.y <= mazeFloor.topY + 0.8f && physics.velocityY <= 0.0f) {
                 maxFallHeight = mazeFloor.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
@@ -256,8 +226,9 @@ int main() {
                 float fall = glm::max(maxFallHeight - 0.7f, 0.0f);
                 if (fall >= 1.5f) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = 3; }
                 else if (fall >= 0.9f) { crackCount++; if (crackCount >= 3) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } player->UpdateCracks(crackCount); }
-                maxFallHeight = 0.7f; eggPosition.y = 0.7f; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+                maxFallHeight = 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
+            windParticles->Update(deltaTime, eggPosition, physics.windForce);
             cloudManager.Update(deltaTime);
         }
 
@@ -284,22 +255,20 @@ int main() {
         if (bouncyTrampoline) bouncyTrampoline->Draw(ourShader);
 
         ourShader.setInt("useTexture", 1);
-        // ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(45.0f, 14.85f, 0.0f)), glm::vec3(4.0f, 1.0f, 4.0f))); pillowModel.Draw(ourShader);
-
         for (auto& p : platforms) { ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(p.startPos, p.endPos, p.progress) - glm::vec3(0, 0.68f, 0)), glm::vec3(2, 1, 2))); tableModel.Draw(ourShader); }
 
-        // --- Rysowanie mostu ---
-        if (myFlyover) {
-            myFlyover->Draw(ourShader);
+        if (myFlyover) myFlyover->Draw(ourShader);
+
+        if (physics.windForce != glm::vec3(0.0f)) {
+            windParticles->Draw(ourShader);
         }
 
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
         glfwSwapBuffers(window); glfwPollEvents();
     }
 
-    // Czyszczenie pamięci
     delete myFlyover;
-
+    delete windParticles;
     glfwTerminate(); return 0;
 }
 
@@ -323,27 +292,36 @@ void processInput(GLFWwindow* w) {
     else {
         float speed = (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 5.0f : 2.5f;
         glm::vec3 f = gameCamera->GetFlatFront(), r = gameCamera->Right;
+
+        // NORMALNY RUCH (wspinaczka)
         if (physics.isClimbing) {
             if (glfwGetKey(w, GLFW_KEY_W)) eggPosition.y += speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_S)) eggPosition.y -= speed * deltaTime;
-
-            // Limit wspinaczki (sufit)
             eggPosition.y = glm::clamp(eggPosition.y, 0.7f, myLadder->position.y + 10.0f);
-
             if (glfwGetKey(w, GLFW_KEY_A)) eggPosition -= r * speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_D)) eggPosition += r * speed * deltaTime;
         }
+        // NORMALNY RUCH (chodzenie)
         else {
             if (glfwGetKey(w, GLFW_KEY_W)) eggPosition += f * speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_S)) eggPosition -= f * speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_A)) eggPosition -= r * speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_D)) eggPosition += r * speed * deltaTime;
         }
+
         if (glfwGetKey(w, GLFW_KEY_SPACE)) physics.TryJump();
+
+        // ZASTOSUJ WIATR (po wszystkich ruchach)
+        if (physics.windForce != glm::vec3(0.0f)) {
+            eggPosition += physics.windForce * deltaTime;
+        }
     }
 }
+
 void framebuffer_size_callback(GLFWwindow* w, int width, int height) { glViewport(0, 0, width, height); if (uiManager) uiManager->UpdateProjection((float)width, (float)height); }
-void mouse_callback(GLFWwindow* w, double x, double y) { if (currentState == GAME_STATE_PLAYING) gameCamera->ProcessMouseMovement(x, y); }
+
+void mouse_callback(GLFWwindow* w, double xpos, double ypos) { if (currentState == GAME_STATE_PLAYING) gameCamera->ProcessMouseMovement(xpos, ypos); }
+
 static unsigned int loadTexture(const char* path) {
     unsigned int id; glGenTextures(1, &id); int w, h, c; stbi_set_flip_vertically_on_load(true);
     unsigned char* d = stbi_load(path, &w, &h, &c, 0);

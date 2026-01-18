@@ -30,13 +30,11 @@ public:
         playerY += velocityY * deltaTime;
     }
 
-    // Obsługa skoku
     void TryJump() {
-        // Pozwalamy skoczyć z drabiny lub z ziemi
         if (canJump || isClimbing) {
             velocityY = JUMP_FORCE;
             canJump = false;
-            isClimbing = false; // Skok odrywa nas od drabiny
+            isClimbing = false;
         }
     }
 
@@ -45,6 +43,9 @@ public:
         canJump = true;
         isClimbing = false;
     }
+    // Ogłusga wiatru na moście
+    glm::vec3 windForce = glm::vec3(0.0f); // NOWA: Siła wiatru
+    bool isOnFlyover = false;
 
     // --- Funkcje statyczne do kolizji ---
     static bool IsInsideXZ(const glm::vec3& pos, const TableHitbox& t) {
