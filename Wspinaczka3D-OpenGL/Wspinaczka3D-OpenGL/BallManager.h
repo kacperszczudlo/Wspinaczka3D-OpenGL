@@ -42,7 +42,7 @@ public:
         spawnTimer = 0.0f;
 
         // --- KONFIGURACJA TRUDNOŒCI ---
-        spawnInterval = 2.0f; // Szybciej! Co 2 sekundy nowa kula
+        spawnInterval = 3.5f; // Szybciej! Co 2 sekundy nowa kula
         ballRadius = 0.5f;
 
         // Most FlyoverBridge
