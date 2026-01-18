@@ -201,11 +201,11 @@ private:
         float randZ = randomFloat(minZ, maxZ);
 
         // LOSOWANIE PRÊDKOŒCI (¯eby nie wszystkie toczy³y siê tak samo)
-        float speed = randomFloat(5.0f, 9.0f); // Miêdzy 5 a 9 jednostek
+        float speed = randomFloat(4.0f, 7.0f); // Miêdzy 5 a 9 jednostek
 
         // Opcjonalnie: Lekki k¹t (kula mo¿e lekko zbaczaæ z kursu)
         // ZWIÊKSZY£EM MINIMALNIE DRIFT, bo teraz mamy odbijanie, wiêc bêdzie ciekawiej
-        float driftZ = randomFloat(-1.5f, 1.5f);
+        float driftZ = randomFloat(-1.2f, 1.2f);
 
         b.position = glm::vec3(startX, floorLevel, randZ);
         b.velocity = glm::vec3(speed, 0.0f, driftZ); // Ustawiamy wektor prêdkoœci
