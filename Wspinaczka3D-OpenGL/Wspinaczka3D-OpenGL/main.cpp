@@ -50,6 +50,11 @@ GlassBridge* glassBridge = nullptr;
 Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
 
+// --- SHADOWS ---
+const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+unsigned int depthMapFBO = 0;
+unsigned int depthMap = 0;
+
 struct MovingPlatform { TableHitbox hitbox; glm::vec3 startPos, endPos; float speed, progress; int direction; glm::vec3 currentOffset; };
 std::vector<MovingPlatform> platforms = {
     { {37.5f, 40.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(39.0f, 15.0f, -4.5f), glm::vec3(39.0f, 15.0f, 4.5f), 2.5f, 0.0f, 1, glm::vec3(0.0f) },
@@ -87,6 +92,17 @@ void processInput(GLFWwindow* w);
 static unsigned int loadTexture(const char* path);
 void updateCrackWrapper(int count) { if (player) player->UpdateCracks(count); }
 
+void RenderScene(Shader& shader,
+    Model& floorModel, Model& tableModel, Model& rampModel,
+    WinZone& winZone,
+    Ladder* myLadder,
+    Player* player, glm::vec3 eggPosition, GameState currentState,
+    float currentFrame, float crashStartTime, float CRASH_ANIMATION_DURATION,
+    Maze* myMaze, GlassBridge* glassBridge, Trampoline* bouncyTrampoline,
+    std::vector<MovingPlatform>& platforms,
+    FlyoverBridge* myFlyover);
+
+
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -105,7 +121,32 @@ int main() {
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     glEnable(GL_DEPTH_TEST);
+
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
+    Shader shadowShader("shadow_depth.vs.glsl", "shadow_depth.fs.glsl");
+
+    // --- init shadow framebuffer + depth texture ---
+    glGenFramebuffers(1, &depthMapFBO);
+
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+        SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
     gameCamera = new Camera((float)SCR_WIDTH, (float)SCR_HEIGHT);
     uiManager = new UIManager((float)SCR_WIDTH, (float)SCR_HEIGHT, loadTexture("menu_prompt.png"));
     player = new Player();
@@ -159,10 +200,10 @@ int main() {
 
         if (needsReset) {
             //og nie usuwac
-            //eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
-            eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-            physics.Reset();
-            //maxFallHeight = 0.7f;
+            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+            /*eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+            physics.Reset();*/
+            maxFallHeight = 0.7f;
             maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);
@@ -261,40 +302,123 @@ int main() {
             cloudManager.Update(deltaTime);
         }
 
-        glClearColor(0.53f, 0.81f, 0.92f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // --- LIGHT SETUP ---
+        glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -1.0f, -0.2f));
+        glm::vec3 lightColor = glm::vec3(1.0f);
+
+        // --- LIGHT SPACE MATRIX (orthographic for directional light) ---
+        glm::mat4 lightProjection = glm::ortho(-60.0f, 60.0f, -60.0f, 60.0f, 1.0f, 80.0f);
+
+        glm::mat4 lightView = glm::lookAt(-lightDir * 30.0f, glm::vec3(0.0f), glm::vec3(0, 1, 0));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+
+        // =========================
+// 1) SHADOW DEPTH PASS
+// =========================
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        shadowShader.use();
+        shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+        // UWAGA: nie potrzebujesz projection/view, tylko model + lightSpaceMatrix
+        RenderScene(shadowShader,
+            floorModel, tableModel, rampModel,
+            winZone,
+            myLadder,
+            player, eggPosition, currentState,
+            currentFrame, crashStartTime, CRASH_ANIMATION_DURATION,
+            myMaze, glassBridge, bouncyTrampoline,
+            platforms,
+            myFlyover
+        );
+        if (bouncyTrampoline) bouncyTrampoline->Draw(shadowShader);
+
+        if (glassBridge) glassBridge->Draw(shadowShader);
+
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // =========================
+        // 2) NORMAL RENDER PASS
+        // =========================
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ourShader.setInt("forceUpNormal", 0);
         ourShader.use();
+        ourShader.setInt("forceUpNormal", 0);
+        ourShader.setInt("twoSided", 0);
 
         glm::mat4 view = (currentState == GAME_STATE_MENU) ?
             glm::lookAt(glm::vec3(0, 5, 15), glm::vec3(0, 2, 0), glm::vec3(0, 1, 0)) :
             gameCamera->GetViewMatrix(eggPosition);
 
-        ourShader.setMat4("projection", glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f));
+        ourShader.setMat4("projection", glm::perspective(glm::radians(45.0f),
+            (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f));
         ourShader.setMat4("view", view);
 
-        ourShader.setInt("useTexture", 1);
-        ourShader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.01f, 0))); floorModel.Draw(ourShader);
-        for (auto& t : tables) { ourShader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3((t.minX + t.maxX) / 2, t.topY - 0.68f, (t.minZ + t.maxZ) / 2))); tableModel.Draw(ourShader); }
-        winZone.Draw(ourShader, rampModel);
+        // żeby nie było czarno jeśli shader mnoży przez objectColor
+        ourShader.setVec4("objectColor", glm::vec4(1.0f));
 
-        if (myLadder) myLadder->Draw(ourShader);
 
-        player->Draw(ourShader, eggPosition, currentState == GAME_STATE_CRASHED, currentFrame - crashStartTime, CRASH_ANIMATION_DURATION);
-        if (myMaze) { ourShader.use(); ourShader.setInt("useTexture", 1); myMaze->DrawFloor(ourShader); myMaze->Draw(ourShader); }
-        if (glassBridge) { glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glassBridge->Draw(ourShader); glDisable(GL_BLEND); }
-        if (bouncyTrampoline) bouncyTrampoline->Draw(ourShader);
+        // --- LIGHT ---
 
-        ourShader.setInt("useTexture", 1);
-        // ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(45.0f, 14.85f, 0.0f)), glm::vec3(4.0f, 1.0f, 4.0f))); pillowModel.Draw(ourShader);
+        glm::vec3 viewPos;
+        if (currentState == GAME_STATE_MENU) viewPos = glm::vec3(0.0f, 5.0f, 15.0f);
+        else {
+            viewPos = eggPosition - gameCamera->Front * gameCamera->Distance;
+            viewPos.y += 1.5f;
+            if (viewPos.y < 0.5f) viewPos.y = 0.5f;
+        }
+        ourShader.setVec3("viewPos", viewPos);
+        ourShader.setVec3("lightDir", lightDir);
+        ourShader.setVec3("lightColor", lightColor);
 
-        for (auto& p : platforms) { ourShader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(p.startPos, p.endPos, p.progress) - glm::vec3(0, 0.68f, 0)), glm::vec3(2, 1, 2))); tableModel.Draw(ourShader); }
+        ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-        // --- Rysowanie mostu ---
-        if (myFlyover) {
-            myFlyover->Draw(ourShader);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        ourShader.setInt("shadowMap", 3);
+
+        // szkło tylko tutaj z blendingiem (jak miałeś)
+        RenderScene(ourShader,
+            floorModel, tableModel, rampModel,
+            winZone,
+            myLadder,
+            player, eggPosition, currentState,
+            currentFrame, crashStartTime, CRASH_ANIMATION_DURATION,
+            myMaze, glassBridge, bouncyTrampoline,
+            platforms,
+            myFlyover
+        );
+
+        if (bouncyTrampoline) {
+            ourShader.setInt("twoSided", 1);
+            ourShader.setInt("forceUpNormal", 1);
+            bouncyTrampoline->Draw(ourShader);
+            ourShader.setInt("forceUpNormal", 0);
+            ourShader.setInt("twoSided", 0);
+        }
+
+
+        // blend dla szkła w Twoim projekcie było w osobnym if-ie.
+        // Jeśli GlassBridge->Draw robi tylko draw, to najlepiej zrobić tak:
+        if (glassBridge) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glassBridge->Draw(ourShader);
+            glDisable(GL_BLEND);
         }
 
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
-        glfwSwapBuffers(window); glfwPollEvents();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
     }
 
     // Czyszczenie pamięci
@@ -302,6 +426,70 @@ int main() {
 
     glfwTerminate(); return 0;
 }
+
+void RenderScene(Shader& shader,
+    Model& floorModel, Model& tableModel, Model& rampModel,
+    WinZone& winZone,
+    Ladder* myLadder,
+    Player* player, glm::vec3 eggPosition, GameState currentState,
+    float currentFrame, float crashStartTime, float CRASH_ANIMATION_DURATION,
+    Maze* myMaze, GlassBridge* glassBridge, Trampoline* bouncyTrampoline,
+    std::vector<MovingPlatform>& platforms,
+    FlyoverBridge* myFlyover)
+{
+    shader.setInt("useTexture", 1);
+
+    // floor
+    shader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.01f, 0)));
+    floorModel.Draw(shader);
+
+    // tables
+    for (auto& t : tables) {
+        shader.setMat4("model", glm::translate(glm::mat4(1.0f),
+            glm::vec3((t.minX + t.maxX) / 2, t.topY - 0.68f, (t.minZ + t.maxZ) / 2)));
+        tableModel.Draw(shader);
+    }
+
+    // ramp/winzone
+    winZone.Draw(shader, rampModel);
+
+    // ladder
+    if (myLadder) myLadder->Draw(shader);
+
+    // player
+    player->Draw(shader, eggPosition, currentState == GAME_STATE_CRASHED,
+        currentFrame - crashStartTime, CRASH_ANIMATION_DURATION);
+
+    // maze
+    if (myMaze) {
+        shader.use();
+        shader.setInt("useTexture", 1);
+        myMaze->DrawFloor(shader);
+        myMaze->Draw(shader);
+    }
+
+    //// glass bridge (blend tylko w main pass; w depth pass i tak alpha discard w shaderze jeśli ustawisz)
+    //if (glassBridge) {
+    //    // UWAGA: w depth pass nie potrzebujesz blendingu; tu nie robimy enable/disable żeby nie mieszać
+    //    glassBridge->Draw(shader);
+    //}
+
+    
+
+    // moving platforms
+    shader.setInt("useTexture", 1);
+    for (auto& p : platforms) {
+        shader.setMat4("model",
+            glm::scale(glm::translate(glm::mat4(1.0f),
+                glm::mix(p.startPos, p.endPos, p.progress) - glm::vec3(0, 0.68f, 0)),
+                glm::vec3(2, 1, 2)));
+        tableModel.Draw(shader);
+    }
+
+    // flyover
+    if (myFlyover) myFlyover->Draw(shader);
+}
+
 
 void processInput(GLFWwindow* w) {
     if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(w, true);

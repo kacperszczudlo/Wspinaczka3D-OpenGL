@@ -60,6 +60,7 @@
     <ClInclude Include="WinZone.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="FlyoverBridge.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex_shader.glsl">
@@ -72,6 +73,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="ui_vertex.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shadow_depth.vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shadow_depth.fs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

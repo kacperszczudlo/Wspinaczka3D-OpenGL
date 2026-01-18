@@ -145,6 +145,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader.glsl" />
+    <None Include="shadow_depth.fs.glsl" />
+    <None Include="shadow_depth.vs.glsl" />
     <None Include="ui_fragment.glsl" />
     <None Include="ui_vertex.glsl" />
     <None Include="vertex_shader.glsl" />
