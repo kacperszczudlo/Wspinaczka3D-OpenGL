@@ -20,6 +20,7 @@
 #include "Shader.h"
 #include "Ladder.h"
 #include "FlyoverBridge.h"
+#include "BallManager.h"
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -49,6 +50,7 @@ unsigned int ladderTexture = 0;
 GlassBridge* glassBridge = nullptr;
 Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
+BallManager* ballManager = nullptr;
 
 struct MovingPlatform { TableHitbox hitbox; glm::vec3 startPos, endPos; float speed, progress; int direction; glm::vec3 currentOffset; };
 std::vector<MovingPlatform> platforms = {
@@ -120,8 +122,9 @@ int main() {
     Model pillowModel("models/pillow.obj");
     Model rampModel("models/ramp.obj");
     Model flyoverModel("models/flyover.obj"); //
+    Model ballModel("models/ball.obj");
 
-    ladderTexture = loadTexture("models/wood_ladder.jpg");
+    ballManager = new BallManager(&ballModel);
 
     // Drabina (23, 15, 27)
     myLadder = new Ladder(glm::vec3(23.0f, 15.0f, 27.0f), 10.0f, &ladderModel);
@@ -174,6 +177,18 @@ int main() {
         processInput(window);
 
         if (currentState == GAME_STATE_PLAYING) {
+
+
+            if (ballManager) {
+                ballManager->Update(deltaTime); // Przesuwanie kul
+
+                if (ballManager->CheckCollision(eggPosition)) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = currentFrame;
+                    crackCount = 3;
+                    if (player) player->UpdateCracks(3);
+                }
+            }
             if (myLadder) physics.isClimbing = myLadder->CheckCollision(eggPosition);
 
             for (auto& t : tables) physics.CheckHorizontalCollision(eggPosition, previousEggPosition, t);
@@ -258,6 +273,8 @@ int main() {
                 else if (fall >= 0.9f) { crackCount++; if (crackCount >= 3) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } player->UpdateCracks(crackCount); }
                 maxFallHeight = 0.7f; eggPosition.y = 0.7f; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
+
+            
             cloudManager.Update(deltaTime);
         }
 
@@ -278,6 +295,9 @@ int main() {
 
         if (myLadder) myLadder->Draw(ourShader);
 
+
+        
+
         player->Draw(ourShader, eggPosition, currentState == GAME_STATE_CRASHED, currentFrame - crashStartTime, CRASH_ANIMATION_DURATION);
         if (myMaze) { ourShader.use(); ourShader.setInt("useTexture", 1); myMaze->DrawFloor(ourShader); myMaze->Draw(ourShader); }
         if (glassBridge) { glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glassBridge->Draw(ourShader); glDisable(GL_BLEND); }
@@ -292,6 +312,9 @@ int main() {
         if (myFlyover) {
             myFlyover->Draw(ourShader);
         }
+        if (ballManager) {
+            ballManager->Draw(ourShader);
+        }
 
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
         glfwSwapBuffers(window); glfwPollEvents();
@@ -299,6 +322,7 @@ int main() {
 
     // Czyszczenie pamięci
     delete myFlyover;
+    delete ballManager;
 
     glfwTerminate(); return 0;
 }

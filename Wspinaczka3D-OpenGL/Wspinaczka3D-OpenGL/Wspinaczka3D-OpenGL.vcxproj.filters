@@ -60,6 +60,12 @@
     <ClInclude Include="WinZone.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="FlyoverBridge.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="BallManager.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex_shader.glsl">
