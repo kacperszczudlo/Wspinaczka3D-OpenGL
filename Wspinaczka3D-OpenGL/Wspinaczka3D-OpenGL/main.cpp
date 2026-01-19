@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+﻿#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
@@ -24,7 +24,9 @@
 #include "Ground.h"
 #include "BallManager.h" // Upewnij się, że masz ten nagłówek, bo używasz ballManager
 #include "MovingWallCourse.h"
-
+#include "WindyTileBridge.h"
+#include "FinalWinZone.h"
+#include "WindParticles.h"
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -41,6 +43,7 @@ UIManager* uiManager = nullptr;
 //OG SCIEZKA NIE USUWAC
 glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
 //glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+//glm::vec3 eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
 
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
@@ -56,14 +59,29 @@ Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
 BallManager* ballManager = nullptr;
 MovingWallCourse* wallCourse = nullptr;
-
+WindyTileBridge* windyBridge = nullptr;
+WindParticles* windParticles = nullptr;
+FinalWinZone* finalWinZone = nullptr;
+bool gameWon = false;
+bool showWinMessage = false;
+std::string winMessage = "";
+float winMessageDisplayTime = 0.0f;
+const float WIN_MESSAGE_DURATION = 5.0f;
+bool restrictMovementToWinZone = false; // Ograniczenie ruchu po wygranej
 
 // --- SHADOWS ---
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 unsigned int depthMapFBO = 0;
 unsigned int depthMap = 0;
 
-struct MovingPlatform { TableHitbox hitbox; glm::vec3 startPos, endPos; float speed, progress; int direction; glm::vec3 currentOffset; };
+struct MovingPlatform {
+    TableHitbox hitbox;
+    glm::vec3 startPos, endPos;
+    float speed, progress;
+    int direction;
+    glm::vec3 currentOffset;
+};
+
 std::vector<MovingPlatform> platforms = {
     { {37.5f, 40.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(39.0f, 15.0f, -4.5f), glm::vec3(39.0f, 15.0f, 4.5f), 2.5f, 0.0f, 1, glm::vec3(0.0f) },
     { {33.5f, 36.5f, -1.5f, 1.5f, 15.0f }, glm::vec3(35.0f, 15.0f, -5.0f), glm::vec3(35.0f, 15.0f, 5.0f), 4.0f, 0.2f, -1, glm::vec3(0.0f) },
@@ -77,7 +95,8 @@ TableHitbox tables[] = {
     {11.7f, 13.3f, 0.7f, 2.3f, 1.45f}, {14.2f, 15.8f, -2.3f, -0.7f, 1.45f}, {17.2f, 18.8f, -0.8f, 0.8f, 1.45f},
     {17.2f, 18.8f, 1.7f, 3.3f, 0.68f}
 };
-TableHitbox safeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
+
+TableHitbox midSafeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 TableHitbox mazeFloor = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
 
 // <--- HITBOX PODUSZKI (MOSTU) - PODŁOGA
@@ -89,10 +108,8 @@ TableHitbox ladderPillow = { -40.5f, 28.0f, 27.8f, 33.0f, 22.9f };
 
 // Barierka TYLNA
 TableHitbox barrierBack = { -40.5f, 28.0f, 28.1f, 28.5f, 23.6f };
-
 // Barierka PRZEDNIA
 TableHitbox barrierFront = { -40.5f, 28.0f, 31.6f, 32.0f, 23.6f };
-
 
 void framebuffer_size_callback(GLFWwindow* w, int width, int height);
 void mouse_callback(GLFWwindow* w, double xpos, double ypos);
@@ -111,12 +128,14 @@ void RenderScene(Shader& shader,
     std::vector<MovingPlatform>& platforms,
     FlyoverBridge* myFlyover,
     BallManager* ballManager,
-    Model& pillowModel);
-
+    Model& pillowModel,
+    WindyTileBridge* windyBridge,
+    FinalWinZone* finalWinZone);
 
 int main() {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     SCR_WIDTH = 1280;
@@ -124,8 +143,8 @@ int main() {
 
     // NULL jako 4. argument oznacza tryb okienkowy!
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
-
     if (!window) return -1;
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -134,12 +153,12 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     Skybox skybox({
-    "models/skybox/Daylight Box_Right.bmp",
-    "models/skybox/Daylight Box_Left.bmp",
-    "models/skybox/Daylight Box_Top.bmp",
-    "models/skybox/Daylight Box_Bottom.bmp",
-    "models/skybox/Daylight Box_Front.bmp",
-    "models/skybox/Daylight Box_Back.bmp"
+        "models/skybox/Daylight Box_Right.bmp",
+        "models/skybox/Daylight Box_Left.bmp",
+        "models/skybox/Daylight Box_Top.bmp",
+        "models/skybox/Daylight Box_Bottom.bmp",
+        "models/skybox/Daylight Box_Front.bmp",
+        "models/skybox/Daylight Box_Back.bmp"
         });
 
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
@@ -147,11 +166,9 @@ int main() {
 
     // --- init shadow framebuffer + depth texture ---
     glGenFramebuffers(1, &depthMapFBO);
-
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-        SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -165,7 +182,6 @@ int main() {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
     gameCamera = new Camera((float)SCR_WIDTH, (float)SCR_HEIGHT);
     uiManager = new UIManager((float)SCR_WIDTH, (float)SCR_HEIGHT, loadTexture("menu_prompt.png"));
@@ -191,13 +207,34 @@ int main() {
     myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
+
+    // UWAGA: dałem Y=15 żeby pasowało do Twojej “platformowej” wysokości
     wallCourse = new MovingWallCourse(
-        glm::vec3(-45.0f, 23.6f, 28.0f),   // UWAGA: dałem Y=15 żeby pasowało do Twojej “platformowej” wysokości
+        glm::vec3(-45.0f, 23.6f, 28.0f),
         myMaze->wallTextureID,
         myMaze->floorTextureID,
         myMaze->cubeMesh
     );
 
+    windyBridge = new WindyTileBridge(
+        glm::vec3(-46.0f, 24.3f, 58.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        &tileModel,
+        10,
+        30,
+        2.0f
+    );
+
+    windParticles = new WindParticles();
+    windParticles->bridge = windyBridge;
+
+    finalWinZone = new FinalWinZone(
+        glm::vec3(0.0f, 24.3f, 125.0f),
+        12.0f,
+        12.0f,
+        24.3f
+    );
 
     ballManager = new BallManager(&ballModel);
 
@@ -213,19 +250,32 @@ int main() {
         glm::vec3(5.0f, 0.4f, 0.8f),
         &flyoverModel
     );
+
     float titleTimer = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
-        deltaTime = currentFrame - lastFrame; lastFrame = currentFrame;
-        if (wallCourse) wallCourse->Update(deltaTime);
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
+        if (wallCourse) wallCourse->Update(deltaTime);
+        if (windyBridge) windyBridge->Update(deltaTime, eggPosition);
+
+        if (windParticles) {
+            windParticles->Update(deltaTime, glm::vec3(windyBridge->GetWindForce().x, 0, windyBridge->GetWindForce().y));
+        }
 
         titleTimer += deltaTime;
         if (titleTimer >= 0.1f) { // Aktualizuj co 100ms
-            std::string title = "Wspinaczka3D | X: " + std::to_string(eggPosition.x) +
-                " | Y: " + std::to_string(eggPosition.y) +
-                " | Z: " + std::to_string(eggPosition.z);
+            std::string title;
+            if (showWinMessage) {
+                title = "=== GRATULACJE! UKONCZYLES PARKOUR! ===";
+            }
+            else {
+                title = "Wspinaczka3D | X: " + std::to_string(eggPosition.x) +
+                    " | Y: " + std::to_string(eggPosition.y) +
+                    " | Z: " + std::to_string(eggPosition.z);
+            }
             glfwSetWindowTitle(window, title.c_str());
             titleTimer = 0.0f;
         }
@@ -233,13 +283,15 @@ int main() {
         if (needsReset) {
             //og nie usuwac
             eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
-            //eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-            //physics.Reset(); 
-            maxFallHeight = 0.7f;
+            //eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
+            physics.Reset();
             maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);
             if (glassBridge) glassBridge->Reset();
+            if (finalWinZone) finalWinZone->playerHasWon = false;
+            gameWon = false;
+            restrictMovementToWinZone = false;
             needsReset = false;
         }
 
@@ -247,7 +299,6 @@ int main() {
         processInput(window);
 
         if (currentState == GAME_STATE_PLAYING) {
-
             // Logika kulek
             if (ballManager) {
                 ballManager->Update(deltaTime);
@@ -263,7 +314,7 @@ int main() {
 
             for (auto& t : tables) physics.CheckHorizontalCollision(eggPosition, previousEggPosition, t);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, winZone.rampHorizontalBox);
-            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, safeZone);
+            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, midSafeZone);
 
             if (eggPosition.y > 15.0f) {
                 // Kolizja z podłogą mostu (żeby nie przenikać przez bok podłogi)
@@ -275,8 +326,10 @@ int main() {
             }
 
             if (myMaze) myMaze->checkCollision(eggPosition, previousEggPosition);
-            if (bouncyTrampoline && eggPosition.y - 0.7f <= 1.0f && glm::distance(glm::vec3(eggPosition.x, 0, eggPosition.z), bouncyTrampoline->position) < bouncyTrampoline->radius + 1.1f) {
-                eggPosition.x = previousEggPosition.x; eggPosition.z = previousEggPosition.z;
+            if (bouncyTrampoline && eggPosition.y - 0.7f <= 1.0f &&
+                glm::distance(glm::vec3(eggPosition.x, 0, eggPosition.z), bouncyTrampoline->position) < bouncyTrampoline->radius + 1.1f) {
+                eggPosition.x = previousEggPosition.x;
+                eggPosition.z = previousEggPosition.z;
             }
 
             if (wallCourse && wallCourse->CheckPlayer(eggPosition, 0.4f)) {
@@ -288,13 +341,17 @@ int main() {
                 }
             }
 
-
             float oldY = eggPosition.y;
             physics.ApplyGravity(deltaTime, eggPosition.y);
-            if (!physics.isClimbing && physics.velocityY >= 0.0f) maxFallHeight = glm::max(eggPosition.y, maxFallHeight);
+            if (!physics.isClimbing && physics.velocityY >= 0.0f) {
+                maxFallHeight = glm::max(eggPosition.y, maxFallHeight);
+            }
 
             bool standing = physics.isClimbing;
-            if (standing) { maxFallHeight = eggPosition.y; physics.velocityY = 0.0f; }
+            if (standing) {
+                maxFallHeight = eggPosition.y;
+                physics.velocityY = 0.0f;
+            }
 
             for (auto& plat : platforms) {
                 float dist = glm::distance(plat.startPos, plat.endPos);
@@ -303,67 +360,178 @@ int main() {
                     if (plat.progress >= 1.0f || plat.progress <= 0.0f) plat.direction *= -1;
                     glm::vec3 curr = glm::mix(plat.startPos, plat.endPos, plat.progress = glm::clamp(plat.progress, 0.0f, 1.0f));
                     plat.currentOffset = curr - glm::mix(plat.startPos, plat.endPos, glm::clamp(plat.progress - (plat.speed * deltaTime * plat.direction / dist), 0.0f, 1.0f));
-                    plat.hitbox.minX = curr.x - 1.5f; plat.hitbox.maxX = curr.x + 1.5f;
-                    plat.hitbox.minZ = curr.z - 1.5f; plat.hitbox.maxZ = curr.z + 1.5f; plat.hitbox.topY = curr.y;
-                    if (!standing && Physics::IsInsideXZ(eggPosition, plat.hitbox) && oldY >= plat.hitbox.topY + 0.5f && eggPosition.y <= plat.hitbox.topY + 0.8f && physics.velocityY <= 0.0f) {
-                        eggPosition.y = plat.hitbox.topY + 0.7f; physics.velocityY = 0.0f; physics.canJump = true; standing = true; maxFallHeight = eggPosition.y; eggPosition += plat.currentOffset;
+                    plat.hitbox.minX = curr.x - 1.5f;
+                    plat.hitbox.maxX = curr.x + 1.5f;
+                    plat.hitbox.minZ = curr.z - 1.5f;
+                    plat.hitbox.maxZ = curr.z + 1.5f;
+                    plat.hitbox.topY = curr.y;
+                    if (!standing && Physics::IsInsideXZ(eggPosition, plat.hitbox) &&
+                        oldY >= plat.hitbox.topY + 0.5f && eggPosition.y <= plat.hitbox.topY + 0.8f && physics.velocityY <= 0.0f) {
+                        eggPosition.y = plat.hitbox.topY + 0.7f;
+                        physics.velocityY = 0.0f;
+                        physics.canJump = true;
+                        standing = true;
+                        maxFallHeight = eggPosition.y;
+                        eggPosition += plat.currentOffset;
                     }
                 }
             }
 
             if (!standing) {
                 int stateInt = (int)currentState;
-                standing = winZone.CheckRampCollision(oldY, eggPosition.y, physics.velocityY, 0.7f, eggPosition, physics.canJump, maxFallHeight, 1.5f, 0.9f, crackCount, 3, stateInt, (int)GAME_STATE_CRASHED, currentFrame, crashStartTime, updateCrackWrapper);
+                standing = winZone.CheckRampCollision(oldY, eggPosition.y, physics.velocityY, 0.7f,
+                    eggPosition, physics.canJump, maxFallHeight, 1.5f, 0.9f, crackCount, 3,
+                    stateInt, (int)GAME_STATE_CRASHED, currentFrame, crashStartTime, updateCrackWrapper);
                 currentState = (GameState)stateInt;
             }
-            if (!standing && glassBridge && glassBridge->checkCollision(eggPosition, eggPosition.y, physics.velocityY, 0.7f)) { standing = true; physics.canJump = true; maxFallHeight = eggPosition.y; }
-            if (!standing && bouncyTrampoline && bouncyTrampoline->checkCollision(eggPosition, eggPosition.y, physics.velocityY, 0.7f)) { physics.canJump = false; maxFallHeight = eggPosition.y; }
 
-            if (!standing && Physics::IsInsideXZ(eggPosition, safeZone) && oldY >= safeZone.topY + 0.6f && eggPosition.y <= safeZone.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = safeZone.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            if (!standing && glassBridge && glassBridge->checkCollision(eggPosition, eggPosition.y, physics.velocityY, 0.7f)) {
+                standing = true;
+                physics.canJump = true;
+                maxFallHeight = eggPosition.y;
             }
 
-            if (!standing && Physics::IsInsideXZ(eggPosition, ladderPillow) && oldY >= ladderPillow.topY + 0.6f && eggPosition.y <= ladderPillow.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = ladderPillow.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            if (!standing && bouncyTrampoline && bouncyTrampoline->checkCollision(eggPosition, eggPosition.y, physics.velocityY, 0.7f)) {
+                physics.canJump = false;
+                maxFallHeight = eggPosition.y;
+            }
+
+            if (!standing && Physics::IsInsideXZ(eggPosition, midSafeZone) &&
+                oldY >= midSafeZone.topY + 0.6f && eggPosition.y <= midSafeZone.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = midSafeZone.topY + 0.7f;
+                eggPosition.y = maxFallHeight;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
+            }
+
+            if (!standing && Physics::IsInsideXZ(eggPosition, ladderPillow) &&
+                oldY >= ladderPillow.topY + 0.6f && eggPosition.y <= ladderPillow.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = ladderPillow.topY + 0.7f;
+                eggPosition.y = maxFallHeight;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
             }
 
             // Obsługa stania na barierkach (jeśli ktoś na nie wskoczy)
-            if (!standing && Physics::IsInsideXZ(eggPosition, barrierBack) && oldY >= barrierBack.topY + 0.6f && eggPosition.y <= barrierBack.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = barrierBack.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
-            }
-            if (!standing && Physics::IsInsideXZ(eggPosition, barrierFront) && oldY >= barrierFront.topY + 0.6f && eggPosition.y <= barrierFront.topY + 0.7f && physics.velocityY <= 0.0f) {
-                maxFallHeight = barrierFront.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            if (!standing && Physics::IsInsideXZ(eggPosition, barrierBack) &&
+                oldY >= barrierBack.topY + 0.6f && eggPosition.y <= barrierBack.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = barrierBack.topY + 0.7f;
+                eggPosition.y = maxFallHeight;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
             }
 
-
-            if (!standing && Physics::IsInsideXZ(eggPosition, mazeFloor) && oldY >= mazeFloor.topY + 0.5f && eggPosition.y <= mazeFloor.topY + 0.8f && physics.velocityY <= 0.0f) {
-                maxFallHeight = mazeFloor.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+            if (!standing && Physics::IsInsideXZ(eggPosition, barrierFront) &&
+                oldY >= barrierFront.topY + 0.6f && eggPosition.y <= barrierFront.topY + 0.7f && physics.velocityY <= 0.0f) {
+                maxFallHeight = barrierFront.topY + 0.7f;
+                eggPosition.y = maxFallHeight;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
             }
+
+            if (!standing && Physics::IsInsideXZ(eggPosition, mazeFloor) &&
+                oldY >= mazeFloor.topY + 0.5f && eggPosition.y <= mazeFloor.topY + 0.8f && physics.velocityY <= 0.0f) {
+                maxFallHeight = mazeFloor.topY + 0.7f;
+                eggPosition.y = maxFallHeight;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
+            }
+
             if (!standing) {
                 for (auto& t : tables) {
-                    if (Physics::IsInsideXZ(eggPosition, t) && oldY >= t.topY + 0.5f && eggPosition.y <= t.topY + 0.8f && physics.velocityY <= 0.0f) {
+                    if (Physics::IsInsideXZ(eggPosition, t) && oldY >= t.topY + 0.5f &&
+                        eggPosition.y <= t.topY + 0.8f && physics.velocityY <= 0.0f) {
                         float fall = glm::max(maxFallHeight - (t.topY + 0.7f), 0.0f);
-                        if (fall >= 1.5f) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = 3; }
-                        else if (fall >= 0.9f) { crackCount++; if (crackCount >= 3) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } player->UpdateCracks(crackCount); }
-                        maxFallHeight = t.topY + 0.7f; eggPosition.y = maxFallHeight; physics.velocityY = 0.0f; physics.canJump = true; standing = true; break;
+                        if (fall >= 1.5f) {
+                            currentState = GAME_STATE_CRASHED;
+                            crashStartTime = currentFrame;
+                            crackCount = 3;
+                        }
+                        else if (fall >= 0.9f) {
+                            crackCount++;
+                            if (crackCount >= 3) {
+                                currentState = GAME_STATE_CRASHED;
+                                crashStartTime = currentFrame;
+                            }
+                            player->UpdateCracks(crackCount);
+                        }
+                        maxFallHeight = t.topY + 0.7f;
+                        eggPosition.y = maxFallHeight;
+                        physics.velocityY = 0.0f;
+                        physics.canJump = true;
+                        standing = true;
+                        break;
                     }
                 }
             }
+
             if (!standing && eggPosition.y < 0.7f && oldY >= 0.6f) {
                 float fall = glm::max(maxFallHeight - 0.7f, 0.0f);
-                if (fall >= 1.5f) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; crackCount = 3; }
-                else if (fall >= 0.9f) { crackCount++; if (crackCount >= 3) { currentState = GAME_STATE_CRASHED; crashStartTime = currentFrame; } player->UpdateCracks(crackCount); }
-                maxFallHeight = 0.7f; eggPosition.y = 0.7f; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
+                if (fall >= 1.5f) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = currentFrame;
+                    crackCount = 3;
+                }
+                else if (fall >= 0.9f) {
+                    crackCount++;
+                    if (crackCount >= 3) {
+                        currentState = GAME_STATE_CRASHED;
+                        crashStartTime = currentFrame;
+                    }
+                    player->UpdateCracks(crackCount);
+                }
+                maxFallHeight = 0.7f;
+                eggPosition.y = 0.7f;
+                physics.velocityY = 0.0f;
+                physics.canJump = true;
+                standing = true;
             }
+
             cloudManager.Update(deltaTime);
+
+            if (windyBridge) {
+                bool onTiles = windyBridge->CheckCollision(eggPosition, deltaTime);
+                if (onTiles && !standing) {
+                    standing = true;
+                    physics.canJump = true;
+                    maxFallHeight = eggPosition.y;
+                }
+
+                if (windyBridge->IsPlayerFalling(eggPosition)) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = currentFrame;
+                    crackCount = 3;
+                    if (player) player->UpdateCracks(3);
+                }
+
+                if (eggPosition.z >= (58.0f + (30 - 3) * 2.0f)) {
+                    eggPosition = glm::vec3(0.0f, 24.3f + 1.0f, 125.0f);
+                }
+
+                // Wygrana - aktywuj ograniczenie ruchu
+                if (finalWinZone && finalWinZone->CheckPlayerInZone(eggPosition) && !gameWon) {
+                    gameWon = true;
+                    restrictMovementToWinZone = true;
+                    showWinMessage = true;  // NOWA: aktywuj komunikat
+                    winMessageDisplayTime = (float)glfwGetTime();
+                    restrictMovementToWinZone = true;
+                    // USTAW KOMUNIKAT
+                    winMessage = "=== GRATULACJE! UKONCZYLES PARKOUR! ===";
+                    winMessageDisplayTime = (float)glfwGetTime();
+                }
+            }
 
             if (!standing && wallCourse) {
                 TableHitbox roadHB = wallCourse->GetRoadHitbox();
                 if (Physics::IsInsideXZ(eggPosition, roadHB) &&
                     oldY >= roadHB.topY + 0.5f &&
                     eggPosition.y <= roadHB.topY + 0.8f &&
-                    physics.velocityY <= 0.0f)
-                {
+                    physics.velocityY <= 0.0f) {
                     maxFallHeight = roadHB.topY + 0.7f;
                     eggPosition.y = maxFallHeight;
                     physics.velocityY = 0.0f;
@@ -371,7 +539,14 @@ int main() {
                     standing = true;
                 }
             }
+        }
 
+        // Sprawdź czy gracz spadł z platformy wygranej
+        if (restrictMovementToWinZone && finalWinZone && !finalWinZone->IsPositionInsideZone(eggPosition)) {
+            currentState = GAME_STATE_CRASHED;
+            crashStartTime = currentFrame;
+            crackCount = 3;
+            if (player) player->UpdateCracks(3);
         }
 
         // --- LIGHT SETUP ---
@@ -380,10 +555,8 @@ int main() {
 
         // --- LIGHT SPACE MATRIX (orthographic for directional light) ---
         glm::mat4 lightProjection = glm::ortho(-60.0f, 60.0f, -60.0f, 60.0f, 1.0f, 80.0f);
-
         glm::mat4 lightView = glm::lookAt(-lightDir * 30.0f, glm::vec3(0.0f), glm::vec3(0, 1, 0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
 
         // =========================
         // 1) SHADOW DEPTH PASS
@@ -407,12 +580,17 @@ int main() {
             platforms,
             myFlyover,
             ballManager,
-            pillowModel
+            pillowModel,
+            windyBridge,
+            finalWinZone
         );
-        if (bouncyTrampoline) bouncyTrampoline->Draw(shadowShader);
 
+        if (bouncyTrampoline) bouncyTrampoline->Draw(shadowShader);
         if (glassBridge) glassBridge->Draw(shadowShader);
 
+        // RYSUJ CIENIE DLA NOWYCH OBIEKTÓW:
+        if (windyBridge) windyBridge->Draw(shadowShader);
+        if (finalWinZone) finalWinZone->Draw(shadowShader, tableModel);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -422,7 +600,6 @@ int main() {
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
         ourShader.use();
         ourShader.setInt("forceUpNormal", 0);
@@ -435,31 +612,25 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
             (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f);
 
-        ourShader.setMat4("projection", glm::perspective(glm::radians(45.0f),
-            (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f));
-
+        ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-
         // żeby nie było czarno jeśli shader mnoży przez objectColor
         ourShader.setVec4("objectColor", glm::vec4(1.0f));
 
-
         // --- LIGHT ---
-
         glm::vec3 viewPos;
-        if (currentState == GAME_STATE_MENU) viewPos = glm::vec3(0.0f, 5.0f, 15.0f);
+        if (currentState == GAME_STATE_MENU) {
+            viewPos = glm::vec3(0.0f, 5.0f, 15.0f);
+        }
         else {
             viewPos = eggPosition - gameCamera->Front * gameCamera->Distance;
             viewPos.y += 1.5f;
             if (viewPos.y < 0.5f) viewPos.y = 0.5f;
         }
 
-
-
         ourShader.setVec3("viewPos", viewPos);
         ourShader.setVec3("lightDir", lightDir);
         ourShader.setVec3("lightColor", lightColor);
-
         ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         glActiveTexture(GL_TEXTURE3);
@@ -478,7 +649,9 @@ int main() {
             platforms,
             myFlyover,
             ballManager,
-            pillowModel
+            pillowModel,
+            windyBridge,
+            finalWinZone
         );
 
         if (bouncyTrampoline) {
@@ -488,7 +661,6 @@ int main() {
             ourShader.setInt("forceUpNormal", 0);
             ourShader.setInt("twoSided", 0);
         }
-
 
         // blend dla szkła w Twoim projekcie było w osobnym if-ie.
         // Jeśli GlassBridge->Draw robi tylko draw, to najlepiej zrobić tak:
@@ -502,19 +674,28 @@ int main() {
         // skybox
         skybox.Draw(view, projection);
 
-        if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
+        if (currentState != GAME_STATE_PLAYING) {
+            uiManager->Draw();
+            if (gameWon) {
+                std::string winTitle = "=== GRATULACJE! UKONCZYLES PARKOUR! ===";
+                glfwSetWindowTitle(window, winTitle.c_str());
+            }
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
     }
 
     // Czyszczenie pamięci
     delete myFlyover;
     delete ballManager; // Pamiętaj o wyczyszczeniu
     delete wallCourse;
+    delete windyBridge;
+    delete finalWinZone;
+    delete windParticles;
 
-    glfwTerminate(); return 0;
+    glfwTerminate();
+    return 0;
 }
 
 // --- DEFINICJA FUNKCJI (DODANO pillowModel) ---
@@ -528,8 +709,10 @@ void RenderScene(Shader& shader,
     std::vector<MovingPlatform>& platforms,
     FlyoverBridge* myFlyover,
     BallManager* ballManager,
-    Model& pillowModel)
-{
+    Model& pillowModel,
+    WindyTileBridge* windyBridge,
+    FinalWinZone* finalWinZone) {
+
     shader.setInt("useTexture", 1);
 
     // floor (nowe)
@@ -592,17 +775,43 @@ void RenderScene(Shader& shader,
 
     // kulki
     if (ballManager) ballManager->Draw(shader);
-}
 
+    if (windyBridge) windyBridge->Draw(shader);
+
+    if (finalWinZone) finalWinZone->Draw(shader, tableModel);
+
+    if (windParticles) windParticles->Draw(shader);
+}
 
 void processInput(GLFWwindow* w) {
     if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(w, true);
+
+    if (gameWon && restrictMovementToWinZone) {
+        if (glfwGetKey(w, GLFW_KEY_ENTER) == GLFW_PRESS) {
+            gameWon = false;
+            restrictMovementToWinZone = false;
+            needsReset = true;
+            showWinMessage = false;
+            return;
+        }
+    }
+
+    if (gameWon && currentState == GAME_STATE_MENU) {
+        if (glfwGetKey(w, GLFW_KEY_ENTER) == GLFW_PRESS) {
+            gameWon = false;
+            restrictMovementToWinZone = false;
+            needsReset = true;
+            showWinMessage = false;
+            return;
+        }
+    }
 
     if (currentState == GAME_STATE_MENU || currentState == GAME_STATE_CRASHED) {
         if (glfwGetKey(w, GLFW_KEY_ENTER) == GLFW_PRESS) {
             if (!enterKeyPressed) {
                 currentState = GAME_STATE_PLAYING;
                 needsReset = true;
+                showWinMessage = false;
                 glfwSetInputMode(w, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 gameCamera->FirstMouse = true;
                 enterKeyPressed = true;
@@ -615,6 +824,8 @@ void processInput(GLFWwindow* w) {
     else {
         float speed = (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? 5.0f : 2.5f;
         glm::vec3 f = gameCamera->GetFlatFront(), r = gameCamera->Right;
+        glm::vec3 lastSafePosition = eggPosition;
+
         if (physics.isClimbing) {
             if (glfwGetKey(w, GLFW_KEY_W)) eggPosition.y += speed * deltaTime;
             if (glfwGetKey(w, GLFW_KEY_S)) eggPosition.y -= speed * deltaTime;
@@ -632,13 +843,37 @@ void processInput(GLFWwindow* w) {
             if (glfwGetKey(w, GLFW_KEY_D)) eggPosition += r * speed * deltaTime;
         }
         if (glfwGetKey(w, GLFW_KEY_SPACE)) physics.TryJump();
+
+        // Ograniczenie ruchu do strefy wygranej
+        if (restrictMovementToWinZone && finalWinZone) {
+            if (!finalWinZone->IsPositionInsideZone(eggPosition)) {
+                eggPosition = lastSafePosition;
+            }
+        }
     }
 }
-void framebuffer_size_callback(GLFWwindow* w, int width, int height) { glViewport(0, 0, width, height); if (uiManager) uiManager->UpdateProjection((float)width, (float)height); }
-void mouse_callback(GLFWwindow* w, double x, double y) { if (currentState == GAME_STATE_PLAYING) gameCamera->ProcessMouseMovement(x, y); }
+
+void framebuffer_size_callback(GLFWwindow* w, int width, int height) {
+    glViewport(0, 0, width, height);
+    if (uiManager) uiManager->UpdateProjection((float)width, (float)height);
+}
+
+void mouse_callback(GLFWwindow* w, double xpos, double ypos) {
+    if (currentState == GAME_STATE_PLAYING) gameCamera->ProcessMouseMovement(xpos, ypos);
+}
+
 static unsigned int loadTexture(const char* path) {
-    unsigned int id; glGenTextures(1, &id); int w, h, c; stbi_set_flip_vertically_on_load(true);
+    unsigned int id;
+    glGenTextures(1, &id);
+    int w, h, c;
+    stbi_set_flip_vertically_on_load(true);
     unsigned char* d = stbi_load(path, &w, &h, &c, 0);
-    if (d) { GLenum f = (c == 4) ? GL_RGBA : GL_RGB; glBindTexture(GL_TEXTURE_2D, id); glTexImage2D(GL_TEXTURE_2D, 0, f, w, h, 0, f, GL_UNSIGNED_BYTE, d); glGenerateMipmap(GL_TEXTURE_2D); }
-    stbi_image_free(d); return id;
+    if (d) {
+        GLenum f = (c == 4) ? GL_RGBA : GL_RGB;
+        glBindTexture(GL_TEXTURE_2D, id);
+        glTexImage2D(GL_TEXTURE_2D, 0, f, w, h, 0, f, GL_UNSIGNED_BYTE, d);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    stbi_image_free(d);
+    return id;
 }
