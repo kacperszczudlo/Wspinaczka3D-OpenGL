@@ -22,6 +22,8 @@
 #include "FlyoverBridge.h"
 #include "Skybox.h"
 #include "Ground.h"
+#include "MovingWallCourse.h"
+
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -51,6 +53,8 @@ unsigned int ladderTexture = 0;
 GlassBridge* glassBridge = nullptr;
 Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
+MovingWallCourse* wallCourse = nullptr;
+
 
 // --- SHADOWS ---
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
@@ -181,6 +185,13 @@ int main() {
     myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
+    wallCourse = new MovingWallCourse(
+        glm::vec3(-45.0f, 23.6f, 28.0f),   // UWAGA: dałem Y=15 żeby pasowało do Twojej “platformowej” wysokości
+        myMaze->wallTextureID,
+        myMaze->floorTextureID,
+        myMaze->cubeMesh
+    );
+
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
         // Pozycja: PRZESUNIĘTA MOCNO W X (-16.0f), żeby środek był na długiej trasie
@@ -199,6 +210,8 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame; lastFrame = currentFrame;
+        if (wallCourse) wallCourse->Update(deltaTime);
+
 
         titleTimer += deltaTime;
         if (titleTimer >= 0.1f) { // Aktualizuj co 100ms
@@ -243,6 +256,16 @@ int main() {
             if (bouncyTrampoline && eggPosition.y - 0.7f <= 1.0f && glm::distance(glm::vec3(eggPosition.x, 0, eggPosition.z), bouncyTrampoline->position) < bouncyTrampoline->radius + 1.1f) {
                 eggPosition.x = previousEggPosition.x; eggPosition.z = previousEggPosition.z;
             }
+
+            if (wallCourse && wallCourse->CheckPlayer(eggPosition, 0.4f)) {
+                crackCount++;
+                player->UpdateCracks(crackCount);
+                if (crackCount >= 3) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = (float)glfwGetTime();
+                }
+            }
+
 
             float oldY = eggPosition.y;
             physics.ApplyGravity(deltaTime, eggPosition.y);
@@ -311,6 +334,22 @@ int main() {
                 maxFallHeight = 0.7f; eggPosition.y = 0.7f; physics.velocityY = 0.0f; physics.canJump = true; standing = true;
             }
             cloudManager.Update(deltaTime);
+
+            if (!standing && wallCourse) {
+                TableHitbox roadHB = wallCourse->GetRoadHitbox();
+                if (Physics::IsInsideXZ(eggPosition, roadHB) &&
+                    oldY >= roadHB.topY + 0.5f &&
+                    eggPosition.y <= roadHB.topY + 0.8f &&
+                    physics.velocityY <= 0.0f)
+                {
+                    maxFallHeight = roadHB.topY + 0.7f;
+                    eggPosition.y = maxFallHeight;
+                    physics.velocityY = 0.0f;
+                    physics.canJump = true;
+                    standing = true;
+                }
+            }
+
         }
 
         // --- LIGHT SETUP ---
@@ -441,6 +480,7 @@ int main() {
 
     // Czyszczenie pamięci
     delete myFlyover;
+    delete wallCourse;
 
     glfwTerminate(); return 0;
 }
@@ -484,6 +524,10 @@ void RenderScene(Shader& shader,
         myMaze->DrawFloor(shader);
         myMaze->Draw(shader);
     }
+
+    if (wallCourse) wallCourse->Draw(shader);
+
+
 
     //// glass bridge (blend tylko w main pass; w depth pass i tak alpha discard w shaderze jeśli ustawisz)
     //if (glassBridge) {

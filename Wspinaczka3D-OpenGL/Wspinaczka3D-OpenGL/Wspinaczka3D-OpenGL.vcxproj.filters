@@ -25,6 +25,9 @@
     <ClCompile Include="MazeTextures.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="MovingWallCourse.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -75,6 +78,9 @@
     </ClInclude>
     <ClInclude Include="Ground.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="MovingWallCourse.h">
+      <Filter>GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
