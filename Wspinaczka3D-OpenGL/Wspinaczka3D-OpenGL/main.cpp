@@ -15,13 +15,14 @@
 #include "Physics.h"
 #include "Camera.h"
 #include "UIManager.h" 
-#include "Player.h"      
+#include "Player.h"       
 #include "Model.h"
 #include "Shader.h"
 #include "Ladder.h"
 #include "FlyoverBridge.h"
 #include "Skybox.h"
 #include "Ground.h"
+#include "BallManager.h" // Upewnij się, że masz ten nagłówek, bo używasz ballManager
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -51,6 +52,7 @@ unsigned int ladderTexture = 0;
 GlassBridge* glassBridge = nullptr;
 Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
+BallManager* ballManager = nullptr;
 
 // --- SHADOWS ---
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
@@ -94,6 +96,7 @@ void processInput(GLFWwindow* w);
 static unsigned int loadTexture(const char* path);
 void updateCrackWrapper(int count) { if (player) player->UpdateCracks(count); }
 
+// --- NAPRAWIONA DEKLARACJA (DODANO pillowModel) ---
 void RenderScene(Shader& shader,
     Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
@@ -102,7 +105,9 @@ void RenderScene(Shader& shader,
     float currentFrame, float crashStartTime, float CRASH_ANIMATION_DURATION,
     Maze* myMaze, GlassBridge* glassBridge, Trampoline* bouncyTrampoline,
     std::vector<MovingPlatform>& platforms,
-    FlyoverBridge* myFlyover);
+    FlyoverBridge* myFlyover,
+    BallManager* ballManager,
+    Model& pillowModel);
 
 
 int main() {
@@ -171,7 +176,8 @@ int main() {
     Model trampolineModel("models/trampoline.obj");
     Model pillowModel("models/pillow.obj");
     Model rampModel("models/ramp.obj");
-    Model flyoverModel("models/flyover.obj"); //
+    Model flyoverModel("models/flyover.obj");
+    Model ballModel("models/ball.obj");
 
     ladderTexture = loadTexture("models/wood_ladder.jpg");
 
@@ -181,6 +187,8 @@ int main() {
     myMaze = new Maze(glm::vec3(11.0f, 15.0f, 7.0f));
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
+
+    ballManager = new BallManager(&ballModel);
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
         // Pozycja: PRZESUNIĘTA MOCNO W X (-16.0f), żeby środek był na długiej trasie
@@ -212,8 +220,8 @@ int main() {
         if (needsReset) {
             //og nie usuwac
             eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
-            /*eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-            physics.Reset();*/
+            /* eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+            physics.Reset(); */
             maxFallHeight = 0.7f;
             maxFallHeight = eggPosition.y;
             crackCount = 0;
@@ -226,18 +234,32 @@ int main() {
         processInput(window);
 
         if (currentState == GAME_STATE_PLAYING) {
+
+            // Logika kulek
+            if (ballManager) {
+                ballManager->Update(deltaTime);
+                if (ballManager->CheckCollision(eggPosition)) {
+                    currentState = GAME_STATE_CRASHED;
+                    crashStartTime = currentFrame;
+                    crackCount = 3;
+                    if (player) player->UpdateCracks(3);
+                }
+            }
+
             if (myLadder) physics.isClimbing = myLadder->CheckCollision(eggPosition);
 
             for (auto& t : tables) physics.CheckHorizontalCollision(eggPosition, previousEggPosition, t);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, winZone.rampHorizontalBox);
             physics.CheckHorizontalCollision(eggPosition, previousEggPosition, safeZone);
 
-            // Kolizja z podłogą mostu (nie spadamy)
-            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, ladderPillow);
+            if (eggPosition.y > 15.0f) {
+                // Kolizja z podłogą mostu (żeby nie przenikać przez bok podłogi)
+                physics.CheckHorizontalCollision(eggPosition, previousEggPosition, ladderPillow);
 
-            // Kolizja z BARIERKAMI (poręcze wzdłuż mostu)
-            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierBack);
-            physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierFront);
+                // Kolizja z BARIERKAMI (poręcze wzdłuż mostu)
+                physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierBack);
+                physics.CheckHorizontalCollision(eggPosition, previousEggPosition, barrierFront);
+            }
 
             if (myMaze) myMaze->checkCollision(eggPosition, previousEggPosition);
             if (bouncyTrampoline && eggPosition.y - 0.7f <= 1.0f && glm::distance(glm::vec3(eggPosition.x, 0, eggPosition.z), bouncyTrampoline->position) < bouncyTrampoline->radius + 1.1f) {
@@ -335,6 +357,7 @@ int main() {
         shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         // UWAGA: nie potrzebujesz projection/view, tylko model + lightSpaceMatrix
+        // --- NAPRAWIONE WYWOŁANIE (DODANO pillowModel) ---
         RenderScene(shadowShader,
             ground, tableModel, rampModel,
             winZone,
@@ -343,7 +366,9 @@ int main() {
             currentFrame, crashStartTime, CRASH_ANIMATION_DURATION,
             myMaze, glassBridge, bouncyTrampoline,
             platforms,
-            myFlyover
+            myFlyover,
+            ballManager,
+            pillowModel
         );
         if (bouncyTrampoline) bouncyTrampoline->Draw(shadowShader);
 
@@ -359,7 +384,7 @@ int main() {
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
+
         ourShader.use();
         ourShader.setInt("forceUpNormal", 0);
         ourShader.setInt("twoSided", 0);
@@ -389,6 +414,9 @@ int main() {
             viewPos.y += 1.5f;
             if (viewPos.y < 0.5f) viewPos.y = 0.5f;
         }
+
+
+
         ourShader.setVec3("viewPos", viewPos);
         ourShader.setVec3("lightDir", lightDir);
         ourShader.setVec3("lightColor", lightColor);
@@ -400,6 +428,7 @@ int main() {
         ourShader.setInt("shadowMap", 3);
 
         // szkło tylko tutaj z blendingiem (jak miałeś)
+        // --- NAPRAWIONE WYWOŁANIE (DODANO pillowModel) ---
         RenderScene(ourShader,
             ground, tableModel, rampModel,
             winZone,
@@ -408,7 +437,9 @@ int main() {
             currentFrame, crashStartTime, CRASH_ANIMATION_DURATION,
             myMaze, glassBridge, bouncyTrampoline,
             platforms,
-            myFlyover
+            myFlyover,
+            ballManager,
+            pillowModel
         );
 
         if (bouncyTrampoline) {
@@ -429,7 +460,7 @@ int main() {
             glDisable(GL_BLEND);
         }
 
-		// skybox
+        // skybox
         skybox.Draw(view, projection);
 
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
@@ -441,10 +472,12 @@ int main() {
 
     // Czyszczenie pamięci
     delete myFlyover;
+    delete ballManager; // Pamiętaj o wyczyszczeniu
 
     glfwTerminate(); return 0;
 }
 
+// --- DEFINICJA FUNKCJI (DODANO pillowModel) ---
 void RenderScene(Shader& shader,
     Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
@@ -453,7 +486,9 @@ void RenderScene(Shader& shader,
     float currentFrame, float crashStartTime, float CRASH_ANIMATION_DURATION,
     Maze* myMaze, GlassBridge* glassBridge, Trampoline* bouncyTrampoline,
     std::vector<MovingPlatform>& platforms,
-    FlyoverBridge* myFlyover)
+    FlyoverBridge* myFlyover,
+    BallManager* ballManager,
+    Model& pillowModel)
 {
     shader.setInt("useTexture", 1);
 
@@ -469,6 +504,11 @@ void RenderScene(Shader& shader,
 
     // ramp/winzone
     winZone.Draw(shader, rampModel);
+
+    // poduszka
+    shader.setInt("useTexture", 1);
+    shader.setMat4("model", glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(45.0f, 14.85f, 0.0f)), glm::vec3(4.0f, 1.0f, 4.0f)));
+    pillowModel.Draw(shader);
 
     // ladder
     if (myLadder) myLadder->Draw(shader);
@@ -491,7 +531,7 @@ void RenderScene(Shader& shader,
     //    glassBridge->Draw(shader);
     //}
 
-    
+
 
     // moving platforms
     shader.setInt("useTexture", 1);
@@ -505,6 +545,9 @@ void RenderScene(Shader& shader,
 
     // flyover
     if (myFlyover) myFlyover->Draw(shader);
+
+    // kulki
+    if (ballManager) ballManager->Draw(shader);
 }
 
 
