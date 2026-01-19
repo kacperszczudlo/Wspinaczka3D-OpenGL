@@ -15,6 +15,9 @@ uniform sampler2D texture_diffuse1;
 uniform int forceUpNormal;
 uniform int twoSided;
 
+uniform int useWorldUV;        // 0 = normalne UV, 1 = world-space UV
+uniform float texWorldSize;   // ile jednostek œwiata = 1 powtórzenie tekstury
+
 
 
 // Nowe:
@@ -65,7 +68,36 @@ void main()
 {
     vec4 texColor = vec4(1.0);
     if (useTexture == 1)
-        texColor = texture(texture_diffuse1, fs_in.TexCoords);
+    {
+        vec2 uv = fs_in.TexCoords;
+
+        // world-space UV tylko gdy w³¹czone
+        if (useWorldUV == 1)
+    {
+        vec3 n = normalize(fs_in.Normal);
+        n = abs(n);
+
+        if (n.y > 0.5)
+        {
+            // powierzchnie poziome (góra/dó³)
+            uv = fs_in.FragPos.xz / texWorldSize;
+        }
+        else if (n.x > n.z)
+        {
+            // œciany X (lewo/prawo)
+            uv = fs_in.FragPos.zy / texWorldSize;
+        }
+        else
+        {
+            // œciany Z (przód/ty³)
+            uv = fs_in.FragPos.xy / texWorldSize;
+        }
+    }
+
+
+        texColor = texture(texture_diffuse1, uv);
+    }
+
 
     vec4 baseColor = texColor * objectColor;
 

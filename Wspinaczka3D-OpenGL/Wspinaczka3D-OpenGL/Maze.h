@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Shader.h"
 #include "Mesh.h"
+#include <iostream>
 
 class Maze {
 public:
@@ -13,6 +14,15 @@ public:
         float x, z;
         float width;
     };
+    unsigned int wallTextureID = 0;
+    unsigned int floorTextureID = 0;
+    Mesh* floorMesh = nullptr;
+
+    float floorThickness = 0.4f; // np. 0.2–0.6 zale¿nie od skali
+    Mesh* floorSlabMesh = nullptr;
+
+
+    unsigned int loadTexture2D(const std::string& path);
 
     std::vector<Wall> walls;
     glm::vec3 startPosition;
@@ -80,6 +90,79 @@ public:
         std::vector<Texture> textures;
         cubeMesh = new Mesh(vertices, indices, textures);
 
+        // --- TEXTURES (zmieñ œcie¿ki jak chcesz) ---
+        wallTextureID = loadTexture2D("models/textures/maze_wall.png");   // np. ceg³a/kamieñ
+        floorTextureID = loadTexture2D("models/textures/maze_floor.png");  // np. p³ytki/kamieñ
+
+        // --- FLOOR MESH (plane z tilingiem) ---
+        float halfW = mazeWidth * 0.5f;
+        float halfD = mazeDepth * 0.5f;
+
+        float topY = 0.0f;
+        float botY = -floorThickness;
+
+        float tileTop = 10.0f;   // tiling na górze
+        float tileSide = 2.0f;   // tiling na bokach (mo¿esz dopasowaæ)
+
+        std::vector<Vertex> v;
+
+        // --- TOP (normal up) ---
+        v.push_back({ {-halfW, topY, -halfD}, {0,1,0}, {0,0} });
+        v.push_back({ { halfW, topY, -halfD}, {0,1,0}, {tileTop,0} });
+        v.push_back({ { halfW, topY,  halfD}, {0,1,0}, {tileTop,tileTop} });
+        v.push_back({ { halfW, topY,  halfD}, {0,1,0}, {tileTop,tileTop} });
+        v.push_back({ {-halfW, topY,  halfD}, {0,1,0}, {0,tileTop} });
+        v.push_back({ {-halfW, topY, -halfD}, {0,1,0}, {0,0} });
+
+        // --- BOTTOM (normal down) ---
+        v.push_back({ {-halfW, botY,  halfD}, {0,-1,0}, {0,0} });
+        v.push_back({ { halfW, botY,  halfD}, {0,-1,0}, {tileTop,0} });
+        v.push_back({ { halfW, botY, -halfD}, {0,-1,0}, {tileTop,tileTop} });
+        v.push_back({ { halfW, botY, -halfD}, {0,-1,0}, {tileTop,tileTop} });
+        v.push_back({ {-halfW, botY, -halfD}, {0,-1,0}, {0,tileTop} });
+        v.push_back({ {-halfW, botY,  halfD}, {0,-1,0}, {0,0} });
+
+        // --- SIDE +Z (front) normal (0,0,1) ---
+        v.push_back({ {-halfW, botY,  halfD}, {0,0,1}, {0,0} });
+        v.push_back({ { halfW, botY,  halfD}, {0,0,1}, {tileSide,0} });
+        v.push_back({ { halfW, topY,  halfD}, {0,0,1}, {tileSide,1} });
+        v.push_back({ { halfW, topY,  halfD}, {0,0,1}, {tileSide,1} });
+        v.push_back({ {-halfW, topY,  halfD}, {0,0,1}, {0,1} });
+        v.push_back({ {-halfW, botY,  halfD}, {0,0,1}, {0,0} });
+
+        // --- SIDE -Z (back) normal (0,0,-1) ---
+        v.push_back({ { halfW, botY, -halfD}, {0,0,-1}, {0,0} });
+        v.push_back({ {-halfW, botY, -halfD}, {0,0,-1}, {tileSide,0} });
+        v.push_back({ {-halfW, topY, -halfD}, {0,0,-1}, {tileSide,1} });
+        v.push_back({ {-halfW, topY, -halfD}, {0,0,-1}, {tileSide,1} });
+        v.push_back({ { halfW, topY, -halfD}, {0,0,-1}, {0,1} });
+        v.push_back({ { halfW, botY, -halfD}, {0,0,-1}, {0,0} });
+
+        // --- SIDE +X (right) normal (1,0,0) ---
+        v.push_back({ { halfW, botY,  halfD}, {1,0,0}, {0,0} });
+        v.push_back({ { halfW, botY, -halfD}, {1,0,0}, {tileSide,0} });
+        v.push_back({ { halfW, topY, -halfD}, {1,0,0}, {tileSide,1} });
+        v.push_back({ { halfW, topY, -halfD}, {1,0,0}, {tileSide,1} });
+        v.push_back({ { halfW, topY,  halfD}, {1,0,0}, {0,1} });
+        v.push_back({ { halfW, botY,  halfD}, {1,0,0}, {0,0} });
+
+        // --- SIDE -X (left) normal (-1,0,0) ---
+        v.push_back({ {-halfW, botY, -halfD}, {-1,0,0}, {0,0} });
+        v.push_back({ {-halfW, botY,  halfD}, {-1,0,0}, {tileSide,0} });
+        v.push_back({ {-halfW, topY,  halfD}, {-1,0,0}, {tileSide,1} });
+        v.push_back({ {-halfW, topY,  halfD}, {-1,0,0}, {tileSide,1} });
+        v.push_back({ {-halfW, topY, -halfD}, {-1,0,0}, {0,1} });
+        v.push_back({ {-halfW, botY, -halfD}, {-1,0,0}, {0,0} });
+
+        std::vector<unsigned int> idx;
+        idx.reserve(v.size());
+        for (unsigned int i = 0; i < v.size(); i++) idx.push_back(i);
+
+        std::vector<Texture> noTex;
+        floorSlabMesh = new Mesh(v, idx, noTex);
+
+
+
         // 2. MAPA LABIRYNTU
         const char* mapLayout[10] = {
             "bbbbbbbb b",
@@ -109,33 +192,32 @@ public:
 
     // Nowa funkcja do rysowania pod³ogi pod labiryntem
     void DrawFloor(Shader& shader) {
-        shader.setInt("useTexture", 0);
-        shader.setVec4("objectColor", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f)); // Czarny
+        shader.setInt("useTexture", 1);
+        shader.setInt("texture_diffuse1", 0);
 
-        // Obliczamy œrodek labiryntu
-        // StartPosition to lewy górny róg pierwszego bloku.
-        // Mapa ma szerokoœæ 10 bloków * 2.0 = 20.0
-        // Œrodek w X = startX + (20 / 2) - (pó³ bloku korekty)
-        // Dla uproszczenia: Geometryczny œrodek planszy 10x10
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTextureID);
+
         float centerX = startPosition.x + (mazeWidth / 2.0f) - (blockSize / 2.0f);
         float centerZ = startPosition.z + (mazeDepth / 2.0f) - (blockSize / 2.0f);
 
         glm::mat4 model = glm::mat4(1.0f);
-
-        // Ustawiamy pod³ogê:
-        // Y = startPosition.y - 0.1f (¿eby by³a minimalnie pod œcianami, ale styka³a siê)
-        model = glm::translate(model, glm::vec3(centerX, startPosition.y - 0.1f, centerZ));
-
-        // Skalujemy: Szerokoœæ labiryntu, gruboœæ 0.2, g³êbokoœæ labiryntu
-        model = glm::scale(model, glm::vec3(mazeWidth, 0.2f, mazeDepth));
-
+        model = glm::translate(model, glm::vec3(centerX, startPosition.y, centerZ));
         shader.setMat4("model", model);
-        cubeMesh->Draw(shader);
+        floorSlabMesh->Draw(shader);
     }
 
+
     void Draw(Shader& shader) {
-        shader.setInt("useTexture", 0);
-        shader.setVec4("objectColor", glm::vec4(0.6f, 0.6f, 0.6f, 1.0f)); // Szare œciany
+        shader.setInt("useTexture", 1);
+        shader.setInt("texture_diffuse1", 0);
+        shader.setInt("useWorldUV", 1);
+        shader.setFloat("texWorldSize", 2.0f); // testuj: 1.5 / 2 / 3
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, wallTextureID);
+
 
         for (const auto& w : walls) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -152,6 +234,8 @@ public:
             shader.setMat4("model", model);
             cubeMesh->Draw(shader);
         }
+        shader.setInt("useWorldUV", 0);
+
     }
 
     void checkCollision(glm::vec3& playerPos, const glm::vec3& oldPos) {

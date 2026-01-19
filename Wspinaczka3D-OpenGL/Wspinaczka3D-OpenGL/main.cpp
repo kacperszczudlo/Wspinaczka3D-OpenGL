@@ -21,6 +21,7 @@
 #include "Ladder.h"
 #include "FlyoverBridge.h"
 #include "Skybox.h"
+#include "Ground.h"
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -94,7 +95,7 @@ static unsigned int loadTexture(const char* path);
 void updateCrackWrapper(int count) { if (player) player->UpdateCracks(count); }
 
 void RenderScene(Shader& shader,
-    Model& floorModel, Model& tableModel, Model& rampModel,
+    Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
     Ladder* myLadder,
     Player* player, glm::vec3 eggPosition, GameState currentState,
@@ -163,9 +164,9 @@ int main() {
     CloudManager cloudManager;
     WinZone winZone;
 
+    Ground ground("models/textures/grass_albedo.png", 120.0f, 100.0f, -0.01f);
     Model tableModel("models/table.obj");
     Model ladderModel("models/Ladder.fbx");
-    Model floorModel("models/floor.obj");
     Model tileModel("models/glass_tile.obj");
     Model trampolineModel("models/trampoline.obj");
     Model pillowModel("models/pillow.obj");
@@ -335,7 +336,7 @@ int main() {
 
         // UWAGA: nie potrzebujesz projection/view, tylko model + lightSpaceMatrix
         RenderScene(shadowShader,
-            floorModel, tableModel, rampModel,
+            ground, tableModel, rampModel,
             winZone,
             myLadder,
             player, eggPosition, currentState,
@@ -400,7 +401,7 @@ int main() {
 
         // szkło tylko tutaj z blendingiem (jak miałeś)
         RenderScene(ourShader,
-            floorModel, tableModel, rampModel,
+            ground, tableModel, rampModel,
             winZone,
             myLadder,
             player, eggPosition, currentState,
@@ -445,7 +446,7 @@ int main() {
 }
 
 void RenderScene(Shader& shader,
-    Model& floorModel, Model& tableModel, Model& rampModel,
+    Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
     Ladder* myLadder,
     Player* player, glm::vec3 eggPosition, GameState currentState,
@@ -456,9 +457,8 @@ void RenderScene(Shader& shader,
 {
     shader.setInt("useTexture", 1);
 
-    // floor
-    shader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.01f, 0)));
-    floorModel.Draw(shader);
+    // floor (nowe)
+    ground.Draw(shader);
 
     // tables
     for (auto& t : tables) {

@@ -138,7 +138,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MazeTextures.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -158,6 +160,7 @@
     <ClInclude Include="Clouds.h" />
     <ClInclude Include="FlyoverBridge.h" />
     <ClInclude Include="GlassBridge.h" />
+    <ClInclude Include="Ground.h" />
     <ClInclude Include="Ladder.h" />
     <ClInclude Include="Maze.h" />
     <ClInclude Include="Mesh.h" />
