@@ -39,8 +39,8 @@ Player* player = nullptr;
 UIManager* uiManager = nullptr;
 
 //OG SCIEZKA NIE USUWAC
-//glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
-glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+//glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
 
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
@@ -232,10 +232,10 @@ int main() {
 
         if (needsReset) {
             //og nie usuwac
-            //eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
-            eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-            physics.Reset(); 
-            //maxFallHeight = 0.7f;
+            eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
+            //eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
+            //physics.Reset(); 
+            maxFallHeight = 0.7f;
             maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);

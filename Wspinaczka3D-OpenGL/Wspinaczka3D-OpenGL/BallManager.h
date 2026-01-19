@@ -42,14 +42,14 @@ public:
         spawnTimer = 0.0f;
 
         // --- KONFIGURACJA TRUDNOŒCI ---
-        spawnInterval = 3.5f; // Szybciej! Co 2 sekundy nowa kula
+        spawnInterval = 3.0f; // Szybciej! Co 2 sekundy nowa kula
         ballRadius = 0.5f;
 
         // Most FlyoverBridge
         floorLevel = 23.4f + ballRadius;
 
         // Startuje daleko na pocz¹tku mostu
-        startX = -42.0f;
+        startX = -28.0f;
 
         // Koniec mostu (tam gdzie s¹ barierki w main.cpp)
         // Kule zaczn¹ spadaæ jak min¹ X = 28.0f
