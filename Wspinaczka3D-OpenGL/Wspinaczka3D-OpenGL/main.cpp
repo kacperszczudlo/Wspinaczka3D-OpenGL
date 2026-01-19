@@ -20,6 +20,7 @@
 #include "Shader.h"
 #include "Ladder.h"
 #include "FlyoverBridge.h"
+#include "Skybox.h"
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -51,7 +52,7 @@ Trampoline* bouncyTrampoline = nullptr;
 Maze* myMaze = nullptr;
 
 // --- SHADOWS ---
-const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 unsigned int depthMapFBO = 0;
 unsigned int depthMap = 0;
 
@@ -121,6 +122,15 @@ int main() {
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     glEnable(GL_DEPTH_TEST);
+
+    Skybox skybox({
+    "models/skybox/Daylight Box_Right.bmp",
+    "models/skybox/Daylight Box_Left.bmp",
+    "models/skybox/Daylight Box_Top.bmp",
+    "models/skybox/Daylight Box_Bottom.bmp",
+    "models/skybox/Daylight Box_Front.bmp",
+    "models/skybox/Daylight Box_Back.bmp"
+        });
 
     Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
     Shader shadowShader("shadow_depth.vs.glsl", "shadow_depth.fs.glsl");
@@ -314,8 +324,8 @@ int main() {
 
 
         // =========================
-// 1) SHADOW DEPTH PASS
-// =========================
+        // 1) SHADOW DEPTH PASS
+        // =========================
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -348,7 +358,7 @@ int main() {
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ourShader.setInt("forceUpNormal", 0);
+        
         ourShader.use();
         ourShader.setInt("forceUpNormal", 0);
         ourShader.setInt("twoSided", 0);
@@ -357,8 +367,12 @@ int main() {
             glm::lookAt(glm::vec3(0, 5, 15), glm::vec3(0, 2, 0), glm::vec3(0, 1, 0)) :
             gameCamera->GetViewMatrix(eggPosition);
 
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+            (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f);
+
         ourShader.setMat4("projection", glm::perspective(glm::radians(45.0f),
             (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 150.0f));
+
         ourShader.setMat4("view", view);
 
         // żeby nie było czarno jeśli shader mnoży przez objectColor
@@ -413,6 +427,9 @@ int main() {
             glassBridge->Draw(ourShader);
             glDisable(GL_BLEND);
         }
+
+		// skybox
+        skybox.Draw(view, projection);
 
         if (currentState != GAME_STATE_PLAYING) uiManager->Draw();
 

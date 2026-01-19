@@ -33,13 +33,19 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDirNorm)
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-    // poza map¹
+    // poza map¹ (x/y)
+    if (projCoords.x < 0.0 || projCoords.x > 1.0 ||
+        projCoords.y < 0.0 || projCoords.y > 1.0)
+        return 0.0;
+
+    // poza map¹ (z)
     if (projCoords.z > 1.0) return 0.0;
+
 
     float currentDepth = projCoords.z;
 
     // bias (wa¿ne przeciw "shadow acne")
-    float bias = max(0.002 * (1.0 - dot(normal, -lightDirNorm)), 0.0005);
+    float bias = max(0.003 * (1.0 - dot(normal, -lightDirNorm)), 0.0005);
 
     // PCF 3x3
     float shadow = 0.0;

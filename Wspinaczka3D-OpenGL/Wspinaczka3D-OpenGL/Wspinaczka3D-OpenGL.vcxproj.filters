@@ -16,6 +16,9 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -61,6 +64,9 @@
       <Filter>GameObjects</Filter>
     </ClInclude>
     <ClInclude Include="FlyoverBridge.h" />
+    <ClInclude Include="Skybox.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex_shader.glsl">
