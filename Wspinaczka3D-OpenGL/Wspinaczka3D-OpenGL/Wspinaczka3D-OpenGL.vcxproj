@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Downloads\stb_image.h" />
+    <ClInclude Include="BallManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Clouds.h" />
     <ClInclude Include="FlyoverBridge.h" />
