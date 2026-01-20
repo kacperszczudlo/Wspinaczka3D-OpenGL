@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Shader.h"
 
-// Struktury wewn�trzne
+// Struktury wewnetrzne
 struct CloudComponent { glm::vec3 offset; float scale; };
 struct Cloud {
     glm::vec3 position = glm::vec3(0.0f);
@@ -20,7 +20,7 @@ private:
     std::vector<Cloud> clouds;
     float spawnTimer = 0.0f;
     unsigned int vao, vbo, ebo;
-    std::vector<unsigned int> indices; // Przechowujemy indeksy do rysowania
+    std::vector<unsigned int> indices; 
 
     // Funkcja pomocnicza do losowania
     float randomFloat(float min, float max) {
@@ -44,7 +44,6 @@ private:
 
 public:
     CloudManager() {
-        // Inicjalizacja geometrii sfery (chmury) w konstruktorze
         std::vector<float> vertices;
         int segments = 20;
         for (int i = 0; i <= segments; ++i) {

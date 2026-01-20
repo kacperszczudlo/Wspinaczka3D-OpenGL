@@ -139,6 +139,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dependencies\GLAD\src\glad.c" />
+    <ClCompile Include="src\BallManager.cpp" />
+    <ClCompile Include="src\FlyOverBridge.cpp" />
+    <ClCompile Include="src\GlassBridge.cpp" />
     <ClCompile Include="src\Ground.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MazeTextures.cpp" />
@@ -147,6 +150,7 @@
     <ClCompile Include="src\MovingWallCourse.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\Trampoline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BallManager.h" />

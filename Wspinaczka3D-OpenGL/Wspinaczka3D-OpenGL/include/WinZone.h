@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "Shader.h"
 
-// Przenosimy struktury hitbox�w tutaj, bo s� u�ywane globalnie
+
 struct TableHitbox {
     float minX, maxX;
     float minZ, maxZ;
@@ -52,7 +52,7 @@ public:
         float currentFrame, float& crashStartTime,
         void (*updateCrackGeom)(int))
     {
-        // Czy jeste�my w og�le w obszarze XZ rampy?
+        // Czy jeste�my w obszarze XZ rampy?
         if (eggPosition.x <= ramp.minX || eggPosition.x >= ramp.maxX ||
             eggPosition.z <= ramp.minZ || eggPosition.z >= ramp.maxZ) {
             return false;

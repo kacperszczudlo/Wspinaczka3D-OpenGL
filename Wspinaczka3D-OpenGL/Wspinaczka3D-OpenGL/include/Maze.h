@@ -18,7 +18,7 @@ public:
     unsigned int floorTextureID = 0;
     Mesh* floorMesh = nullptr;
 
-    float floorThickness = 0.4f; // np. 0.2–0.6 zale¿nie od skali
+    float floorThickness = 0.4f; 
     Mesh* floorSlabMesh = nullptr;
 
 
@@ -90,11 +90,11 @@ public:
         std::vector<Texture> textures;
         cubeMesh = new Mesh(vertices, indices, textures);
 
-        // --- TEXTURES (zmieñ œcie¿ki jak chcesz) ---
+        // --- TEXTURy 
         wallTextureID = loadTexture2D("assets/textures/maze_wall.png");   // np. ceg³a/kamieñ
         floorTextureID = loadTexture2D("assets/textures/maze_floor.png");  // np. p³ytki/kamieñ
 
-        // --- FLOOR MESH (plane z tilingiem) ---
+        // --- FLOOR MESH 
         float halfW = mazeWidth * 0.5f;
         float halfD = mazeDepth * 0.5f;
 
@@ -102,7 +102,7 @@ public:
         float botY = -floorThickness;
 
         float tileTop = 10.0f;   // tiling na górze
-        float tileSide = 2.0f;   // tiling na bokach (mo¿esz dopasowaæ)
+        float tileSide = 2.0f;   // tiling na bokach 
 
         std::vector<Vertex> v;
 
@@ -190,7 +190,6 @@ public:
         }
     }
 
-    // Nowa funkcja do rysowania pod³ogi pod labiryntem
     void DrawFloor(Shader& shader) {
         shader.setInt("useTexture", 1);
         shader.setInt("texture_diffuse1", 0);
@@ -222,9 +221,7 @@ public:
         for (const auto& w : walls) {
             glm::mat4 model = glm::mat4(1.0f);
 
-            // Œciana ma wysokoœæ 5.0f. Jej œrodek jest w 2.5f.
-            // Chcemy, ¿eby spód œciany by³ na startPosition.y
-            // Wiêc œrodek = startPosition.y + 2.5f
+            
             float wallHeight = 5.0f;
             float yPos = startPosition.y + (wallHeight / 2.0f);
 

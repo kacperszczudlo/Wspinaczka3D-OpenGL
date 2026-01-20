@@ -54,7 +54,7 @@ public:
         bool inXZ = (playerPos.x >= minX && playerPos.x <= maxX &&
             playerPos.z >= minZ && playerPos.z <= maxZ);
 
-        // POPRAWKA: Koniec wspinania równo z wysokoœci¹ wizualn¹ (ok. 9.6m od podstawy)
+        // Koniec wspinania równo z wysokoœci¹ wizualn¹
         bool inY = (playerPos.y >= position.y - 0.5f && playerPos.y <= position.y + 9.8f);
 
         return inXZ && inY;

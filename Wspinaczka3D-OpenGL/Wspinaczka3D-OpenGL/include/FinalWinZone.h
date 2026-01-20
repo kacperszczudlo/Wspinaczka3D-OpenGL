@@ -13,10 +13,8 @@ public:
     float height;
     float topY;
 
-    // Hitbox
     TableHitbox hitbox;
 
-    // Flag czy gracz ju¿ wygra³
     bool playerHasWon;
 
     FinalWinZone(glm::vec3 pos, float w = 8.0f, float h = 8.0f, float surfaceY = 24.3f) {
@@ -34,9 +32,8 @@ public:
         hitbox.topY = topY;
     }
 
-    // SprawdŸ kolizjê z graczem
     bool CheckPlayerInZone(const glm::vec3& playerPos, float playerHeight = 0.7f) {
-        if (playerHasWon) return false; // Tylko raz
+        if (playerHasWon) return false; 
 
         bool inXZ = (playerPos.x >= hitbox.minX && playerPos.x <= hitbox.maxX &&
             playerPos.z >= hitbox.minZ && playerPos.z <= hitbox.maxZ);
@@ -53,10 +50,9 @@ public:
     bool IsPositionInsideZone(const glm::vec3& pos) const {
         return pos.x >= hitbox.minX && pos.x <= hitbox.maxX &&
             pos.z >= hitbox.minZ && pos.z <= hitbox.maxZ &&
-            pos.y >= topY - 2.0f; // Tolerancja 2 jednostki w dó³
+            pos.y >= topY - 2.0f; 
     }
 
-    // Rysuj strefê (zielona platforma)
     void Draw(Shader& shader, Model& platformModel) {
         shader.setInt("useTexture", 1);
         shader.setVec4("objectColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Zielona
@@ -68,15 +64,11 @@ public:
         shader.setMat4("model", model);
         platformModel.Draw(shader);
 
-        // Reset koloru
         shader.setVec4("objectColor", glm::vec4(1.0f));
     }
 
-    // Wyœwietl komunikat (wywo³aj w UI)
     void DisplayWinMessage(UIManager* ui) {
-        // U¿yj istniej¹cego UIManager do pokazania komunikatu
-        // UIManager musi mieæ metodê DrawCustomMessage(std::string)
-        // Jeœli nie ma, trzeba dodaæ - albo rysujemy bezpoœrednio tutaj
+        
     }
 };
 

@@ -79,7 +79,7 @@ unsigned int Skybox::loadCubemap(const std::vector<std::string>& faces)
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-    stbi_set_flip_vertically_on_load(false); // WA¯NE dla cubemap
+    stbi_set_flip_vertically_on_load(false); 
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++)
@@ -119,7 +119,7 @@ void Skybox::Draw(const glm::mat4& view, const glm::mat4& projection)
 
     skyboxShader.use();
 
-    // view bez translacji (dok³adnie jak na LearnOpenGL)
+    // view bez translacji 
     glm::mat4 viewNoTranslate = glm::mat4(glm::mat3(view));
     skyboxShader.setMat4("view", viewNoTranslate);
     skyboxShader.setMat4("projection", projection);

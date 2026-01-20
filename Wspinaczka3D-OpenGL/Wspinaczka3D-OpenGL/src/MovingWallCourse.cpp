@@ -129,7 +129,7 @@ bool MovingWallCourse::CheckPlayer(const glm::vec3& p, float r)
     // 2) testujemy każdą ścianę
     for (const auto& w : walls)
     {
-        // bliskość w osi Z (grubość ściany ~0.6, więc dajemy mały margines)
+        // bliskość w osi Z 
         if (fabs(p.z - w.zPos) > (r + 0.5f)) 
             continue;
 

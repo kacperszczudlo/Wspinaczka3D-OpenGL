@@ -5,6 +5,7 @@
 #include <random> 
 #include <cmath> 
 
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "GlassBridge.h" 
@@ -22,7 +23,7 @@
 #include "FlyoverBridge.h"
 #include "Skybox.h"
 #include "Ground.h"
-#include "BallManager.h" // Upewnij się, że masz ten nagłówek, bo używasz ballManager
+#include "BallManager.h" 
 #include "MovingWallCourse.h"
 #include "WindyTileBridge.h"
 #include "FinalWinZone.h"
@@ -43,7 +44,7 @@ UIManager* uiManager = nullptr;
 //OG SCIEZKA NIE USUWAC
 glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
 //glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-//glm::vec3 eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
+//lm::vec3 eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
 
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
@@ -99,12 +100,8 @@ TableHitbox tables[] = {
 TableHitbox midSafeZone = { 43.0f, 47.0f, -2.0f, 2.0f, 15.0f };
 TableHitbox mazeFloor = { 10.0f, 30.0f, 6.0f, 26.0f, 15.0f };
 
-// <--- HITBOX PODUSZKI (MOSTU) - PODŁOGA
-// WYDŁUŻONA W LEWO (aż do -60.0f)
+// HITBOX PODUSZKI
 TableHitbox ladderPillow = { -40.5f, 28.0f, 27.8f, 33.0f, 22.9f };
-
-// <--- HITBOXY BARIEREK (WYDŁUŻONE)
-// Też ciągną się od -60.0f do 28.0f
 
 // Barierka TYLNA
 TableHitbox barrierBack = { -40.5f, 28.0f, 28.1f, 28.5f, 23.6f };
@@ -117,7 +114,7 @@ void processInput(GLFWwindow* w);
 static unsigned int loadTexture(const char* path);
 void updateCrackWrapper(int count) { if (player) player->UpdateCracks(count); }
 
-// --- NAPRAWIONA DEKLARACJA (DODANO pillowModel) ---
+
 void RenderScene(Shader& shader,
     Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
@@ -141,7 +138,7 @@ int main() {
     SCR_WIDTH = 1280;
     SCR_HEIGHT = 720;
 
-    // NULL jako 4. argument oznacza tryb okienkowy!
+    
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
     if (!window) return -1;
 
@@ -164,7 +161,7 @@ int main() {
     Shader ourShader("assets/shaders/vertex_shader.glsl", "assets/shaders/fragment_shader.glsl");
     Shader shadowShader("assets/shaders/shadow_depth.vs.glsl", "assets/shaders/shadow_depth.fs.glsl");
 
-    // --- init shadow framebuffer + depth texture ---
+   
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -208,7 +205,7 @@ int main() {
     glassBridge = new GlassBridge(glm::vec3(25.0f, 0.0f, 0.0f), 2.85f, &tileModel);
     bouncyTrampoline = new Trampoline(glm::vec3(41.0f, 0.0, 0.0f), 0.4f, 0.5f, 35.0f, &trampolineModel, glm::vec3(0.2f), glm::vec3(0.0f));
 
-    // UWAGA: dałem Y=15 żeby pasowało do Twojej “platformowej” wysokości
+    
     wallCourse = new MovingWallCourse(
         glm::vec3(-45.0f, 23.6f, 28.0f),
         myMaze->wallTextureID,
@@ -239,14 +236,12 @@ int main() {
     ballManager = new BallManager(&ballModel);
 
     FlyoverBridge* myFlyover = new FlyoverBridge(
-        // Pozycja: PRZESUNIĘTA MOCNO W X (-16.0f), żeby środek był na długiej trasie
-        // Z=30.0f, Y=21.8f bez zmian
+        
         glm::vec3(-9.0, 21.8f, 30.0f),
 
         // Obrót
         glm::vec3(0.0f, 0.0f, 0.0f),
 
-        // Skala: WYDŁUŻONA DO 13.0f (bardzo długa trasa)
         glm::vec3(5.0f, 0.4f, 0.8f),
         &flyoverModel
     );
@@ -284,7 +279,8 @@ int main() {
             //og nie usuwac
             eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
             //eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
-            physics.Reset();
+            //physics.Reset();
+			maxFallHeight = 0.7f;
             maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);
@@ -568,8 +564,6 @@ int main() {
         shadowShader.use();
         shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-        // UWAGA: nie potrzebujesz projection/view, tylko model + lightSpaceMatrix
-        // --- NAPRAWIONE WYWOŁANIE (DODANO pillowModel) ---
         RenderScene(shadowShader,
             ground, tableModel, rampModel,
             winZone,
@@ -637,8 +631,6 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, depthMap);
         ourShader.setInt("shadowMap", 3);
 
-        // szkło tylko tutaj z blendingiem (jak miałeś)
-        // --- NAPRAWIONE WYWOŁANIE (DODANO pillowModel) ---
         RenderScene(ourShader,
             ground, tableModel, rampModel,
             winZone,
@@ -662,8 +654,6 @@ int main() {
             ourShader.setInt("twoSided", 0);
         }
 
-        // blend dla szkła w Twoim projekcie było w osobnym if-ie.
-        // Jeśli GlassBridge->Draw robi tylko draw, to najlepiej zrobić tak:
         if (glassBridge) {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -671,7 +661,6 @@ int main() {
             glDisable(GL_BLEND);
         }
 
-        // skybox
         skybox.Draw(view, projection);
 
         if (currentState != GAME_STATE_PLAYING) {
@@ -688,7 +677,7 @@ int main() {
 
     // Czyszczenie pamięci
     delete myFlyover;
-    delete ballManager; // Pamiętaj o wyczyszczeniu
+    delete ballManager;
     delete wallCourse;
     delete windyBridge;
     delete finalWinZone;
@@ -697,8 +686,6 @@ int main() {
     glfwTerminate();
     return 0;
 }
-
-// --- DEFINICJA FUNKCJI (DODANO pillowModel) ---
 void RenderScene(Shader& shader,
     Ground& ground, Model& tableModel, Model& rampModel,
     WinZone& winZone,
@@ -715,7 +702,7 @@ void RenderScene(Shader& shader,
 
     shader.setInt("useTexture", 1);
 
-    // floor (nowe)
+    // floor 
     ground.Draw(shader);
 
     // tables
@@ -752,7 +739,7 @@ void RenderScene(Shader& shader,
 
 
 
-    //// glass bridge (blend tylko w main pass; w depth pass i tak alpha discard w shaderze jeśli ustawisz)
+    
     //if (glassBridge) {
     //    // UWAGA: w depth pass nie potrzebujesz blendingu; tu nie robimy enable/disable żeby nie mieszać
     //    glassBridge->Draw(shader);

@@ -82,16 +82,16 @@ unsigned int Ground::loadTexture2D(const std::string& path)
 
 void Ground::Draw(Shader& shader)
 {
-    // Shader ju¿ jest .use() w mainie przed RenderScene, ale to ustawiamy tu:
+    
     shader.setInt("useTexture", 1);
 
-    // Twoje shadery u¿ywaj¹ texture_diffuse1
+   
     shader.setInt("texture_diffuse1", 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    // model = identity, bo y ju¿ jest w wierzcho³kach
+    
     shader.setMat4("model", glm::mat4(1.0f));
 
     glBindVertexArray(VAO);

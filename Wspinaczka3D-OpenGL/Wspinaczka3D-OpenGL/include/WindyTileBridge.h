@@ -16,7 +16,7 @@ struct WindyTile {
     float timer;
     float maxTime;
     TableHitbox hitbox;
-    bool isEndTile; // **NOWE**: kafelek prowadz¹cy do mety
+    bool isEndTile; // kafelek prowadz¹cy do mety
 };
 
 class WindyTileBridge {
@@ -76,7 +76,7 @@ public:
                 tile.timer = 0.0f;
                 tile.maxTime = STAND_TIME_THRESHOLD;
 
-                // **NOWE**: Oznacz ostatnie 3 rzêdy jako kafelki mety
+                // Oznacz ostatnie 3 rzêdy jako kafelki mety
                 tile.isEndTile = (z >= gridSizeZ - 3);
 
                 tile.hitbox.minX = tile.position.x - tileSize * 0.4f;
@@ -172,7 +172,7 @@ public:
             float visualSize = tileSize * 0.82f;
             model = glm::scale(model, glm::vec3(visualSize, 0.5f, visualSize));
 
-            // **NOWE**: Kolorowanie kafelków mety
+            // Kolorowanie kafelków mety
             glm::vec4 color;
             if (tile.isEndTile) {
                 // Fioletowe kafelki mety (zielony + czerwony = fioletowy)
@@ -207,12 +207,12 @@ public:
         shader.setVec4("objectColor", glm::vec4(1.0f));
     }
 
-    // **NOWE**: Funkcja zwracaj¹ca aktualny wiatr
+    //Funkcja zwracaj¹ca aktualny wiatr
     glm::vec2 GetWindForce() const {
         return windVelocity;
     }
 
-    // **NOWE**: Lista pozycji do generowania cz¹steczek (ca³a platforma)
+    //Lista pozycji do generowania cz¹steczek (ca³a platforma)
     std::vector<glm::vec3> GetParticleSpawnPoints() const {
         std::vector<glm::vec3> points;
         for (const auto& tile : tiles) {
