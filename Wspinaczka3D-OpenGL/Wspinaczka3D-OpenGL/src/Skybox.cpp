@@ -4,7 +4,7 @@
 #include "stb_image.h"
 
 Skybox::Skybox(const std::vector<std::string>& faces)
-    : skyboxShader("skybox.vs.glsl", "skybox.fs.glsl")
+    : skyboxShader("assets/shaders/skybox.vs.glsl", "assets/shaders/skybox.fs.glsl")
 {
     setupMesh();
     cubemapTexture = loadCubemap(faces);

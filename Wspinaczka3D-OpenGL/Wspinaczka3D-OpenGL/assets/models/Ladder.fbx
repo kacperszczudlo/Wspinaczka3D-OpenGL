@@ -1,0 +1,410 @@
+Kaydara FBX Binary    è  –           FBXHeaderExtension\         FBXHeaderVersionIë  x         
+FBXVersionIè  ˜         EncryptionTypeI              CreationTimeStampÏ          VersionIè  å         YearIê   ü         MonthI           DayI   '        HourI   ?        MinuteI   W        SecondI	   t        
+MillisecondIÃ                Â     -    CreatorS(   Blender (stable FBX IO) - 5.0.0 - 5.14.0‰      '   	SceneInfoS   GlobalInfo SceneInfoS   UserData     
+   TypeS   UserData6         VersionId             MetaDatad         VersionId   {        TitleS    ”         SubjectS    ¬        AuthorS    Æ        KeywordsS    à        RevisionS    ù         CommentS                 |           Properties70f     9   PS
+   DocumentUrlS    KStringS   UrlS    S
+   /foobar.fbx°     <   PS   SrcDocumentUrlS    KStringS   UrlS    S
+   /foobar.fbxâ     $   PS   OriginalS   CompoundS    S    <     L   PS   Original|ApplicationVendorS    KStringS    S    S   Blender Foundation™     O   PS   Original|ApplicationNameS    KStringS    S    S   Blender (stable FBX IO)ç     @   PS   Original|ApplicationVersionS    KStringS    S    S   5.0.0B     M   PS   Original|DateTime_GMTS   DateTimeS    S    S   01/01/1970 00:00:00.000Œ     <   PS   Original|FileNameS    KStringS    S    S
+   /foobar.fbx¿     %   PS	   LastSavedS   CompoundS    S         M   PS   LastSaved|ApplicationVendorS    KStringS    S    S   Blender Foundationx     P   PS   LastSaved|ApplicationNameS    KStringS    S    S   Blender (stable FBX IO)Ç     A   PS   LastSaved|ApplicationVersionS    KStringS    S    S   5.0.0#      N   PS   LastSaved|DateTime_GMTS   DateTimeS    S    S   01/01/1970 00:00:00.000o      >   PS   Original|ApplicationNativeFileS    KStringS    S    S                                           ¾         FileIdR   (³*ë¶$ÌÂ¿È°*©+üñó         CreationTimeS   1970-01-01 10:00:00:0004     -    CreatorS(   Blender (stable FBX IO) - 5.0.0 - 5.14.0²          GlobalSettingsh         VersionIè  ¥          Properties70¸     )   PS   UpAxisS   intS    IntegerS    I   ó     -   PS
+   UpAxisSignS   intS    IntegerS    I   -	     ,   PS	   FrontAxisS   intS    IntegerS    I   k	     0   PS
+   FrontAxisSignS   intS    IntegerS    I   ¥	     ,   PS	   CoordAxisS   intS    IntegerS    I    ã	     0   PS
+   CoordAxisSignS   intS    IntegerS    I   "
+     1   PS   OriginalUpAxisS   intS    IntegerS    Iÿÿÿÿe
+     5   PS   OriginalUpAxisSignS   intS    IntegerS    I   «
+     8   PS   UnitScaleFactorS   doubleS   NumberS    D      ğ?ù
+     @   PS   OriginalUnitScaleFactorS   doubleS   NumberS    D      ğ?O
+      H   PS   AmbientColorS   ColorRGBS   ColorS    D        D        D        
+     A   PS
+   DefaultCameraS    KStringS    S    S   Producer PerspectiveÑ
+     %   PS   TimeModeS   enumS    S    I
+        3   PS
+   TimeSpanStartS   KTimeS   TimeS    L        R     2   PS   TimeSpanStopS   KTimeS   TimeS    L°×èÀ
+   ˜     8   PS   CustomFrameRateS   doubleS   NumberS    D      8@                          ä
+          	Documentsß        CountI   ×
+        DocumentL1'¢
+    S   SceneS   Scene¬
+          Properties70^
+     &   PS   SourceObjectS   objectS    S    Ÿ
+     3   PS   ActiveAnimStackNameS    KStringS    S    S                 Ê
+     	   RootNodeL                                            
+References             5          
+Definitions9         VersionId   P        CountI           
+ObjectTypeS   GlobalSettings‘        CountI                ä     
+   
+ObjectTypeS   GeometryÙ        CountI   ×        PropertyTemplateS    FbxMeshÊ          Properties70j      A   PS   ColorS   ColorRGBS   ColorS    Dš™™™™™é?Dš™™™™™é?Dš™™™™™é?¼      D   PS    BBoxMinS   Vector3DS   VectorS    D        D        D              D   PS    BBoxMaxS   Vector3DS   VectorS    D        D        D        K     /   PS   Primary VisibilityS   boolS    S    I   ƒ     *   PS
+   Casts ShadowsS   boolS    S    I   ½     ,   PS   Receive ShadowsS   boolS    S    I                                          ‡$     
+   
+ObjectTypeS   Model        CountI   z$        PropertyTemplateS    FbxNodem$          Properties70     2   PS   QuaternionInterpolateS   enumS    S    I    ÷      K   PS   RotationOffsetS   Vector3DS   VectorS    D        D        D        O      J   PS
+   RotationPivotS   Vector3DS   VectorS    D        D        D        §      J   PS
+   ScalingOffsetS   Vector3DS   VectorS    D        D        D        ş      I   PS   ScalingPivotS   Vector3DS   VectorS    D        D        D        :     .   PS   TranslationActiveS   boolS    S    I    “      K   PS   TranslationMinS   Vector3DS   VectorS    D        D        D        ì      K   PS   TranslationMaxS   Vector3DS   VectorS    D        D        D        &     ,   PS   TranslationMinXS   boolS    S    I    `     ,   PS   TranslationMinYS   boolS    S    I    š     ,   PS   TranslationMinZS   boolS    S    I    Ô     ,   PS   TranslationMaxXS   boolS    S    I         ,   PS   TranslationMaxYS   boolS    S    I    H     ,   PS   TranslationMaxZS   boolS    S    I    €     *   PS
+   RotationOrderS   enumS    S    I    Ä     6   PS   RotationSpaceForLimitOnlyS   boolS    S    I    
+     ;   PS   RotationStiffnessXS   doubleS   NumberS    D        V     ;   PS   RotationStiffnessYS   doubleS   NumberS    D        Ÿ     ;   PS   RotationStiffnessZS   doubleS   NumberS    D        İ     0   PS    AxisLenS   doubleS   NumberS    D      $@3      H   PS
+   PreRotationS   Vector3DS   VectorS    D        D        D        Š      I   PS   PostRotationS   Vector3DS   VectorS    D        D        D        Ã     +   PS   RotationActiveS   boolS    S    I          H   PS
+   RotationMinS   Vector3DS   VectorS    D        D        D        o      H   PS
+   RotationMaxS   Vector3DS   VectorS    D        D        D        ¦     )   PS   RotationMinXS   boolS    S    I    İ     )   PS   RotationMinYS   boolS    S    I         )   PS   RotationMinZS   boolS    S    I    K     )   PS   RotationMaxXS   boolS    S    I    ‚     )   PS   RotationMaxYS   boolS    S    I    ¹     )   PS   RotationMaxZS   boolS    S    I    ï     (   PS
+   InheritTypeS   enumS    S    I    '     *   PS
+   ScalingActiveS   boolS    S    I    |      G   PS
+   ScalingMinS   Vector3DS   VectorS    D        D        D        Ñ      G   PS
+   ScalingMaxS   Vector3DS   VectorS    D      ğ?D      ğ?D      ğ?      (   PS
+   ScalingMinXS   boolS    S    I    =     (   PS
+   ScalingMinYS   boolS    S    I    s     (   PS
+   ScalingMinZS   boolS    S    I    ©     (   PS
+   ScalingMaxXS   boolS    S    I    ß     (   PS
+   ScalingMaxYS   boolS    S    I         (   PS
+   ScalingMaxZS   boolS    S    I    t      Q   PS   GeometricTranslationS   Vector3DS   VectorS    D        D        D        Ğ      N   PS   GeometricRotationS   Vector3DS   VectorS    D        D        D        +      M   PS   GeometricScalingS   Vector3DS   VectorS    D      ğ?D      ğ?D      ğ?o     6   PS
+   MinDampRangeXS   doubleS   NumberS    D        ³     6   PS
+   MinDampRangeYS   doubleS   NumberS    D        ÷     6   PS
+   MinDampRangeZS   doubleS   NumberS    D        ;     6   PS
+   MaxDampRangeXS   doubleS   NumberS    D             6   PS
+   MaxDampRangeYS   doubleS   NumberS    D        Ã     6   PS
+   MaxDampRangeZS   doubleS   NumberS    D        
+     9   PS   MinDampStrengthXS   doubleS   NumberS    D        Q     9   PS   MinDampStrengthYS   doubleS   NumberS    D        ˜     9   PS   MinDampStrengthZS   doubleS   NumberS    D        ß     9   PS   MaxDampStrengthXS   doubleS   NumberS    D        &      9   PS   MaxDampStrengthYS   doubleS   NumberS    D        m      9   PS   MaxDampStrengthZS   doubleS   NumberS    D        ²      7   PS   PreferedAngleXS   doubleS   NumberS    D        ÷      7   PS   PreferedAngleYS   doubleS   NumberS    D        <!     7   PS   PreferedAngleZS   doubleS   NumberS    D        r!     (   PS   LookAtPropertyS   objectS    S    ª!     *   PS   UpVectorPropertyS   objectS    S    Ù!     !   PS   ShowS   boolS    S    I   "     8   PS   NegativePercentShapeSupportS   boolS    S    I   e"     8   PS   DefaultAttributeIndexS   intS    IntegerS    Iÿÿÿÿ–"     #   PS   FreezeS   boolS    S    I    Ç"     #   PS   LODBoxS   boolS    S    I    ##      N   PS   Lcl TranslationS   Lcl TranslationS    S   AD        D        D        y#      H   PS   Lcl RotationS   Lcl RotationS    S   AD        D        D        Í#      F   PS
+   Lcl ScalingS
+   Lcl ScalingS    S   AD      ğ?D      ğ?D      ğ?
+$     2   PS
+   VisibilityS
+   VisibilityS    S   AD      ğ?`$     E   PS   Visibility InheritanceS   Visibility InheritanceS    S    I                                          ı+     
+   
+ObjectTypeS   MaterialÂ$        CountI   ğ+        PropertyTemplateS   FbxSurfacePhongã+          Properties70K%     1   PS   ShadingModelS    KStringS    S    S   Phong€%     '   PS
+   MultiLayerS   boolS    S    I    Ğ%      B   PS
+   EmissiveColorS   ColorS    S   AD        D        D        &     2   PS   EmissiveFactorS   NumberS    S   AD      ğ?_&      A   PS   AmbientColorS   ColorS    S   ADš™™™™™É?Dš™™™™™É?Dš™™™™™É?&     1   PS
+   AmbientFactorS   NumberS    S   AD      ğ?í&      A   PS   DiffuseColorS   ColorS    S   ADš™™™™™é?Dš™™™™™é?Dš™™™™™é?,'     1   PS
+   DiffuseFactorS   NumberS    S   AD      ğ?'      E   PS   TransparentColorS   ColorS    S   AD        D        D        Ã'     6   PS   TransparencyFactorS   NumberS    S   AD        ü'     +   PS    OpacityS   NumberS    S   AD      ğ?P(      F   PS	   NormalMapS   Vector3DS   VectorS    D        D        D        Ÿ(      A   PS   BumpS   Vector3DS   VectorS    D        D        D        à(     3   PS
+   BumpFactorS   doubleS   NumberS    D      ğ?;)      M   PS   DisplacementColorS   ColorRGBS   ColorS    D        D        D        „)     ;   PS   DisplacementFactorS   doubleS   NumberS    D      ğ?å)      S   PS   VectorDisplacementColorS   ColorRGBS   ColorS    D        D        D        4*     A   PS   VectorDisplacementFactorS   doubleS   NumberS    D      ğ?„*      B   PS
+   SpecularColorS   ColorS    S   ADš™™™™™É?Dš™™™™™É?Dš™™™™™É?Ä*     2   PS   SpecularFactorS   NumberS    S   AD      ğ?ÿ*     -   PS	   ShininessS   NumberS    S   AD      4@B+     5   PS   ShininessExponentS   NumberS    S   AD      4@”+      D   PS   ReflectionColorS   ColorS    S   AD        D        D        Ö+     4   PS   ReflectionFactorS   NumberS    S   AD      ğ?                                       	1        
+ObjectTypeS    Texture7,        CountI   ü0        PropertyTemplateS   FbxFileTextureï0          Properties70¹,     +   PS   TextureTypeUseS   enumS    S    I    ï,     (   PS
+   AlphaSourceS   enumS    S    I   3-     6   PS
+   Texture alphaS   doubleS   NumberS    D      ğ?n-     -   PS   PremultiplyAlphaS   boolS    S    I   °-     4   PS   CurrentTextureBlendModeS   enumS    S    I   í-     /   PS   CurrentMappingTypeS   enumS    S    I    '.     ,   PS   UVSetS    KStringS    S    S    default[.     &   PS	   WrapModeUS   enumS    S    I    .     &   PS	   WrapModeVS   enumS    S    I    À.     #   PS   UVSwapS   boolS    S    I    /      H   PS
+   TranslationS   Vector3DS   VectorS    D        D        D        i/      E   PS   RotationS   Vector3DS   VectorS    D        D        D        »/      D   PS    ScalingS   Vector3DS   VectorS    D      ğ?D      ğ?D      ğ?0      Q   PS   TextureRotationPivotS   Vector3DS   VectorS    D        D        D        x0      P   PS   TextureScalingPivotS   Vector3DS   VectorS    D        D        D        ®0     (   PS
+   UseMaterialS   boolS    S    I    â0     &   PS	   UseMipMapS   boolS    S    I                                           5     
+   
+ObjectTypeS   VideoA1        CountI   ÷4     
+   PropertyTemplateS   FbxVideoê4          Properties70º1     (   PS   WidthS   intS    IntegerS    I    ñ1     )   PS   HeightS   intS    IntegerS    I    &2     '   PS   PathS    KStringS   UrlS    S    [2     '   PS
+   AccessModeS   enumS    S    I    –2     -   PS
+   StartFrameS   intS    IntegerS    I    Ğ2     ,   PS	   StopFrameS   intS    IntegerS    I    
+3     ,   PS   OffsetS   KTimeS   TimeS    L        J3     2   PS	   PlaySpeedS   doubleS   NumberS    D        €3     (   PS
+   FreeRunningS   boolS    S    I    ¯3     !   PS   LoopS   boolS    S    I    ç3     *   PS
+   InterlaceModeS   enumS    S    I    4     *   PS
+   ImageSequenceS   boolS    S    I    c4     6   PS   ImageSequenceOffsetS   intS    IntegerS    I    £4     2   PS	   FrameRateS   doubleS   NumberS    D        İ4     ,   PS	   LastFrameS   intS    IntegerS    I                                                        !Ñ           ObjectsæÃ     )   GeometryLú~    S   Cube.001 GeometryS   Mesh‰5          Properties70             ª5        GeometryVersionI|   “C     Ô
+  Verticesd8      Ç
+  xm™O¨]WÅµO-ş%³£M¡!Q'Ä{Ú†TœX+GB¡*-´îğ8qV-­ …Hq  ˆÅw©¦ju¢˜”¶[Ø”ÒFÏÚgı6û|ï¾ÉKV>Ö]û·¿³Ş½yMÓ¤W¾ùÌnÓ4ı¥G}ç
+=İqóÏ¥wî½{£üçÙÕ<:óİ]Ç–ç¿zõ˜æûÊóãgög}øó§¿(}xö×Y/óöGOÎÓÙ ÿ’çè vºÙ üã‰f}OÎ0Ïë'åù=9?tSÖcæÑñiƒ¿òd^sÆüUq“¹é\µ?>p ç0óÌ·ğ¬}à£œY<ñ‡ó%ÏUóÌ>á¼øÃ‡œº÷œ3ğdnœ7™>ãùGÏîÎ¼”Sßù¯»òT­Ã“ù²'Ş«ôÖÃ+xNG»¬‹§üØOæ¹_ü ç)ºyòºä„'zÉcn{ò[şp gyÌ3æ„'ºxê\øG97ÀÔ¿û\åŞÍ­Î©ùm²nuNéÛxÖ>uÎÚ‡<ä,<«{ÏóğŒùÙÏêŞ5 r–çh
+OÍÃ³¾—Ú§yîÑ³ú;÷>ÿqù²Î½·ôçÎ•§êyxâÃ^5æÙİŞeÿrï~Ş§ù\òatî=Ù òtæƒN~871g˜çuá¹'§yÆ<Ì£ãç:ÎW¾ª<ùÜğ¬8×:şìÏ;9Ë½oáYûG9³xâ_¸Å<p‹ùÑ=?|È©{×ë'ópã¼ºwÍã£>×ß¹ßÂsşyTëìóeOÌYı¼š7 õ¼tñÜÕ÷êç‘tî7úİ>¼.9á‰^òÀ-æ·Î<şp gyÌ“s1OtñÔ¹ğÁ_9u>¾Ğ•SzË~V93ëÌëu³OàYî}
+ÏÚ§Î)çrÂS?Ç5‡N0O~tü™‡<uïòc?™ç\ğÄŸôöåçxó¹‹'wgŸîµëÿ–Ïñ‘cùç{û¾‡·éãg—ùqúB®?—ç‡Ãßûq=ßıéñ¬§ıç$½½åã+ÿäùşù£+ŸÉşèí‡åŞNÿ».ç/-9[?×ÍíÎƒîùÎzçœı;ÏeŸiÿ’Ÿæg}¼vÉ9tKNæñ™.,9;û7 txG/ÇÈS9¥Ã-™s7Ÿ«‡çd8sNÍGÃ|.éÌã“¬“ nºÇœ'pß»“óÀ§ğ÷|äÙÍ÷XûÀ³›ï]:<áÖznpì^xzÒƒ?}Z~pKè»WÎÕºòïjÎóp¿ôî‰ÃÙ Ê)}¼Ú­ü•³ÇGç­ı
+Ïù¾²~rÉ	7İï6½M¿_òÃA÷UÏÃ3y?Ç7—œğÔ½k¾ÿİr.|´?Ò;ëğdáÏÁ{uíÿföIæ‡Ñ{Å<<õi>òÔó"½7|Zû£ÃS½”_7ğdoágõU=_8x¯àSxz?#ÏäıdŸÁzrÂÓıÙ~û±çóë‡şŒºòïÎ¦»ÿçá é}àI67^ù+§æ‡oüaå3Ù>ôçtÿ’³pvO=ôçàœp˜¼oä„'ı9\r2¯ıQÎäœì-ı‰Oú3rcoáÆŞÒŸÌÃ“ş„CáéıŒ<õm¶ğLÖ9/ÜØÃÈşŒzòF÷
+xÒŸğ„[Ëš'œ ûïáé}hÿı©
+:Ü”G÷Ò_zÿJ§?™‡§üó=¾zs‡'ıÙùèÊG9ëy|t^éøî«éâ’“½¥?£®}È>Î İ—tæáI6Î	Oİ»æ;Ÿ
+ŸÒŸÖÙOöüğ¤?£®ıßTœá0z¯˜‡'ıyÒŸÉyğiíOúğ½'­¹¡ÓŸÌ‡OáéşŒ<“÷“y|ëøîÏáÄÓ¯ˆ<yÿuå×}õ÷¼–çá éÉ>ğ¤?Ó¡VşÊ©ùæŞ‹+ŸÉşèğ¡?{ûÎŞÃ¢‡şl“÷œğ¤?ÉÉ¼ö§ÎÉŞÒŸä„'ı9ì-ÜàL2OúÿÂÓıIN|ôm¶ğLÖ9/ÜØÃæFF=±·gç½Âô'9áÖzsÁy°?záé}şsüeó*îeº|d¥ÓŸÌÃSşù/ß‘çáI¦OŞ¹òQÎzWzrÂÓıÙ£³‡~ÿuíƒ|ç‡ƒî«ö‡'ıINxêŞëœøĞŸÏ
+Oö>ğ¤?£®ıßTœá0²W>/<éOrâO’ ŸÖşèğ¤?#·Ñ{7úşd¾pğ<ş…§û“œğLì§¹á3XOìaøüŞœùÖ«âÄyéÏ¨+¾¯Íò<äŸuûÀ“şl:±òWNÍw›ï¬|&û£Ã‡ş$OáL¿ùu™×½ËüÄ’ûæyxÒŸädòÀ™şDg?éOrÂ³aOÌ
+şdô'ş…'ï?O=G›-<“uüáÆ=ôgÔ“÷0òìØ·À“ş„'ÜZÏs.8öG/<½é³ÿÕùà¦<ù~¯şf¥ÓŸÌÃSşšï®ş6ÏÃ³ôç©'V>ÊYÏã£óJÇ¿ğäó»s–=äó{ĞµÙÇùá ûªıÙÏÒŸÎ	Oİ{ú“óÂ“=$?<éÏ¨kÿ7óyGç„Ãè½b¥?Oú“<ø´öG‡'ı‰?<GïIrtú“ùÂÁóøôgà™ØOï	>ƒuü
+O¿ÿì~ÿ²8Á“şŒºòçû:ıH‡ƒü¥3Oú³?prå¯œšN?´ò™ìú³uÎÂÙ{Xt~î[oœ“÷yxÒŸ­s2¯ıÉçrNö–şì­Ã“ş„<ÙÛÎyĞéOæáIÂ¡ğtFz6[x&ëøÃ=„œyÿõä=Œ<;ïóğ¤?á	·Öópƒó`ôÂÓû0]yöunÊ£{ixr¥ÓŸÌÃSşšÓ¹<Oú³9ô—•rÖóøè¼ùußXòîÏÁ9á©ûÕ|Ôµ‹ÿ’º¯zôçpÓ’ºwÍ÷>>ô':<ÙCøÀ“şŒºö3ûÃ£÷ŠyxÒŸ“sâOÎ‰OktxÒŸ‘Ûè=ÓÂ
+Îô'ó…ƒçáPxº?#ÏÄ~ƒuü
+O>¿ŸıÉ›âÄyéÏ!èÊ¯ûJ·ı*ÏÃAşÒGÏÃ“ş>µòWNÍ7G[ùLöG‡ıÙÛ¿p¦ßĞCvÎYx²o‡'ıÙ;'óÚån[r²·ô':<Çù9ÚhŞşğdoá†N2Oí¿|F^—ßÇñù=ğÔsTÏã£çQz‚ïÆáıgÔ“÷0òìØ·À“ş„'ÜZöĞç‚ó`ÿ=<½íı/¿‘ÏáÿŸWİù\İ¾¬tú“y8È_óÓ5ÿÊóì'ıÙşò¹•rÖóøè¼Òñguïyş¾%'{KNA×>h¾q~8è¾²îó²ŸôgãœğÔ½k~ô¹ğÑşÔ:ûÉ’Ÿ=¤?£®ıßÌşp†Ãè½bôgäIÂŸÖşèğ¤?#·Ñ{78ÓŸÌ‡OáÉÿÉûÉ<>ƒõ†=ŸßÓw¾¥›9Á“şŒºòë^¦/õyò—Î<<éÏæİŸ_ù+§æ›/ßµò™ìú³sÎÂÙ{XôĞŸ£sÂaò¾õö'ı9½kÉÉ¼ö§ÎÉŞÒŸäd?éO8À“½…:ıÉ<<éOü
+O>¿ z6[x&ëøÃ=ìàú3ê‰=<;ïUxÒŸğ„[ËúŞá<ØŸóŞ‡.]mºù|pSİËxë¥•N2Oùk~¸õõ<Oús|ğòÊG9ëy|t^éøî«Æ9Ù[ú3êÚ‡ÅÉ İ—tæÙOú39'<uïšO>>ô':<ÙCòÃ“şŒºö3ûÃ£÷ªõyáI'ıI|Zû£Ã“ş„<GïÉà{G§?™/<áÉç÷À3y?™Çg`oÙÃØŸ/ß×éÂïßSĞ•?ßïÁ‹yòÏ÷èyx–ş|æ…•¿rj¾=øÒÊg²?:|èÏŞş…³÷°è¡?§–œp˜¼o}àI]r2¯ıQÎé†%'{K¢³Ÿ¥?7ö¶178—şô<<éO8ôgà©çh³…g²Î=Â=ŒÜøüõä=Œ<;ïUäIÂn­çáç¡ø/œ
+OïCËw×ûc}ÚwßJ§?™‡§üuÃ¾”çáYúóØ+å¬çñÑy¥wÎSxº?‹Îúó{Ôµòº¯ÚŸı¤?Gç„§î½Î‰ıÉyáÉÂ‡=¤?£®ıßÌ9á‡Ñ{Å¹àI’ú“<ø´öG‡'ı‰?=ÀŞÂ
+şd¾pğ^á_xº?É	ÏäıdŸÁ:ş…'Ÿßñ•·u3'ÎËûÏ!èÊ¯ûj_üz‡ƒü¥‡'ıÙığøÊ_95ß¿øµ•ÏdtøĞŸÉş…³÷°èì­õÆ9á0yß˜‡'ıÙ8'óÚŸå¼KN8ÓŸ­óÃ“ş7önp¦?™‡'ı	‡ÂÓıyê9Úlá™¬{ 8ÓŸQOŞÃÈ³ó^1Oúpk=78öG/<½éš÷¬÷Çzóäµ+şdò×=Ngvò<<éÏæÀ;V>ÊYÏã£óJÇŸ=Ô½Kïºßmºöañ_òÃA÷%½³<Kî_rÂS÷®ùÁçÂ§ô§ux²‡ägéÏ¨kÿ7³?œá0z¯˜‡'ıyÒŸğÇ§µ?:<éÏ>ğdo§3
+78ÓŸÌŞ+øôgà™¼ŸÌã3Xï”çÿV~zÎ·S       PolygonVertexIndexiH	     ø  x5™ ØOõÿ‡y’-BDÉ*BDÙQ$E’½³*Ù!$E
+¥(+«23³wffH‘MÙ#ÿûş_ï_×u_ï×ıôœs¾Î÷sÎù¾¾OÎ$I’ä…pûÎ;…™Å!ÁŸa¶€—`=ş8ó>H	 ñf*È
+çñÌ,Pváõ™ "¬Ã[1ÛCc˜†¿Æ|a2^†Y	jÃB¼:³t€18#É]şÅ“2ï¿‰ûz’‡ßÀıw¥†4p÷u§
+¿‚ûÚÓ…_Âï!ß
+á™)üÜ_æğ³¸çâ~ÈGqÿíÙÃOà— Âá’sAnøÏÁ|(üO<'9Oø!üar~( {pß«‚á¿á¾O„ïÅ%?E`^ˆY4üWÜ÷·XøvÜ÷ó	(	pßûRá¿à¾O†oÄŸ"—…r°/Í,¾÷ı«¾
+÷}¯U`1È¬ş3î{ıtøÜõö,Ô€¹x5æsá?á®‡šáóp×Î
+P ¦ã®•ºá?â®£Ãgà®ã—¡LÁë1_	ÿw½6ŸŠ¿JnMaîZnş
+î:n>oAn
+màK¼%³møW¸ë¿]ø(Üõß:Á0Ük£søg¸ëşõğá¸ëÓÿ\ã®G×ªÙuïõ—”éšwM»ş½6Ì®ó[¸ëß5ëšt½{-˜]§Wq×¯kÜ5ïzu-›½Nâ®/_ƒ×€ëé±Ènãõî¾]S®×¿×†Ùut
+w}¹]“®'×šÙuº÷úğ®Q¯ ¯³Ûx?rß^®y×§k×ìu°÷úğòšòzğZ1{íÇI<†×˜÷‹»"»÷?÷í9J
+^_ù#{NàÏ0½\ã®Çg#»î½_y=¸æ]Ó®¯
+s%X‹'2Ÿ ×¤ëİkÁ\–á®ßêàšw½º–Í^ ³p×—¯¡&¸ZGvïîû5x\ÿ/DvÍÆ]_®A×¤ëÉµfv~{}xŒvàõàµbv›ÿİ¯½&šƒë³cd¯ƒ‘¸×‡××Ôx¼Yd¯³‰¸çÎcxy¿(Ùm|>¸ïD¨^_^{fÏé$Üµçúğ=Dï|ÂüzÀ'øæD	]ğŸ˜¿Âxÿ†ùô„xf/xúãı™ƒa´Â×17ÃPßÅÜ[ ş3uRÖ3şóg˜OàÓ˜³a9TÇ2—Á(Œßf&cûÌœxZrF¸ğüÌÊğœ`ŞË¼Âï„›øæ)¸øıóÌ«‰ß»Ìÿ/Å, ¹à8^•YÊÃ&¼	³7t„ñg™AnXƒgg>Ea^Yƒ¥xgfWxfâ}˜¡ŒÀ¿`ÎÉĞÀl
+
+à#¼.óh
+ğfÌ6ğ.Â§2§Ã§ĞŸÇ\3 !¾•yBE|s,ƒ—ğ¡Ìá0Úá£˜ã`	ÔÄ1Âz¨€Ÿe^„c OÀ„Ì¿ÀÏwÃx_ÅÜ{¡¾¹ .Af<
+Û=Ş˜“ãyÉB8Í
+¹³!Ô„mø#Ìtà
+ı(~ƒí’’ÓÃu<%ó( ñZÌ—àIØŠ7b¶€z0 oÎ|‚éxqfi¨+ğDæ3Ğ&ãopè· +a=½ÉìşîõÒ=|(îu×Ş†¸×UŸğ÷p¯­¾áïâıÈ` ?Ãßa¾ŞïOŞ ÷Zı †@WÜkshxÜëöÃğnøGäOatÂ?f÷~1"¼3şù
+øÚàŞKF…¿†{ŞÿŠ<ÆASükæøğ¸÷Ÿ	áÍğoÈ“a
+4À'2§†¿Š{Ÿù6üü;ò0êàß3g„¿„{?™^÷¾4 æB
+ÜûÎ¼ğçqï=óÃŸÃ½.‚ÅP_À\şîıiixUÜ{Ù
+X	åpï]«Â+âŞ×V‡—Ç½Ï®‡
+P_ËÜşîıtSx)üòVØEpïµÛÃÇ½Ïî/ŠÿJŞ
+{  ¾“¹7üQÜûó¾ğ‚¸÷ãƒğ;äÆ½w
+?@ş#ü!üOò_p²á‡™ÇÂÄ‡gÇ½oŸ†3÷¾|6ü>Ü{óßá™pŸà"¤ÁÏ1/…ßƒŸ'_O‹_!_‡!~•y#<~ü_øİøMòH’”Ï{ÜonÉºÌÛŒ„ğÛüÿ»ÈÉ!\Å“1S†ÿ‹ûJ~
+÷Y—îsxfúğ‹¸Ï¯áçqŸW™á>8‰ûlË~÷9•5ü~?ùxãÙ˜9Ââ>r†Á}®å‡a?›™7üwÜgW¾ğx~ò#ğ(ìÄ
+0
+…ïÁ}¾ß…û,,ÃfÜg_ñğm¸ÏÅá[pŸÓOÂS°/É,¾÷y\&|^–\*Â2ÜgubøJÜçt¥ğåxeòÓğ,À«0«…/Æ«’«‡/Ä}×„ça^ƒY+|.îs¼vølüò‹ğ|×aÖ
+Ÿû¼®>
+÷¹ß^…‰xf£ğ)¸ÏöÆá“ğ&äæĞ¾Æ›2[†Ã›‘[…Á[“ÛÁkğ9Ş†Ù>üK¼-¹CøH¼#ùux>Æ;1ß†w&w	ÿ‹ÜzÀ`¼+³gø¼¹Wøûxor_è ïào;Ã â}ÈıÃûãÈƒà=è‰d—ü~x/üò‡ğ¼‰a~ŞJş$¼
+ş)y|íñaÌÏÃ;áÃÉ#Ã;à_GÃWĞÿ’ùux|yLx+|,y|ğqÌ‰áMññäIáñÉäoá;¨‡Oa~Ş ŸJ^ÿ<~„Zøtæ¬ğ:øòìğÚøò|ø	ªás™
+ÂkàóÈ
+Ã«ã‹ÈKágHÄ3—…WÁ——‡WÂWWÃ(¯d®
+/‡¯"¯
+/ƒ¯'o‚_ 8¾¹9¼$¾‘¼%¼¾•¼~…Bø6æÎğ"øvò®ğÂønò>ø
+òâ{˜ûÃ
+à{É Âóá ÉÀŸÿy8<7~ˆ|$<'şù8œ€,øQæÉğlø1ò©ğ¬øiòßğ¤ÇÏ0Ï…gÄÏ’Ï‡gÀ//ÃH‰_d^
+Oƒ_"_
+O…_'ÿ 7!)ş/óVx2üùvx~‡œÀw‚pƒÏ¯~nN~
+÷³óİáÿá~O©á‚™&ü*îçë´á—q?‹g€{á,îgïŒáçp?—g
+ÿ·'d…ûá~3[øIÜ>=ü8ş 9'ä‚C¸]!wøaÜğPø¸]$ä‡½øÃÌáûqûEÁğ}¸}¢0<Ûq»G‘ğ¸=¢hø¼¹<ñÇ™%Ã7ãö‡Rá›p{G(
+«p{F¹ğµ¸]£|øjÜ¾S	*Ã¼"³Jø2<‘\5|)nw©ÏÂ<Ü®R#|ny.|>nª
+/ÀüyfğY¸}©nøLüEr}x¦âv©áßãö¨WÂ¿Åíj¡	ŒÇ_e6
+ŸˆÛ¿š…OÀí_­ 5ŒÂífmÂ¿Æí]mÃGãıø|öt‡~,ï‘»0ı~âMfè
+ö¯n‘{1?Æ{2ß;‘}«Od{Ò`|0³?Ø¹ìKv)ó;Ğ·ßø}fläşL¿qßß€Åşe73O‚^øDæö™©‘íIpû™Ç˜ ö1»šÙmü¾Æ}ÛÉFƒıhrä‘ÌÆ¸ıÌ7ìc£"ÛóÚã;1Â‰¿Ùmü~È}{zƒıî‹ÈÓøOL;ØL°-Šlïòûû˜k>Ø¿ìfæÙPŸÅüVƒ}Ë.f^µğeÌ…`ç*¯Š¼€™ˆÛo|
+KÁ>³;²Ûø}‘ûş
+ş€ŠøŠÈö˜Jø~¦h/ØgEŞÉÌ‹¯azŒ}`[Ùmü>Ë}ÛÉv€ıè`d{X>Ü~f‡³ÓÙÇ¶G^Ë,{î<†Ï¾úCd·ñû3÷í9šö»­‘=§%ğ˜Âq°]ˆ|„é÷[‡™'ÀNeÿ:Ù•·];‘}Ë.f¾Yğ«Ìóp	ìK7"ÛÃRâ©“òl#_ûL:Üì6—q÷}/?Ë
+ö¯ë¸9¤Â32ÓBz°Ïd‰œ†y¿Éï{Œ`»Ã0»ß÷¹ï» Ø2G¾›ù7Œy›m’2íc)™æ[üìş'Óc$ğ3ûê_‘İ&'î¾=GvVû]rÜì9ıÏß9Á>ôHäìL¿ÿËÆÌùÀş•#òCÌcxnæcPì[y#eÂ‹0
+B!°/\€¹¯Ìô5ûÌÓ‘İf)î¾Ÿ…Ú`ÿ*ù9æ¼³*TûL­ÈU˜óğ'˜£:ØÇŒì6~ê¾ËB%°ÕŒ\9/Ç,¥Á>–¹$sî¹óeà(ş@d·9»oÏQ°ßUˆì9]7a¾ õÁ>Ô<r]¦ßÖa¾ÁşU/ò+Ìxfkè ö­F‘Û2§âm˜Í %Ø—ÚGnÊ…÷fúZ}¦od·„»ïğ>Ø¿ÚE~—9Èìï@/|pä·ı9Ş‘é1úƒ}ìõÈn3wßoA/°
+ŠÜÙïÊìo‚}¬gäNÌ¡¸çÎctûê‹‘İÆï§İ·ç¨!ØïºGöœ~ˆÁü >ûĞèÈC™íğ!ÌOa$tÁ?<œÙ
+Æ
+“ şyäñÌÎø8æ(øìK#Él†ÏaúÆ€}f~d·©‰»ïE°ì_"/a6Ç3çÁ°Ï,‹<—YŸÌô
+Á>ömd·iˆ»ï`6Ø–FÁ|ŸÎœ
+ßƒ}lVä)Ìº¸çÎcLûê‡‘İ¦;î¾=G#À~73²çôE|+s¬ûĞÈ«˜Åğ•Ìõ°ì_k#od–Ç70wÃ°om¼—Y
+ßÃÜ;Á¾´?ò6fAü4Ó×°
+2âGv›Ì¸û¾ ×Àşµ/ò%æ#øEæY8 ö™«‘Ï0Óâ ™ã<ØÇşˆì6yp÷ıœûÑåÈÇ˜éğ£ÌCpìc'#ÿÎÌ{î<Æ°¯®ì6p÷í9Úö»ã‘=§àö£ëäÛ`²+™o€ø—y ìT	üş­Èÿß³ğ$üÜÎd'²oÙÅÌö¤Û¸ıÉeç²/Ù¥Ìö°ó¸ıÆ×` ³ÏØuÌnãß;Ü·ÆÎbÿ²›™í1pûÈNdŸ±ë˜íI»pû™Ç°#ÙÇìjf·ñï1îÛNfç²ÙÌö°İ¸ıÌg§³ålÏ;‚{î<†/çã?Üì6Éq÷í9J ûİÏì9ı
+·ÙÁìXö¡J‘í]ş½Æ>fç²SÙ¿ìff{ÖÜşeg²Ù·ìbæj°·?%‚Ë¾d—2ÛÃâö_CU°ÏØuÌnãß‡Üwsh
+ö¯ê‘í1‹ğL;È>c×1Û“Æàö3Ñìcv5³ÛüïïUv2;—ı¨Ud{ØXÜ~f‡³ÓÙÇìjf{Ş4Üsç1ìxöÕ‘İÆ¿¹oÏQ°ßÙıÌÓğ~¼=ö;Ä§|^ú?ÓÌTCˆZ     ¿  Edgesi¤     ²  xÖgœ„pó½Î>ûáì£pÈÎ,²³Ã!2²ÿvvöŸŒÈÈÎÎ:›ììu‡p¾^|_?¿¿ÏóyâÅ‹/>	HH"@’’ŒHN
+R’ŠÔ¤!-éHO2H&2“…¬d#;9"'¹ÈMò’üS€‚âC
+S„¢„PŒâ” $¥(CYÊQ
+T¤•©BUªQpjP“ZÔ¦õi@C>£iB3šÓ‚–´"‚Ö´¡-íhO':Ó…¯èJ7ºÓ“^ô¡/ıˆ¤?È 3”aç;F0’QŒa,ã™ÀD&1™)LeÓ™Ålæğs™Ç|²ˆ%,åG–±œ¬d«YË:Öó
+ØÈ&¶°•íì`'»ØÍö²ı"ŠÃá(Ç8ÎINq†³œã<¸È%.s…ëÜà&·¸Íîrû<ä1ÄG@|?M*	"Á„JEÂ§M‰ #=ˆd£™ÄL°Œu¬ç6°‘Mlf
+[ÙÆ¯lg ;ÙÅnö°—ßØÇ~pCDq˜#åÇ9ÁINqšß9ÃYÎq
+\äp™+\å×¹ÁMnq›;Ü%š{ÜçòG<&†'<åñœ¼$–W¼æoşá
+où—8Şñ¾˜â“€„$"1$!)Éø€ä¤ %©HMÒ’ôd #d"3YÈJ6²“ƒ r’‹Üä!/ùÈO0(H!>¤0E(JÅ(N	>¢$¥(M(e(K9ÊSŠT"ŒÊTác>¡*Õ¨N85¨I->¥6u¨K=êÓ€†|F#Ó„¦4£9Ÿó-hI+"hMÚò%íhO :Ò‰Îtá+ºÒîô '½èÍ×ô¡/ıˆ¤?È7b0ß2„¡c8ß1‚‘Œb4cË8Æ3ÉLa*ß3éÌ`³™Ë<æ³€…,b1KXÊrV°’ŸXÅj~f-ëØÀF6±™-leÛÙÁnö°—ßØÇ~pˆ(rŒãœà$§8ÍÎr‹\â.s…«\ç·¹Ã]¢¹Ç}ğG<á)Ïø‹ç¼à%¯xÍŞò/q¼ãı8ˆOB‘„¤$ã’“‚”¤&
+éÉ@FÉDf²ìä$¹ÉC^ò‘Ÿ¤0E(JÅ(N	JRŠ2”¥å©@E*Q™*T¥Õ	§5©EmêPŸ4ä3Ñ˜&4£9-hI+"hMÚÒöt¢3]øŠ®t£;=éEúÒHú3€b0CÆp¾c#ÅÆ2	Ld“™ÂT¦1YÌf?0—yÌg!‹XÂR~dËYÁJV±šµ¬c=¿°lb
+[ÙÎv²‹İìa/ûØÏ!¢8ÌrŒãœäg8Ë9Îs‹\â2W¸Î
+nr‹ÛÜá.÷¸ÏCñ˜ğ”g<ç¯xÍßüÃŞò/ïx?Œ’ˆÄ„¤$#9)HMÒ’ôd #™ÈL6²“ƒ r’‹Üä%(H!>¤0E(J1ŠS’R”&”2”¥¨Heªğ1ŸP•jT§5©MêRú4 !hL3šó9_Ğ‚–´¢5mhG{:Ğ‘Nt¦
+]éFOzÑ›¯éC_úÑŸb0ß2„¡c8#ÉÆ2ÿ1	Ld2S˜Ætf0“YÌfs™ÇB±˜ÿ³„¥üÈrV°ŠÕüÌÖ²õl`#[ØÊ6~e;;ØÉnö°ıà ‡ˆâ0G9ÆINqšß9ÃYÎq‹\æ
+W¹Æunp“ÛÜá÷yÀŸ<äyÂSó‚—ÄòŠ×üÍŞòx‰u?	HH"“„¤$')IEjÒ–ôd ™ÉBV²‘ä$yÉG~‚)@A
+Q˜"£8%øˆ’”¢4e(K*R‰0*S…©J5jP“Z|JmêP—ú4 iBSšÑœÏiAKZÓ†¶|I;ÚÓNt¦+İèNzÒ‹Şô¡/ıÀ@¾aƒù–¡c#ÅhÆ0–qŒg“™ÂT¾gÓ™Á,f3—yÌg
+YÄb–°”å¬`%?±ŠÕüÌZÖ±lb3[ØÊ6¶³ƒİìa/¿±ıàQåÇ9ÁINqš3œå¹Ä\æ
+W¹Î
+ns‡hbˆ%DúšT’ ‚	¡¡„N=šAGzÉF3‰™,`kØÌ.r‚ó\#šb‰# ‰;$ˆ`B%ŒpêÑ”:ÒƒH†0šIÌdËXÃfvqœçÑÄKIåHÁ„JáÔ£)t¤ ‘a4“˜É–±†Íìâ '8Ï5¢‰!–8’É' ‚	!”0şˆ”WÁ(        LayerElementNormalI    ÅZ         VersionIe   ÛZ        NameS    [        MappingInformationTypeS   ByPolygonVertexI[        ReferenceInformationTypeS
+   IndexToDirect3r     Ö   Normalsd8      É  xu›{ü×C¾Ç'×\KR!5İÔ¯»x¸å7	›-
+Ö¥c?‹=aí+éìÁpB„~È~#Ê¥"E¥ÛoD+·$—n¶†Cªs•(íÌûõšÏOßÇãü5y~ŞŸ÷ÌçûyßfæóUJ©†Ï­åÖ×ÅÖş‡[Ÿújøánúáò-‹!?òš×Õeo÷oSÏ¥”Ÿ³ü.p7‘¼ïRáêpSKî–
+·×£ïg«…”WY¾ w gô©+0näò\™?³R¸«á|²%ë1.õû	wËFáf<äı£ä×¨áò;íİÉ‰ş5?m–şÀ=…Ûm…»Ìî
+ù+ä÷ /¢\ÒãÁuu*x¾_7îäDÿô†¢Çgù+0šºô÷¨Ô¿8åuã*™—²à†óÓRÿvp{)úézš—ê¿¿è±Ïc¼4¾Ìç:òG0n‘¹%¯Ïã¨;=YNËq·€Û<ŸKÈ¿«à“/9óÉògd=ày<w4yÑ¿Ã©¿Ï|põÈïÿ®«!!îOó•ßáRğ¤?õuAùıù¬Gÿüº
+~7ù'àêOGÊû0Ÿğ÷´MDOÏUSş±ƒ…;>¯›ÜöàÁÃjÜïŠ*ğ=šî2·zº"\İŒçÊóUCÈwğ÷ÊÏ;¨™ÈÛ¡à¦äÍ¡§ò÷M^‹ù¥ùÊïöáa¿½bÜ†íÀ?‚|‘åş4®:ş¾öÛZ‰Gö
+´ê-p¿ıâ¿É¯şYä‹.ô÷§ÉÿÜWëgÉOİ·&é7›j%>¸ÏĞª~àÅÏ³ËÉ/¦üô} 
+îvB^¿O~Ë#÷'ıêOŞŸ_Ÿ¿ş2şÿá§ÔB~Û$iİo·ãw{|÷Çq=ëùˆ|OğRÿÀ‰Ô3QÆ-õ¼îÇ°ÍúÛM†|Uí®òa“pÛêgÌÛş{ïôjÔæ]y1©·<çğ"Ëû)àM·ˆ|âé~óûS GƒråOoµUäÍWÅ[Fô÷ W™‡åà×ú,]/ú,éW¯±½ÜG®›)äÏ¢¯áõ§È)çáõÉäsĞwO -#ÿq‚Ø¥î@{z¾îA™gOö·Ì—¾ß9Õöñá±7u åó‰Ù·FæŸíç6p÷2ì6ì<è¹>›üŞ§ö oûŞÓù
+je›_FÛ|Í\ôıt´_šô¯RÿŸÑªš…«Ğ/n"àv Æ
+ëÈ¯ûò}óªŒÿĞFáúEöodë¾_Æ~ÁvPƒáò|[:Hür96Ü<ÆÓ¤×Æø ú—íåÒ}a0ãaÓ}„ Êç0?×Œ/áUÆ¹1ûŠ|Ö~ |
+ù?Ğw9.-OúÓ¸Å›÷©ıEÉãŞÁxû¸:ƒq™×U‹0ÿÙÓY
+¸Íú pŸ€;òp¹9PôYş¯äwÖóô{8r{úy5§^^ëêQ0ÏÎò-ÁMó‰jOù¯ğ»•ú ·_V<ïvÊ÷­ĞÿXã]~Ï‡4/5 ÜŒù¥ñÓó)_//ó?‡óoqè±ÌSi>"xÁ~èOıWR¼èGş]Ñã³üã´“1 
+w™çßyI3ŒÛõVÊÏ2ÿ=šƒÏÄü4ïS][WT<Wp{Kÿ°5äûußÅÓ”ëı7Ôç_yŞ©?“ße ò“ûˆq*æÓÄÍvæµÉ/øY¸ñ(İoĞOc>Mò!æÓÄË|z:âWÊ§‰ÛœOÏ/óò$æÇ!à!æÙ¤Oç<{9¸¢õ ùIİı$òÃyÌ§£Éï ×™Ègªéd¹Ïç|·yÑô¯È÷!O«3y›õ¼@>¼È¼ôªÈÃeİ¸	y4ç5w9òÚc›¡—Ü_Äüød?ùiäÍ˜ÓïRæSÍü8¤‚»_CÌI>åÇôû+Çüxn×K‘7G"ÙWØ.fŞ¾†6¼„V=Ö3/ê˜?e¼çÑºZ´†yUMçuê
+/²ÿ*Ûk8^ìË|ÿ—yq|İƒI¯éF;ù ùØÂ}gòmàúHÚë-¸OıDŞr÷2Ï€~8ˆò=^E¾nB¹x]æq5å3ß<ãæë-)ïÊıÅîìÍv/ÌCÃ¼4ódËíâ7Úqœ˜ßÓs¦üÆ-óûWàş\ú›İp¼Ì+æ÷$¯!¯ë†Ìó™¿F¾®‚>¯Vîûzò~–9üùYe r‡²N¸ñE¹®ÕGX{Îsó|§5XDß¼B^ƒu´ás©¿’	®æC¾†ü²/EOˆûé9õ(ò¾ß÷sÁİò°Ş±ÚK=Püñ\ßv¨¬#l+p“yUkğÎˆÃqXw;ü½ö?ã§^_Q÷Òõ}¬ÿhç6Ö™2ß\/Æú2õC´{áÑO¤O¿	lul/x½ %J\ÑŸ<ÇÑSëõÕÅËöIønYÔ«£¿Ê¸£uY>úyâ&ÖÅIO)ÿ>ítöB±s}ìS+´®íz„Çõıi¿ ³ulÒ§±ï çb_xô—4®úWpEÑÁıV?‰ú¡|GÆ¯éÏ§“~UÆ+Vâ>İ—ü×”_A>ú—2~Ìä<¹Up_)T¿/ş¥sı<~V,€ıg~É,é ;_ü¥”ÿıh ®—|=ykòË¦IİûK{N¿‹î´X¸­ƒ}ûá´ó1¬·_"Ï~Ôp•È›ÈÓı!rÑÓs
+êêé±Ş®Kú·€«è›@ùÓ>ù‚ñ)l'¯Wô»âZò-Ç¸×±?'ë_+ÜıÂOe>Ëş|ä\ö÷¾íQŸ\^ï§2ÏùÀïWÑ…7A~t9ŸÈ§ú.Ø±‰ş’Æ³sé£uô7Ïü¥¥İ[Ş·÷é¼Î‹ëÀ¤Çq˜ó›æzÑózæÙMöëè§2_Æ7ı¸~L<Í'é×°å|=×•ŠqD/£½şşhĞ¢ß%=ê*¬+ıO“ëØ—ëÓÎ™¿tÎ[­‘×tå:-’ü¥™_3÷9ß¾@ìFùß@¯ŠyZãLpŸãÇ”§]¸ÑxïÊ7“õiò
+™ß÷/Á¯Ş®÷/áËè'/"_•ò³!§…_š9m·ßíMí$~›víÁÏ©·«4OÓµ“ğlOö"^ÿ¼'9u'ò€÷£^GkYŸ˜;Éóûd=c&ûÜ>GûâûV}Ë¸nâ}2¯(—Zß{]šç ŒƒıÏnÀû2Ÿğ÷îÃ÷Ğu‡‰ïIæıä<ß«á¾„õ\g=cvc¿÷ë#Ğ7{eîÅ\
+Œcö&FıÍÉ÷Ïö§ho&×U]XHı­)¿“vİã˜Nàş{òßñyW+QŸ™oñœ¦š|0üBòÊ8ßvh: N©^;Æ¥ß!LÃıæHòEÛÁ§’³^±¬Ë”Y*yÁäø?ƒyáÄõ’wAı¾«à'“÷©àw!¨ş¸^êùğeä—Cp½ä£æ
+W¯Ï–¶ä
+™_¦ÀoJ>‚œùÈôœ%qØn„?†Óğüf¸®·ğ÷0¸n†¿#\}ƒ~q*ùXç*®‡óºÙ|u¨c¼V7Ó¿o+ñ¼\—6À:Õƒ8¯)oÑïv€YÏµäMªDO–WcÈÇ:7ËÛ#ÿ
+ü© ÿê…ô¯œè§aù
+hã°‹×Åg£µ¬Ïã¶áş¢¿›~ÏúÊl§ï»µmiW™ÿñ3qÑı+µª
+xˆş•ìÔD¿ıiı¢ùW°ÿĞò‡ƒ»XW¥ûÕô/æğãD#úÅÙÔ³}û.æmF’ÿ@ÿz†<Çí/¡î™‚õE²7™çH®;Nªà£É«·g<×+¢ÇœÈ6ëy}Ö!ªŞÎE¾/ıåÀz;~+ùÄ
+>“¼SßA¾ù§œ-üNÏ¨÷SÑÿ7ò1|ù¹ÜÍ¡ŸV<W›W„ÛnhËq—r]¶q ïkÿğ=ÖñúIY§µä¯dçÕñõÚ£`çÅqÈ_&ûË…ÈkÅÏõ\äÇQş¡Î¢'ùcâêøcñn—Rzn»ªÖUÜ?/²ıs¼ˆ~$zéG:úIêçõDö#÷„s]“õ„XG¥q
+®SôLÊÑŸŠ¬õš¢±^Jú’|ºßá}q?=ñğÚo*VÑî÷ƒ?ØÓp½`~T`ç9OûÂtSúQ[®3X?¹ìÇRôG—~¨ö$ù3ñ2¯VQÏ	÷-Ô…ğë"Ÿ´‚?ºMğ»‚u€[Îçh†ç(b}•ôëX_É8¦±ÔWEÎS3Oı
+ì³äO‘Šzªä]éıp½ä—dÿªàÓ™§.ÆõR~wø[¨…—ü~Úùnğë’×`~ê\ÜWîsÆs¡Ş½e_«ä#±Pá|Ù+:puP[Ôka×Åä#{ì>åô;Ó‘Ê|Ñ™~q{Ç]óËòÏÁÕ0øUÒS—ô\ŞYäÕIKş'ú{v÷TSú×™=„ÛZäE›åê	=› 'ûeı “×5†ëöä_‰ë¸/Æ³1oÉ¸q}’¸c›üEx^Çpİbó~÷åÒº&İgòşëYı.İï³ß¾Æ¼6‚uà…°ï‚ë÷
+’uí9ŸoÅó.á]Èã9˜ô7ÀtúcÎƒ_£nôÌƒE^ÏÜ‡}?×9i^EêÄ:ö;ú
+×)ö8Îáğ§¢;ÇÙB?jO?ÚF= t«¨ÿAÖ=ñ»™¯[êÀd·Ò¿ş ÿ«Şş…ŸÉ¼ğ‡z¿>ö­¨àÃègKŞ+õ·£_tG^ÈÜ\Íı»·GŠvœÏ­ÌËw!ï9ld	Ï"äõó8§5½ÇŠÙZì³…GùÜãÑÚƒ”¼`‚}f»¶ºJ¸¢?¨è/Õñ½Øõ<õÕÜgûtùì'öbòızBÿSèg}–yÇsÿÙå}®X¯%½yo˜Gl>Ÿëít=pİöR¿xvèv¸b=hF o?g9vqü"Ùg²?€Û¸Ï\õ©CX7å<×G‰;®·l¬÷Ò¸uŠë¸tİÆõOâêxì'[
+}6¯³j —ê@‘gŞQ«yÌ?Â¹®²a¯ª%¯ç~/êa™Æ‘qûÓ_8ı"qı"éU[qİÆúPäÇ`À½ÃçEùI|
+¿¶¿e>ú‚ösãFñ›ó‘ã:ÈcSòU¬÷®ƒ?•¼;óNß
+>˜|ì½”ß†z.,Åõ’[æ©|ùÛ¿”?™~7×môùšç|„ó—’†så±Uò%ÈS~í ø×ÿëÏ8l¹ÎHñ<ışy_ ¯7Š|õ— 9õ¤yci·¹øï/°Î°ä.ö“~µˆïk Ş·mÃ÷<‡öÓ€rK ÇÇıtŸ%Oû¢'¯orÜÖĞ›â¶ÈÇ:*µ.ÖQ"¿’úã¾ôëî_Ù×å¾¸_Uæ9‰óŒö/œv_ú÷µR>}mé§‡²ÿ0æ¯â¾†Ü÷RòşÃ4Ô}–ùBíÄxó†=z¾{çC_ğ÷Šö/ãÊõÑdòMäİxşùú–çš*g´œ<úKÒ££¿TÇ¶ø…¿ˆş ˜G^„=&»í-ÉÿÒŞ„7Áy rı¤^*å£İ¦ë¦7ìÖÈyŠ{
+ãú+1§Û Ÿ‡8ã´n Uğü^‹ñßvÇu·öß4ëõâºkßú‡Wè¹ë”$Ÿæiãş[z>×šyäê]ó‚[^Ê_EùFİ‘Gx~c'ğû‘ø‡ş—ôªÅhËïx¸ÿæ¹¿›÷gËu
+×7™;®{×-ë–À:ÌŞKı
+Ğú‡Ğ¬×ÜtÆÑ?Ó^¢¦çvŒÛ.Æk™çyğ÷-ûÛ1.É™/Ğw
+ïOí{ÓË Ïåx{âfX‹úÂå8¶5Ç«KÅNÜ€åØê ;ğû>!ã»;„û%ÇEë®m‰zµ~÷ü\/ÔÕªªşıÊs}Õò´ ûß××ÜçûÿI.Û‹;uuî[Ú‹{û<©şßçêÜuıê^ò¨Ãs=m›Ó®è%ò6ÖåIOº.ó|\ÍÇ|ò}n<âm~>î‹üD¶¹àûÏçlŠu‰bœ.÷“X¿«loŒë&Ÿ?ğz²¯4N‘ëñq´«ço®¡]ğ¼Ëq©à~“šKûÉñ®;ûy6Ú[Ò¯®DœLv'ÏuZ» õs?Ö±NWƒqî`YG;y½–õ@/Ôõu¿ûÙ2În¨·“İJ?Úmu¾´[(ïÜ\Ö·ƒy=ëÇdç¢ç=ÖK/“
+ßÆ8i‡ÁÎ3‹º×ßpäe_‡óhw>ìÛ~L?†óhwãã
+òZÄ«l‡önÚËTÆ«êí9ÍÃ÷Å~‹}³Ş®„OW9îİ»õ|Ïá6¼o½vàÇ<÷=4Ï<÷IÂµ3oP~ßÇT¼ß"î›Ë¸ä.ï£_Í<ÏıõĞrêäçò»ÅøıDº¿ˆvP+Ÿ×`ŞìHı¬‡M>wXÂº Ÿ/œ½†û#>ï³\ı–uƒo‡q¿ãP3¨‡zÓùFšŠç¹2Ÿ®´×¾è[Où“ÀÏ	ÔñØ—õg‚ñÜJô0ÿû?¹
+à;×Yiõ ëÌ±^ó9®6¥½™+aWÃŞ•ø˜çİJÚOİ
+áæBôõG°;ÿF Œ¾^M>t½pG^¬¢™ˆÃ6ÇÕ;°_ç'xxì© }ù+pŞª¶‚'ûMÏí«W“¦ç³ÙçuÛ5®¦}¶:
+ñ“yºÔsìNÇ¼—ôæ}u;yÜ¿×q2.ëZÃº8'äãy~º®âw<Õ±q§ã=yÿû^|Ïcg<í£ˆö"÷u£=Äø•úšñL5§=çúóÄ#ÃúÓWÖ™q]“î÷ÜO4y?£–úäxÇ`ß XÉy>È÷óZeq~”ìJæ×;Ò@~.ù§äK˜·×ÍÃw/ñÿ2Õqÿ—	
+Wc ¿xm¨w7PßÛ†Ö‹ ÏÿÑ˜™¼ŞˆÿÇ‰ßõ&ıÅóä¿{SäÃôÍ ò½ß®Ça<ıÇ]·V¸}ró
+›Á
+£…<ÏÙë Ï}K;…ú[#ŞšÛ©w2Ûæ_‰¼<ÍÓF.¿ÇmØ¯(n¥Ü³lÏÂÿ2l~Ëz!¬F½jc=šîÏù=üŠq¸/öéı"‹ıp»¸Ş_dÜšn¨3Ü5‡¼¯Æ<×oÉä>~‡câùR]zŸÜ—ÈûEüAäó<åõHrî?˜¸ÿäÔa‡!®Ë¤6ú†ç¹!çïwøİZôÑŸãí
+
+à_Œ·áê¹Šzö}‡x®$úO€|ˆçKuişÙo„|ÁïÜB®W·ã;7Åz5l¦Å¼ÿ)õd~bçwoöK¼WíÈşvˆï;Í'/§Í\Ùg±Ny~‰}Ğ Nü¬äuÜ7X„¸]òV
+á¸ãù·ßb¥¯’xV,’8¬ùİÉöyÎIıÎD¿“ßç=Ÿæıù©ä‘üÍ|iä[—Š~kÑwñ»ûô<aÃ —ßÙ‡øığÖ«…›Èå¹Ï&†ïv<ıÎF¿ùàš~˜ãGX‡ïylü_’óŒ[a6òEŠï¢'ı îãÕE9û0ì?_á;Zµÿ+ÉßÁ&¿Hòı£ô
+Ö1÷¡‹{hç±Iò!~!ãòÜ'ùKâÉ_/ıåuğü=›ãyQXÃ<2‹uKÚÛ§àöWè««°¿*÷6b¿9ğ¼Õæóô;~¡®G^Iûi^û*ûE¬¿…G;OóWÍ¸?í¿'Ş·:şb&RÏpÏøëo<öŸëá©Üï=ª®¶úŸŞBH„     Ï  NormalsIndexiH	     Â  x5—t•å‡G7lctwÃèˆJwçØFJƒÒvIcÒ
+
+‚ti%%Tø?ÏÎ+ç<çoÜË·÷»÷~#""‡×á5è"""KÊˆˆÑŸàUºG ^„ºğ<¼µáæ<ÏÀW0“îMh
+á1xŞ€Sğ>sš³ô¨G÷¼uàkºÉp
+nÂ,º·àQø^‚éğ.$±ïùóÌö¾{³½ÿ¯)Ğ®ø¾?
+ÙŞ÷nï¸}ôOº®è³dÿO£f{ÿöf{¯Å4èA.
+şß¿dÙŞëbo¶¯O×ãk¢^ãÇ3'÷töf{¯qUx‚ü£>j¶÷ïdo¶o@W
+šÁc¬oˆ¶
+ÙŞ¿¯½ãöş=3ØA¼û'ÀlßˆÎŞlï˜ÿ#şMÿÙŞ¿Ÿ½ãöşİŸßÉOƒç¾ìc¶÷omo¶÷¼}ÿ}<ıèÍö³Bo¶÷ìL…ÅŒ=•OB¶÷Ù;n  ñµX[ïl‹šíÃÛ›í=“ÕTò£àY~yf{Ï±½ÙŞ{¥|	é<³íèÍö{³½ç?#º*ã½7¾GÍö{{³½çó%4	õ<ŠŞsïYõ~ğÌ{¦=ÿ¢÷œ;Çóï™õLzŞEï9uçw&x¶=¯¢woçx¾|Ş'Ñ»¦!¸·gÊ33- oîíùò¶Ã{DïZçxøQï Ñ»Æ{Å½½'<óOÑ{¸·÷GcğŞñ~½kãµó5¼Ç¦ ’ï7¼×Î½½FSÀûKô^S÷ö|zxÆ=¢÷Ü{V½<óiÏ¿è=çÎñü{f=“wÑ{NãùmÏ«èİÛ9/ßÃsày½k<kîí™òÌL
+è=Gîíùòzö<O¢w­sâÀ×ğŒ¤½k¼WÜÛ{Â3ïùL>£xï÷öşğj
+Ş¢w­s¼vqà=6# w×Î½½F~6x‰ŞkêŞ=Ï‡Cÿ–ùØ³(º
+}=	9a*y8ºªâkÂ2|{´DÂ"8…è·££Ñ“hô:-€–D§¡£Ğ>ht':-V†0²Â<è?0Ş™÷›
+İL€F
+¢ÓÑ±h<Z½à”‡ôƒÑŠhçÂè a/cÑè9Èß‚NDO¡yÑgÑh~´ºíE+¡¡Œ!ÇÂŸø¼×Cø¹°öÑõE³ ëa<ä`N>´>ıSh"Z½öCs1^­‰C+Ğß€MPœ.3š
+@7èy˜wz@NæäGoÃÓ—ñ2h=4=‹–C«3oÚ]£_Šî9øÎĞ’ ]
+æ%¡gÈ9Ğh"š AãĞ!hvæUD7À$XÕ»†ÖA›0ŞŸ"ç‚¬äu0“K¡ÛĞ1hn4İöF¡eÑ{èPtzª«ä,hSöf‡P‚¾*]w´Z­Kß
+íF£[‹Æ0‹Ş%÷Eg£íÑLôÍ œ›\
+?F£Ğµ_€ş†– ï©¶Ì1ÛŸ½ÙŞû®5ìŒŒ{_½²½÷–½ãö•`	„50š±vìc¶÷ş³7Û{¯>`Î÷h#²÷fÚí·‡ŞqûÚh9ø.ıèfû|¡7Û/B_ƒ/ğo EÑ`¶÷sÄŞl?¿ÎáW¢~Ft³½Ÿ?öf{?oRò¾ïâ·‚ŸMéÁl‡q{³ı2(@?€~5Œ"ÿf{?OìÍö~.e¤{MMî‚¦ÙŞÏ{Çíãó¡ÿC/‚ŸI]ÁlšyöfûyäTôŸãÓ£Ñr!ÛofÜŞqûšä¹øAèZ„ï@o¶/ğ_Úûùl‚6t~Ö®Ù~'½ãöUñàWüFt,zÌö~>Û›íı<ş½-ğEĞ
+¼®Ù~:½Ù~<~(¼G.…@ÛÓ›íÏ½ÙşššÜÒàı\Ş
+fûìx{³½ßÃáIèÃz?³#Q³ı©Ğ›íı¬ÁCææ…²ôfû-¡7Ûû=ô»óğÁïC¶gÜŞq{¿CšÀã†Îï¢*¨ÙŞï!{³½ßuW™S]ñ­èÍö'ÀŞlï÷U
+ø†ş Z]f{¿§ìÍöğKá#H`}ºl¨ÙŞï#{³ı4úóäï­ttfû,¡OÎô¡ıÏô%ñãÑc`¶÷ûÍŞl?ßı}
+òáË0Çl¿ìÍöcÑyt³¡0¹z(dûüŒÛ;n¿ÒÓ}…n‡bË¸ÙŞïi{³½¿ÊÀÏğßÁ-éÍöGCo¶÷û<mÁ¼Yx¿ûo£f{¿ÇíÍöş‚ş
+¡ıáíı¾¶wÜş>¤!3s ›Q³}¼½Ù~:úÃ"r8f{¿ÿíÍöÙĞ¶ğ(Ôc,?]%Ôl“lo¶÷wL/´'l G>fûD:{³}7ü+pÿ&Z­È˜ÙŞß1öfûXüyè¿„ú%
+o¶÷÷½Ù>3ş4g^J´º
+ÌöşÎ±7ÛûéòÇğ>9ÚĞ™í“Bo¶¯‡¦E¿f^&èLnfû\¡7ÛW€bğ
+\†$ú#`¶?z³ı´.ûü€¦;UÙŞßUöÛoB‹Ãæ­Bı–•ŞlŸìÍö]ñûáy˜	eèÿ
+ÙŞßyöÛß€ùÌ)Œ®‡D|Gæ˜íÏ†Şl¿‡®)¾6¾%Z¼Ìö
+ÀŞl¿VÏ¢#Ğ!èa0Ûç{³}şmøŸü]XÌöYCo¶÷÷êú9ä…0„lì·ï€>D÷B+|)(Ífûud{³ı8täÆ_¦ŸÁlŸ ìÍöQä-è¿èëƒŸ‚š·à7€½Ù~99µEñŸÂrëíıılï¸}h “›CEæ‹ší·…Şl_ ŠĞA¯0·7t³}ÏĞ›íw£ÿ /¡ş›îBÍö%,ùg¶_‰ìó:š®;Ú
+Ìöş¾¶7Ûû[üoôôúÒx$9Ûû»ÜŞqûkğæt:Í²}n°wÜ>;D°ö²
+"¡|Èö÷·wÜ¾9?zš<ß
+m²ı1:{Çí³à}cM‘PV€Ù¾.Ø›í¯CoÖ½~=!†9fû¼½Ù~+´Æÿƒ¦B}ÎH
+fûÜ`o¶Ÿ„'÷CKÃHüşí£™cï¸}{È@÷š–.
+-²½Ï1öÛWÇ—…<øQh_ú`¶ï
+öfûfèËä&ø
+¥èÌöwÁŞl|
+Â%ºxÈ²}sì·Ÿ
+
+é^@[A,c«Áloo¶¯„Ö‚°$ ?£vá3¢mY/úBàœHèè_EE¿uN8‰÷Ù*-^ôîíœ‰à{XËz×Œ`{·‡­ø ı:÷Î	'¡3¤è]ëœÚàk¬„r½k†ƒ{/‚7 %ïKôSÁ½‹B>|'4C@ïZçxí|
+ä½k¼vî	­áµ€ŞkêŞ‹a¬&çãµEïs×úQ0œı) ÏÎéÂØ<ğ™(E@¿™Î9á4¾+êó’èİÛ9UÁ÷p.àEïš±¨{g…àó—è§ƒ{>ø£¨Ï3¢w­sj‚¯±æÒ‰Ş5ƒğîıÚııN(‚/	ğ>»­Ä‹ŞµÎñÚùk¡ ½${²×Î½½F>›~‡½×Ô½Ë£ã¡èÏÁDÆ À-H>‰>;8g/Ú}ˆîè·Ğ9'/œÂG²Îç%Ñ»·s*ƒï¡İU:Ñ»f Ş½;Àx7 Ü»<œ€V¬YƒŠŞµÎ©¾ÆrøNô®î
+>s¥@E?uïâÿõyLô®u×Î×(H?½k¼vî½M6	è½¦î]?XS( ïK7ñş°O•üü•
+£ÏÎYsá-HĞ¯sò¡>cC}^½{;§
+s}%¡L@ïš§wïC0
+Z’E_Ü»uŒù·QÑ»Ö9cÁ×ø€</ wMÔ½÷¡Û!u¢ßî]ò3çË˜è]ë¯¯Q˜~)*z×xíÜÛkä³izTô^S÷ƒúvĞ÷‚Œ÷ƒûøÌèaTôyÀ9
+ ÔcÍt¢¿‰:'?øŒuõyIôîíœXÖúáÏ£¢wÍÓ¨{g†”Ğ6 ¿Í˜{W Ÿ¢`^ô®uÎŸàk\‚^ô¢wÍ8ÆÜ»¼	úšŒ»waH$G+Ò‰ŞµÎñÚù˜3$ w×Î½½Fià•€ŞkZ˜ñ
+¨Ï`ïã‹áEŸ„&¡	PŸ	mÃ<Ñççt†9
+šô>'9' œ!A+Ó‰Ş½sƒ1ßÃe˜O'z×$âİ{ÚõùKô
+À½ËÁY¼Ï>kñ¢w­s6¯±Š ô®Æ÷îŠŸ	MúêìáŞe /9+ù/Tô®u×Î×Xô®I{{|6İŠŞkêŞıñKÑä+}.˜L?âğéĞÃ}VpNfÖwÀ·‚úxÑ¯ç”‚ãÌ;>/‰Ş½³|
+ÑxTô®ƒºwºæä‡ı6pïŠà3Ï>ßÒ‰ŞµÎ ¾Æ§è°€Ş5“èİ;Šü:ø|$ú
+Œ¹wä!wD§ ¢w­s¼v¾Æet*z×xíÜÛkô6º…,z¯©{/:ø+h"óDß“®;Úvãı×% /Î™MYóº‹NôUéœS:á»¡ÔÉèİÛ9Õ(}£QŸgDïš^ôî…¼ÿw@_—Î½ËÂ1¼Ï>+ğ¢w­s®¡¾ÆHø, wÍPÆÜ;;lÃÿ÷õ÷èÜ;rãsByö½kãµó5Ö¡E½k¼vîí5ú Á˜è½¦î=	½~çúú‘hOØŠO…Æ ¢Ï
+Îñù«=>-Şç-Ñûœäœ(ˆÆïG}^½{;ç:s}¥áj@ïšxæ¸÷lr+È@'úôî
+1t9èVãE:§:Ş×¸„/‹ŠŞ5}Q÷n†ß‰oˆŠş.½{GCoü´c¢w­s¼v¾Æ(ğyU’=ÙkçŞ^£Öø—éDï5uïJèD¨
+µàÿ	Š$e             +¦        LayerElementUVI    a         VersionIe   |     
+   NameS   UVMap³        MappingInformationTypeS   ByPolygonVertexê        ReferenceInformationTypeS
+   IndexToDirectï•     ö  UVd@     é  xUœ}ÜÏåÙÇOva•V¶jÙ|o‹‰õ¤rÕ™‹»¤pI«_BİÕØZ¤¥uzÈ-µ…IÜÈWk÷(dëâ–‡Ë· ‘ä!7û$LcÑÃvŸÏçØïÚ?½Ş¯ã{œçù=ã<>ç÷w9çœËrÆ¡kİ¿şç_(«úo²¸¢»GwD{˜û½wEÎÀÙ_O9 {íÙäİŸ³{¼d_d7ş—ìü¤˜]ÅïFö/G»;wÜæj|øƒ~‘ Ò>ræ¤b£¿XÌÙ–Ú¯³¿ãÍÙÅœ^^ùz1»ıWÎ/æğğüEÅœ4l°¤˜³›WfÅœ|4èÍbÎg^òN1nÚU“3Ò•ÅötÛÍ«ŠÙO¯‹xğ}³zß Şî1>éê­{ãóäĞ÷cÆëÑ6MA¾<8køvœ?/¸w•_ÖaYœ_œ¿|qœßxS‹8¿8­Ãz8çÎ*ÿ0zE5ö‹ws¾ÆÑ¶Şõzp¡aMÔ‡kíş¾¨Nç|‰÷	d·õAvgı’6Íâİ_š\µãíM§s6gDÌ¿ìaD‡˜±{éûåÕâduŞq4æ_Ïg37-.~>ŒÜó/{˜Û#æßxg·o±K¦²¾±şl~Ê|}‡ãÌïùxÏræœ­ŞÊç/@ü¾Êxƒ“zKâ|iòqŸ„N+b~Å~Fó˜_qºõÇq=Æ‹k!Ÿn[ô·~@¶~@.üdUµçÃ•9Ö“ìÀ>U TâıdW?ñx>ÜæPagôÿw?![?'Í²¿Ğşé	Ä+£]ıF¬~CoîC}‰Ù?Â]9ægÿ«ˆÕ?Äêbõ±ú‡XıC¬ş!Vÿ[,p}W¼Œz ‡FÏ£¾ìÖ?ÅşéØòÑ´³Ÿ³Ÿß²-î/qXzpjUı‹ı’éq‰³GšÇı%ö³šÇı$ƒVc¿§FÜOfŸ±¢'£Æı%{öÊ-q‰ı®^èg|ŸÂˆ¿£¾rÆGı’lı’ìÊv¡^Ä6#nWÌ¿õS±ú)Ù™‹z—]ııŞŸ÷}Bılılı]Ïk¿Ôm3®ÊßöSC°×~! í'rAûÇãyÛ?bí²íÙµ:Á?ÑşkÿmÿˆUCáoõ*– ®OõK¶ü=K»òG¶ü‘-båoü-bå¯vË9H¿Ş¹p|UüM¿È¦_‡a7ı"›~ıƒşÒ/²õÿ–-âøÖÿÉ‰ú}[ØMÚñyõÿ;iWÿ«>*ûÄñÕÙê¡î½˜_õp&Øòİ¬|“-Ÿ]`·şBş—>a?•q|åïN°åc(Yù çƒy>,ûÖÄØgZñ|Hv»y¾|v7…çKñã<ÿ,¡ı Ï?âÎ<¿~
+{ø)Ï¯äÂé<_M(‰ó‡å|röGkÖ‚½7Ï«%äY<¿¹:Ú
+_î¾Óïòü3öp?Ï?d—Sß+aÏ¢¾“İ<¯JÚ!>ò|Evç‡y´çùò¼Ñ¤ëoÊóÈyä©ŸÉe/Äø+båƒì—R?ÉÙíÔoË—Xù". ~“ı]ì¿£é¯|Š•Or¨óú/Ù·âù£œşÊ7ÙòMÎğ<BN¤~Üyy|« ²Õ9»ú!V}¼ õ™ìšPŸß‡=¨~È©Î_÷ÏŠß5vş";}‘íü%ÖùüìßGİ¶ó9ÙÆk½çf'n‡ï?¿ğÒøåçàûOœÀùßoz(ÚÓ_áü/ÎçàüèCÿéUõ“h<²GN¯ÆùQÏ ÕßM›_ªVbÕÙêlı 'ü­¾ÈVŸe°[}’­ş†Ò®ú«şÈ™êlõ7şª?²ÕÙêlõ·şAıH¬~D¶ú«şo‰ñ³ú#[ı%°;Õ¹ ş•tû}Uü½ú9U¿ºvëg­ø¼úW7°õ/²Wÿz ö\ı‹lı«‚võ/²õ¯¿ÃÔ¿ñyõ«ÖâúsÕ
+Ùê£vËÿ5då»Yù+Ÿƒa·|Š•¯5´+_dÓZãúlÿ×&_J½ûæš?TÅ?¥Ö¸6²»‡z“€ÃmÔ³óÀé=Ô3rH¨WMa÷ú}`8Yú+>“ú7šöUÔ?r¶‡ú;	ölõ—œ¼Fı;½7Ö[“ßïâÔ›V°ûÅÔ£KÀa!õíRpr1õtşKÈYûã8ÿO„=}úGögSgrü ©¿ä øïş0®?{‹úFN>£>îİò#>Ÿı½öÖêù"[>êĞ^J}8œ]Nı:lù%[~Éî0õ‹œu¤~ö‡¿å[¬|“¾_Èù0êß ú«Äª rèAı#zRÿÍ÷Q½ˆU/ä¤%õŸ,ıHn¿ÛP?ÄÒ±ôÃ˜z”\xş«UûGz•´K’«®vœ*ÿSêÏ‰ú£ü“-ÿÓ`·ü“m.¡]ûo)Ø)ßä z©àóÊÿ[`¯ıM¶ü“-ÿdËÿÄõ[şÅÊ?ÙòO¶ü7£¿ò/VşÉ©òO¶ü_ëbåŸlùë¼péÏãú
+:3?Ú?í™Îd§~óËç¢İúÑ °õ›çÁNıh"ØúÏ$ú«ÿ½úÏ1ú«ÿsõŸ¯a·şC.¨ÿœ6ëSÿ![=
+{5Ú­ÉÖ?fÀnõöØêe&ı¥ d«‡’Ùq|¯z+ß§Ò®|“-ŸçÂnıŸ¬ıëÏ9enÕşÑ~[>i×ş•=_A½é2ôµ¸ÿ¾C=úO°€zx;¸Ğ„zÙƒöIÔ#qN½ê	»éïŸÁ¦¿åäÀïÇï=çÏóû‘Ê¨·a÷}©·äÂuÔŸ^“¢¿Ÿ@ıé
+Î§Rû€³Cü>$§ı¨G}i¯O½êGÖ÷Û[`×Œzúí{øıØl2æ†ßä°”úzìiê+9ôÿğÂ©óŠã/Nº³ßO¢]ùúpRI}œ¶|‘-_älõUÏ+/Â?4£>ó[¡/ì™_qĞ÷ÕZúë|K¶üË®ï3²ëKıüŠşª ²ÕÙŸÎïOÙ¯†~‡§ÅøyÖ‹1ë%Ô„=ü
+ú-ÎYïáèãß¥,Ÿƒm[>ÈNñÿv‹?ÙâON²Å÷ı_1óÈÊØ¾/šÏÄú²Å_vÅ_vÅ»ü-w€-şd‹?9(ş?Åó±öë]\ãïÈÚ¿¡°7®_û7ôÛşí
+¶ıÛÌıÈÚÏbÛ¯ğ¼}Ï3íßå´kÿ’m¿®¦û9­>îû<®ßê‰lõğ ìVdÛOÁî•o²õË©°[>ÅÊß:ÚÕ?ÉÖ/ßçøÚdéGúİ€¿Ãñ< –~ˆ¥bÒaÑ_ç±ô(½6Úm<rø¿¯*+áßœßO;À®7ûÿ_Ái?ö²ÿ€zãwD?†zDÏP_ºÂNR_n»Ô» ÉïRÉÉè_> ö¤5ô/ÈçÛQ>úë›ßWdŸ±ÿ»»„ıŸS?Ê`ı©ä¼„z4ÇÉzR¯Èé
+Ô¿•°‡IÔ?rúô.]EÿW ‡ù°Åoj“ùUúcñ#[|VÂ¯a|V-ï’¯µ`×ß'÷7ã§gS_ÈÙH~ÿüvß‹zGĞ«ôyØóıĞ»|Øµå÷_×
+âøVOäLõDö7ğûOÏ_Ãï¿ÛáïUod«7²ûœßäl õëmÎ¯z#û³©W²«şŞÁóîzşşW²;®?)¯8ó@N ñ÷¿Ó ~Ãøû9+çï^¼ ÊÏÆ#ÛxäĞ¿ÿ‘-ÿ=ç-¬–²åì–²åÿ)Øm¿Œ[ş›,ˆã[şÅÊÿÍ°[şo[şo[ş»-ÿ³WÄñ-ÿdË?Ùò¯ç•ÿyğ·ü“-ÿdË?Ùòßx%æWşÅÊw»ÕÙöw½cÑßö7Ùöw;Øm—‚m_Kío¶üŞTãjù%[~ Ãnù}lùBVÿ{ìÔÿÎªÇêdëwçÂnı°ŸWÿ{†võ?²åó‡
+âø–O²å«	ì–/²õÿñ°[ÿ'ëû-ùß“q|}ï‹CöûY°‡Ç  Élpö+êËûäO¨/äBCêËG°Ö²’³Ğ¯äcúO„~‰Ã`ècò%ì¾ôQì¾AOvÕÆ¿›™şìëû:)©
+;¿¯Åú½8´€İşÖ’Ü‘úâÁÙdê
+Ù÷…å×Ã^¨ ½J:€ƒ‡>&½8Ş
+è£Øâ_r]\ŸÅ¿8c<CK²â}ØâëÉŠ/Ùâ{ı_²Å·ì_ràïCÉúãúôû8_}J>€=9 }J6ƒíï_€íïgd7ŠúW·#Şÿê9t…~&õ`OšB?
+dW
+ıKÎƒİu‚¾‰­~_ìÇ·ú6ıp¯Æ búA6ı ›~MŸÚıSéÙÆ{øx´ÛxdËÿÒ÷–Võ§ÀßO’
+°í¯}dÕÙöÓ	Ø­Nòyí/·>Ÿ1ÿ²å¿ì–²åÌ¦èŸ‚ş'dË÷³´«È–ÿ×a·ü“Så{ìV+ù¼òÿ.XùOÖòyåÿ/dåŸlùï¹
+ñUÿ*'êegTÄóƒú	ÙúÇc
+aWÿ [ÿHi×ß£f€­_”ƒóÙO€­¼¶ş±lıã=°Sÿ [ıü¹q\ŸÕXï[N»ú9Ùêk;ìê7lõõìV_‡ø¼êë(Yı…lõU'‰ë³ú"‡tßã>èûËªş›İRº¥˜ıçõş?òØÃM_Tc?uvôñãóäĞı¬M‘ÇÑö×ÕØÕ½ò½hOaw;¾õ~1‡]·EMÿÓÛn/fwÇsà?ÑÿOƒ+£ıupÖk#ÖSAÿy‹¶F;9ëÔó­âóÓÛoˆv²ÀïÃÕ¿Ñ˜uÑNös·~9‡İ×Ê6³;1ã¢ÿ­Ãğ¼ø®ÿ¡ÍcüÃ']O²ïUñ»ßómÄC\ã)<ÿ;ÚûŞ—œ-ªƒxO¦½ãw09l9 ñŸ	»Ò ñ gç^‡ùÊé?³#âMvË/¤—Qˆÿà¬âm¬g9ı;¯AüÉnngÌ·öpU7ÄKÜ–ß·8~·Yˆ?94XxîãøézÄŸìîƒñÑÿÓ±x^\ÙñØ×ñ×~ Û~ û‡º"Ş²ø5Şç+øÛ~!gÚ/²ßWñ”ıÉaïkúk?‰µŸ¾=;ã9ÄSÜ¶ù-¹ë×~k¿‘ıêzx_²ÛXùo ÛbíGrøâ{È9›\Š÷i¯ı*Ö~_ØõB¥CÁ?âüÚÏç‘µŸÉaİÓ¨¯¦´—fˆGÎ¯ıNÚïd·nò%nÙ	ïs5ü­ˆÕÈaIwÔÙ]Æïÿv\ú…Xı‚ºÏCı’³qËQ·q~õ²õ²k²õM;Fa=÷ğıÕoÈNı†~6óÉ®úo2<ş;ÛLõ/–ƒê_vÖh	Õ¿Xõ/ö¬q¦ú¿ˆşª±êŸlõ/Vı·†¿éXõO¶ú'«şÃğWı³şÅª±ê?”rı¬cÖ¿1ë_¬úó³şYÿbÕ¿Ø©şoäüª²Õ?Ùê_Ìúá¯ú7fı‹Uÿb«ÿ.\¿ê_¬ú'[ı“­şË8¿êŸlõO¶ú'[ıßÍ÷Wı“­şÉVÿ²SCÏ±ş¥¿bÓß>°›şŠ©¿á^ØõW,ı
+ıèOı;éïÏè/ı%›şş’şÒ_²éï`úKÉ¦¿Cé/ı%KÃ0Ø¥¿ÆÒßá_úK–ş†ßp|ê¯Xú&ĞŸú+V¿	½g¢ÿ°ßˆÕO\Ú¥§d?ƒ˜ıB¬~ş
+şı@¬ıî~»?Évş|”şÒ3²?£¿ôŠ¬ógx’şÔ#±í·‘°gÚod?ÃSŸûI¬óg
+»ö‹XçÏ0‰şÔã“m£ş'S½UunÍ6áü-v}ùûÏ,Ø]}œrXócúâ¢¿ˆó£8´âï/s`wp~KÈáMœ?ÒMí£¿ãzÄZØÁùCìZ@Ó]ôçz¹^qèı5æüÉğzñ^‰æk~±æÛücé¯ùÅšŸló‹¿daë8¿â'¶ø­€İâ'V¼_ıµŞ”lù[»å–0ÿÓÖ¬®Ê¿ŸÏü“ÃÅÌÿnØÃÎ§ãù%!»ÿfşÓ
+ÑßueşÅ'¦ÄûIÉ>ØCCæŸìF ÿÉ–ÃÑßÖC¶õÈ¾ù·çOˆã§ÀŸë5ŞõŸÅüëùá¬¿‘Ëâ8š?%k~qàüÆš
+ı5¿Xó‹5?ÙBü’E;ãüŠŸ±âçş‚õ)~dÇü¥K÷D»­—lù+Ù
+åOL½N -Á9ø ØßÆWbÿ/ƒıß˜çßdüúhOì8qÄß˜ş…ı
+â9VşbùÓß˜ëKF®À9˜ëk¼¤öØµr¸õ=îø]±¾É®.Ş?¯? ß
+MQ¿Æßfÿ™óü9^Jv‡Yâ
+Xbúç%ıâw¾Ö#–¿1ı¹¾tú#ø€ëk¼ÂÁø|?±îf–Å¿ûéş¨X÷EÅºOšëyŞómzEİoëş›X÷ßÄºŸ\Øpwô×ıd±î'ó~²X÷«³Ê{ªÍ/Öü9íš_¬û‹…dWô×}O±î{Šu¿Q¬ûbİ ë>¨X÷Å÷3çw¼ŸiÌû™Æ¼Ÿ)ÖıLcİgåxº/»îoŠï_Ší¾ªüyßİì¼Ÿ)ÖıL±İg¥¿İg%ëş¦÷¼ŸÜã¯ûÙâŒ÷³y?[ìxÿ;§¿îóş¶X÷·yÛ˜÷·Åºî>ãúxÿ\¬zÉæˆëW½ˆUbÕƒXùÎéït—¬ÿÙ•O±ò%Öıb±ò!V>"ÿ=xõ_¦        UVIndexiH	       x5× øÎÕû ğoB”=³Û[Ù"*{í)e´')!"MŠH´(¢¨”Q!doÚS{+*¥ş¯w×ïïº^×sÜÏ}ßŸÏ÷<ç|çlß» à¦‚‚‚›ùÂøÎ4>‹ÆÃ
+ãPãî½
+
+¾åîb¯ÂçÊ=BÆE8ßøŠ©G_ã[øÊx'gŸÃ.ãztà
+ÿÿ’?Å.ñÚİÆ{8İøş1náõd"ÿrÏŸò
+?û©N)
+ÈßU™Z4'÷ı#ßó5¹÷+©G9Z"\p0­Èß´7¥©Aş¾š”¡0™‹ïøŸÈß~5
+¨@æ¥<õ¹Šwùˆx‡Ìñ¯×«"Û¿çk>!s|'Ws%ù¬šQ“Jäs*Íq\Æ{¼Ï‡|L>ƒ}(K-òùVğZŒŸóy^Å5ÜC>ûK9–Räs¬HC®!kà@æpò™~ÆwüD>¿ıõ.ÇÆùÜ«p '‘Ïy;Ÿñ	ù¬/æ(ö%ëí>Fğ YQ^¿*d=TõZ‚¿³v:Ó‰öd­ôàJĞı8šîdÂA@Öàïì§_e²^ä[>'kòS>ç+²–Oä ö'ë¸,u¹‚ì•‘ÜÏ½dÍşKI½«‘õ_Éë¾üfœõ
+§rÙ—S‡2dİ—¤6=iI
+òOúk2ë=ë>k5û!k>k=û"{ ë;ë<9YÿY³Y«Ù YóYŸY§ÉÉúÍÏÚÎ:ÎšÍúOïäd}åZ‘u–5•ıš¬µôÎšÊZÊ¾ÈÈúÉ:Jï¬¯¬Á¬½K³¦²>S›œwÉ5²v³O²'²^S“½’ŞÙÙ
+Y·Y£YÿÙ éı‘=”½“}’=‘ı•Úä´ ×ÈŞ;™<3²ßR“¹KïÌQ
+ÙwÙc•Éœ¦wÖgö@Ö~ÖiÖdÖ{Ö}ÖjöCÖ|ÖzöEö@ÖwÖyr²ş³f³V·gÍg}v#9Y¿YãYÛ=Œ»“õŸŞİŒ³¾rÙYgYSÙ©ÉZKï¬©¬¥ì‹ì¬Ÿ¬£ôÎúÊÌÚË:ëIÖgj““ı‘kdífŸdOd½¦æÿŸ×ÙÙ
+Y·Y£eÉ>Hïìì¡ìì“ì‰ì¯Ô&'s—kdïå9’gFö[j2wé9ú„OÉ«Bæ4½[’õ‘Ï°Åô(Î‘Á6±·ù›©ç8Æ2‚Ñc8ò¬¿á–²„ëÔ\Ïp†ÑOÏş<Ê#4‘Ó”
+¹€÷ôx—-le5ËYÁšŒõXÁ÷üÄ…tånî¢72† ™£ç\6°–z´ ,å(BQÑ*jªÒ”&œHsjP‹¾ÜÂÃŒ£¹'r1]©§G]ö¢{äüÃ±ÆµYï7°‹Œd½¹‘}åîÇÑÅ±¥|Ë7y_¦4¡8¿ÈÙÁAÆ ò¢{˜ÍVQŸ:œÎYÜ$÷fb,ôìÈmbvz0”¤'ÒœNr:3”ÛÙÌ›ìæOJêY‚c¨ME*Ñˆ†tÔ£U¨ÊLf1—9´qm¹œËx•ùLb2Sõ˜Æ=ÜÍ”ÄXÄBÚ¦ ©ÄN9»8ÌøPV»Ç5ìàªiÄ9œM/¹½Í(fŠÍbË©¡GM:Ó‰b-éAwÚéÙ†~àH9×r6G„m9™cÉ~™Á£Œ ûî8ZĞájnç.î#{ë~a:ÊùƒXFöÜ'¼Íb²ÿ®åxª2L{¹“!doV£	7}û[ø”£äÍ9\G•Å÷ãã</JQˆßÄòÃ£L Ï’â{{-M#{ØW¬»Å–ó!‘gÄå^òüÙÊë¼D7ãy„QäÙ4›El!Ï™ûx„§!ç~îf(yæ,b6O“çÉ2æ2ƒ<—¦ğ¯³BÍŞ`%yö<Ë<V2RìîáòL*¿—ó|ºˆFc¹œe,e1yv§1]Èsí 
+©/ÅX9Oğ‘gä@zq>yŞÉõô`œµ¬g#ıÅzrw‘çlz3ˆqræq$ÏĞ§Çäù|<GPÕr6°UäÙ]#9<‡ïáa&³UÎfŞby&Ïg&OP…ıùGíòÜ~’çx…FjÓ…>äÙü«¼©fœï‹÷ùi"v6§q<y~ŸÄœGQ9k½~Î>Æy¶ŸËé4#ÏıèÌ9l‘ó6o²‰|‡|Åû¬#ß7·qÑPÎ\HƒŒÅºr%ƒÉ÷ĞFŞãKò]÷ğµäü.¾—×šÌ1~™'x"r
+ó™÷Öï¶1<É<jˆU§€]ş_Nîfão(o<Îë^ä)ÖK]Ç«Ì"ßk“y…«æ8Îã6Èy×ØHK±Vt§?ùN+çºEùÍx$ğ8ÓøGÏ•|Ì¿Œ›ÊcÜÏ.~gõå)«g¾–»‰|ÇŞÆ\D_±¡\G7jË½s9†|WwçZîàb5—Ğ‡Á´ÓnœL¾ƒkp}h.§GQ“=züÍG¬àD±ZÍIä{¼M©N!=WËû”½óŞ–Ô!ß×/0Qä{¿.­èÀAjæ®b¶œÑLà%ê‰Õçz“ïüí¼ÃjêSC¨B~+,á]~¥ØşJ]ò»a-ïò{éYÀ'rWñÿ–Ïaék/ù½R†Âü!v Ü+9Èo™?Å‹x-Ë·j¾K¹XIêÊéÅùÔá,±~\Ç™,‘»˜—y†_ôø™wXÌR±éÌá
+NWs×ÒŸâzc»ÜuŒå5gÔœÊ%¿‹&2‹WÉï“¸„[è,gä4ö[/ï
+ö3¾]l"1„ü>ÚÄ^ ”œr¿¢´q~;½ÈBŞb(w0–I4‘sq<ƒÄàA’ßsC¸š‹Éo´¾\L3n»„k¸üÎÌ¤©œèš\ò®‚y+ÆÆhÏa¦¤œ|©×:ŠápNa7Q\}EfÈÄ%¿	;Ò†úy•Óšc9ˆün¬GkNa®šy¼Æë´•s0ÇÑÙb/ñ
+
+¹Ll(}¹”ü~|Í|À,9“™ÆóÌûM¼Âå\Á-ÜÁt9Ïğ4ièÎäTP’òìÃnùsä,âU^¦„ø_âE½–£éÄY¼(góyÉrïe,OQQNş6ş™™rc*OQÉ{¿ˆï¡²ñ$¯yˆaT•³Eü ªßíõB.e «}V«˜ÏsÜ#6ˆËèÂajç,®aœ™¼ÂZ:ŠÂe"¿©Ë¸na~6nèµ‡Q•]z¾ÁûüN#±Ncv¨ù•"Æe©¢çş|/÷mŠ}Ä›,`ªØ¦3Cå^Í™Â4±¹<Ãx©y·ø˜rr)í9[ìVnà<¦ğ4ãÎN=~ã=–2Uì>fçp.×3€Jz¾%ï;*òú23xŒrNæ`´Øã<Ë:«9+LK9 R›V´kGOn¥»Øn¢íÌekA»ÿÎ.Û~¢–ü6b^
+¥-=Ôôäfn§¢7+ğ­ü7Y.ö[YF/±\Îùt’{—s*½Å.à
+ne…š•lãsÚÈ@ZgìÆ3ŠşÌ”óó 5äTçG½¶2Kl$ñ<ıÔÜÊh&ğ§œ#åÁÆ‹åÌàY–pDŞ§m!v?Ïœáê†1„Û™.öKIÎõ®qU©Æ§bŸŞÉÙ­gîaË¹WÎµ¤fXè9šQÜË
+b÷1œôÎùf/1›§™Bj“s”š\ã/6Î™l+©ÉY-½dãÉi“ŞÅÕã7÷º“JT&µÉÉÜå×q-ÇÊ-õ¿šÌ]zgîc¥Å#sšŞ#ÅF0”;øQÏe,ç'‘ó(¯³ˆbÏ²‚ä¬P³œÅ,a¥Ø|Ÿ÷èÊ…£8¥Ü{iÒ;9ãÔäàaî»ˆÔÜEz¯fËè"vw“ŞMõjB5ª3Yì)R›œ±jr'y‚óåOj. ½×°‘
+œ Ö…
+Iïşşæ~ô 'ƒÄ’Úädîr‡¸Ÿ§åÜIj2wé9ZÉZî›Bæ4½ßÛÊ6Şçx±ı©Bd¯0Ÿ®ù+U“ÓHMQö¡1ÕÄN )ÉiÎ‰œÇ¹œÃÙ¤wrŞU“{ø˜¨)v©©EzañZšQ¤÷\÷2‡ Ã.~'µÉÙ¢6×x‡·Yç½—IÍzÒ»!
+(Ì<±l ½oÔ£Ñ•/Å¾"µÉÉÜå›ØÌrn#5™»ôÎõáF‹=Iæ4½[Š•£<­øÍšYÇzrV'ça²€YbÏ³ä«æñ9Îx£XÎG9'%g#™ÆTÊ»çr¤wrZ¨É=ô§}Ä 57’Ş{XÁJîëEoÒ;ç›æÔ$çœêb5HmrÊê™kœL.’ÓŒÔt%½k‹ÃßÆ9#]ÂÅ¤÷-b}éFw‹İFj““¹Ë56yo3O1”ÔdîÒ;st×“3Şd2§é]O¬{SŸœ‰^àEVq”œ£é@{F‰f6É9HÍñ_9Øø%±œrNJNêS…ıù‚í¤wrêªÉ=ô¦gŠÕ#5g‘Ş9Ó,&ç²ºbgp:é½Ô/á¦Ó_¬©MÎ^zæu(àk/‹YÂ7¤÷â sÓbßñ-é½ŸØ¾ü¡×Ÿ”¤©MNæ.×X%g5u(Cj2wé9ºŠ+)+V—Ìé½ÅŠ³Îÿ×3DÏSéÄíŒ{ˆWy¢bûĞ™äœ¨¶¥9‰ÓÄî`(Éy“Íälõ"“˜Hz'§©š}ÙÈ™f©ÉY'½K’³LÎeo‰åü²›ôîH 
+S„Šæ¦©MNµ¹ÆÍÜÄ@±ö¤féİœf”à±œ¿rKï›]ó&.ær&Ëù.µÉÉÜåÇSŒœY‡šÌ]zgn¡/9ãM$sšŞ³Åfğ,/q©{oM.£¶œc8…$v0mIÎ\5³xy´»‚ËIÎ|^å>ä†’ŞÉyQMîa!
+xJì5R3™ô™8“yEl"“HïJî©"?ÿBÎ4÷’ÚäLW“k¼À34[á5
+½¦÷^æ9*‹5¦éóYIvëõgŸIj““¹Ë5&2‰úbåIMæ.½3G¯³ˆrbõÈœ¦wG±ªäìu
+?ûLW±š_¸[Î=táB›É’s˜š]â¿s¸ñZ±œvœFî¹!U©AYÊŞÉé &÷0ˆœç½¤ælÒ{'9Ëä\ÖXì\Î!½§2…œ}rÎÀ­¤69UôÌ5Ú“sÚ±§IÍBÒûPñCøÍxšØë,"½§‰MesùXì#R›œÌ]®ñ¶÷¶0	¤&s—Ş™£k¸šñbƒÈœ¦w[±JT&ç¤nzL
+º3JÎhæğ2 ˆHK’ÓYMMjq­ÄzÒƒä´1ÇíPšÇïg¦!âéœ6‚¹‡œÍ3MkR3€ô®ÁV
+¶ÑV,ç—œcÒ{–3ÉÙg$ÄÆ“ÚäTT›k´¦Ëää¼”šå¤w'N¥:9#­déİÛ5{q>ğ¹Øg¤69™»\ãMï½Åc 5™»ôÎ
+æ6n{œÌizÿÉnòŞ‘ü·‘             ÎÀ        LayerElementUVI   d¦         VersionIe   ¦        NameS    automap¸¦        MappingInformationTypeS   ByPolygonVertexï¦        ReferenceInformationTypeS
+   IndexToDirect®°     °	  UVd@     £	  xíÛO¨]WÇñ3­ÔLj5ÔDi"±#±Rqà	¨ƒb Å (¾XhÑB¡ş©ˆ
+‚¨`©X©q ‚(şé@ĞÖIÑ˜m*¨m^kS#ıõv`ŞÙë³¸o=öà:¹£ğÍoï³îúíµ÷>{ßû†an>öğÛ.ÿ3¿á¡åßÂ[·|ó±Uıä­»y¼áûÛ«ú\x:}şo«zå¯¾¦ÅÿÚû—ø•§«ooñC?ùšİ|à™_´ø¡Ï…·nÿg‹zåáÎWµøoüYË¿2?è…ÇOŞÜ>_èÓ‰İœş…ş§ÁéO·ü‚·æ/½ğpê¹–è{X¾Ÿ½şWË8U–/½pæzæœùÓÕOpæœùcù gşX¾Î|C¯œõvõİKş•³şBÏúÓ^½gıg½u8çßÖw›ÿü
+Nÿ‚'ş§ÁéŸöüéñá}gwÆ}ëØİùw*<|ù ¿_Õ+oÿøğ«zå­¼õÉU½òüÅûÎ,qŸ¿‰¿‡ÿ|a‰?Ñ
+û^¾Ä§W÷¿{‰OßÃ7ŞÛâ½´Ä
+óc
+½òö—š?ôÊÃ‰§Úçş•·~ş’öùC¯ÌÏ|~øùÙãáCÇ[şâWzËy¼áe?à‡ıÊº¶á¶ŸóÃ~6½éÖe´şàô+ôÊÖ¿éºÖßz†éÃ››ëa°õÚ:½áö>Åû}kÃí}şÎßÑê7ösÌ¯g½=Òú{°÷Û?4İ¸ÁŞ?³®ãıkÃqÎˆı(ıØğ²?ñc+Şï¼n8ö'ïÉqşá÷ÿ›í›>Ï‹Åöñéà·–õÏçÀ¹Ÿ‡îüEÏz£«Ç`ùi¿‡c½›^ÛâÛï{¬îéù¾ıç8/Ò­¯ÃëÚó½×aºçl¸İ‡¤Îîu6ÜÎ á‡ú7O6ÜÖ_~˜ï{ÒØøaı¯ùárÏg_ÂÚaëor¬·=Nÿãù{8ÖßñP‹Ÿë6ß;l=ÕßúŒÇ˜'ØúŒ½?{oŞp;¿ñÃùÃ½â†ÛùÎoó¯¹ÌÿÓ¯Ğ+«·ñtë_Ùy-õ8bï+êzÃíû$~L±>Y·6ÜöÇô#Î)ãş3­~­—Áü¢WÎz‹ö•­ÇsèÖãä¸ï/\ñøÎ=¼ûoì¾»Çî»é•İwÓ+»ï¦WvÿM¯ìş›^Ùı7½²ïÆÏ\òßÃñ}Cê…}ß@¯ìûzeşnŸ?´Ä¯ìûze~Ğ+óƒ^ÙyoøÆñ‹;ãï}«·«·1úWVtõ‡­ßÓÓïkñİ¿[¯é•­×s´¯lıN=å?ŞuÇ®üñV¬_=öş6Eÿœ×ÁŞ·è{8Ş¿fí+ÇûWê…½Ñùù­ËØç<üÔò=œõ(X=Ğå—ÌŸhŸ~ËWû=ìü/ó»şòípæzæ«}<xCË_Xı¿ıÇ’¿÷ ¬Şz¬Ş¦è@ıb÷¿çÚóÕã€ÃïùÀ³-~¬ÿØüë±ù6lıåéSèüÂôùÜÏîŒ¿ù€=« œŸ/úWöüáwíùâcşÏŸ—øüÇüï1ÿ‡;[ş'‡ÿcèüOßkÌï:½;ÿàÌ7Xık¯Ş{¬Şé{X}ŞØâ›ŸCpÇ°óX‡Õ÷:¿±ñÄÎ›ãİŸxnuıÇòë±õcŠşüÁòí²õ.úËwÆæ‡å«½|±|1±ú›nù\Ëßü
+VôÊêoö•Õ[êöŸho~Ìû>¿Ä¯œù„n¼´ÏüBÏzÕŞı@‡Åı×ÎøWŸn}Àâcñ±õ Çü_8·Ä¯Ì?ºñÂæ;¶~`ãÕcõ6}´åõˆÕVï˜XşÉ±Ÿaó#Ùşñs¾ù<q_¤½ù”ócÒ¾°ñ£/œù\õ…ïŒ~¾àŒ×aõ8….,Ÿóö|ë6ÿ;l|ô—/–/ÎùÏËzºôÕ%ÿ¬Ÿà¬Ÿ«×9ôÊê7uó?Ú§_¹§Åı
+6zœóõ®Ö¿2?†ĞùÕïğÈöÿV×,~Å›¢eñéâãôÿÄ_[üğgNÿ;œ~‡^9ı§ó?8ëÿ¦§—øYÿÁYÿæßzÖ¿çÅü¦ç|ğ<õŞcõO/œõ/^ü^wæ7Îú]şó=÷¾°3şêË ó'ÙşıåGç_—#Ÿáë-¾úÁê Ë [?Fı­ßÁü¡Ë«¿ùÃßYò7ÿ±úë±zokı+«¿ÔÕw´ç÷på÷Zü˜ÿ8ç_è•ù5…^™tş%û½ã¥+†ñòø»ÿ™‚İ×ô87í×e÷¿.»/Ò¿²ûze÷-'ãóWvŸE¯<Åï*éë²{)ı×e÷=úWvßC¯ì¾kxäeËøïá¸ïJ½°ßÕÒ×e÷bú¯ËîÛô¯ì¾^Ùx8òŠ%ÿÊîÛè•7}]6Şú¯ËÆ[ÿÊÆ›^Ùz1|àÁŸ>xyşW¶~Ğs½ŠöÖºıçzí+[/‡'/.ñ+[?éÖkìı[¿±õ»Ç™ï•ß¾WşÁ™pæ«}ì7Ã+£aûİ~‹gßıí¯tûgs<®jñÓÿà­ØŸ‡Ëºğ›S«ùcùcùcûï°ıåœù gşÁ™pæœùwødÜŸMçıÙó¼u8ëíc×>´“å¬¿Ğ³ş´ı|Îú
+Îúë0ÿ‡Ÿ]âWæ?]¾Øxàÿx^Î·‹7?~İŸVÇ‹ÅÃYiı3~pÆïpúıéq‰_9ı§ó;ØxŒÁüÇüïqææ¶İù gşÁ™¿öêılô/œõzÖpÖpÖ¿çùû­óô¼¨lş÷ØüÿsícËøÇçOvŞ –ŸöéW´O¿‚å«=?Æÿ¶øê«'ÌŸä˜ß=¶~Ğ+«·éíï]ò¯¬şRúÃêoxGë¯ş°úë±úø`óßy(˜Ÿt~b~MÑ_Øüë±øãóü}uşcñ±øXıMÑ?ã güó{xç©%~eş§nşG{şÁüÇüï±ú.ı±åoşbãÑaõ¯¿zÆüÃüÂüÄüKö~ñÕ?İüî±z§ïaù~ê-Wçÿ€åßáÌ?ôÌ?8óV¯Ÿù‡ùcù{¿ÅŞo:œù†^Y½Í‡nZò¯¬şRúÃêo8Üú«?¬şzlşM}Oó?üÆüÃüÂüœ£?ÿ°ù×cçı­ë÷?³3ş•‡è•‡é•İĞ+»/ ¯Ë“¿›ŒÏ¿.;o‰¿.»¯Ğ]v_¡eç9zeç9ze÷ôÊÎû[/}ı2ş{8Îû©vŞ§¯ËÎûú¯ËÎûúWvŞ§WVÏ'ï;²ä_ÙyŸ^Y½Ñ×eõ¦ÿº¬ô¯¬è»øÿ,ÈEÁÀ     ÿ   UVIndexiH	     ò  x5× øOåû p{kIˆ²©4ŒdïÕ =dk£(+DK{R©hï¢l
+Ñ.«²Ò.Ú»ßëíïïº^×y¾÷ç~îs<Ÿû9Ÿs¶.PàÇB
+ìd«ñ.ş0ş…ïŒW,Pà-z(P 'Ë_ç4ã3øVÎÏrg§ñ6vÿÄçÆó¯ñßüiüÿÆÆkÔZÍÙjÃ÷b¿&—“Ë?Æÿññ©rÚr,'“kŞL"
+ìC®gÇ"|iœÿ×>ùœÍÆ¹îS8väÚ·S$óXêZ^ãÖ‘ÿÓÏ”P¯"ùÿíëX-ÆY‹õ¼ËòßBÁä‘u©èX‚/OwÎ39öd¿¢¨zåÙn¼Ÿc!vg;pg‘ïj+…’G¾§òEùÜx™kØÀ{¬ ßÁV¯ù~+9–äã|Ÿoğ>Éwÿ%“G¾Çr…ÙfœèHWº“ïôwÊ¨W…| 8ãkã|ïUò9ßç{îA7:‘ïz Å2ôÛ›|À&Ò¿RJ½I?äX–?ŒÓ;Ÿğ!+I¯|GÙä‘>:Ğ±_§{s"I~Cqõ*~=Øq/ş5NOvá$Î%½ü={%ôqÇâ|aœ½ò)±6×#ş{«W•ôeÇÒüfœş›ùŒìo(<Ò÷U÷æ ãôgö@z?}šL¿§ïÓ«ÙéùôzöEö@ú;}œôz6½š}O¦O““şM§·ÓÇéÙôj''ı•kÈŞHŸ¥§²2'½–Úé©ôRöEö@ú'}”Úé¯ô`z/}–Jfnr²?rônöIöDú5s²WR;{"{!}›Mÿg¤vöGöPöNöIöDöWæ&'k—s´§-¹gd¿eNÖ.µ³Fíè@öXîYÓÔNf¤÷Ó§éÉô{ú>½šıO¯g_d¤¿ÓçÉIÿ§gÓ«Ù éùôgú49éßôxz;}œMÿï®mœşÊ5do¤ÏÒSÙ»ï“òR;=•^Ê¾ÈHÿì¾¦6éÁô^ú,=•şÜİ§ÆÙ9Gz7û${"ıš9ÿ¿ÎÈ^Hß¦GÓÿÙ ©½û^ïïìì“ì‰ì¯ÌMNÖ.çÈŞëHîÙoÙwY»ÔÎåŞ}—=–ûGÖ4µÓ{é|‡ù.—úì-ğ5}Ö˜O|¶š¡b“¸–!¬d.¯ò«älâhsjğ²ØBÖğ:ã¹‰1\Fm9MøÌœ54ë@{r£Åõ¼%çS1§—‹e
+hË‰´¦>uå4c‹9os9€:t“ÓŠ–te­ØfššS‡bm8‰vìç³*N
+•Ó‚mÆï2È¸¥H¥äP—
+¼ÃVšûìjÁA”£¤XzÑz´âsŸ½OÙ|oşş‡2Æ…{Òƒ‚¼'g;-£?çP”RüÉ1·G·á
+s>äD±6´¦»|VÈ± ;?³ƒÖÆ‡SZ¼(?ÿE
+ã£iÏñ%Ö¯Ìù˜›ÅÆ2†)4¤miÀGr¾¤­9Gr‚X Ó’QŒ`7Ğ@N ¾1g=«Å±UçZ&2Œur¾¦½9õ¹Ql2#Í<^aoÒHN'¾3g#³Å–²„Ylû–r²Rl9¯2ŸWôÌ,â²§â	^ ûe7Ñ‡ì»E<Çcd_Íäf“½5„ ù9b3xšydÏİÉyìCöß‹<ÉÃd¯ÎçY%{óqg1Ù·¹ŠÇX!¶÷XFî}™Â\r¿xwXGîËù€Mä^ò)±–ÜG~c:CySlï³‘Ü#Öó.KÈıg_Îç.r¿ù„YMîMs5]È}æm>æ3rº‚
+èGî9}8aä~2›éGîKWq	ƒÈ}g q%¹÷ã!~`¨X.d¹'İÍìGîOÃ9Ÿ¾ä^6’‹Hî]ƒ¹”«É}íXFñ¹ÏNåv&’{dna>ãÅÆq+÷’{äuÜÉıÜÄƒÜÍÍä>û;3œÜË's Ó˜À}ÜÆ5Ôv
+å¸{ÈıøîâFrï~’ÑÇ±[¸‡é4ä£õ©Æ!Mî·
+¸•´kÎ‘Ô¡%5©G6Ë¹‚GØI#±ZNSrÏ¾—‹ØŸb9”ê´¢GP›6Ôå(ZûşñŒá)Ú‹õäT:“ßÜÆBÚŠuädºÓ•.œÆÙœHoÎäx¶˜ó 3¸’bÇr:½hGN¡u]Cy.æ>º‰ÃG~Ûf,'p’Ø	œÅ¹ä7®
+iN
+šRŸjä÷h·3ˆü®É1´&¿[-hDm¶2‚™ì"¿§-9šÃò·k˜Ê%@M±ê4 ù-¬GcZ‘ß¾64á(š›Ó•q<C~§
+QŠıÉoì`î`1û±%È¿
+”§4şû»«‹9îÅÁlãOe$92¡N[ $ûr¨?*p)Ó¨$V”²T&¿ıÏr
+İÈïxUö¦8Åp;‹Èoún¥ïÉy;9üî÷æfæ‘ßõ9ÜDw¶Ë¹ŠÇø‘<o,æs÷sÉï_nc!=9›)Ì%Ïó¹…siÉ‰Œç9Js£ó¼ÊŞÆï;Ï],¡¤Ø^¼b|³€/8L$Ï2“_¢˜ñçñ8WSF¬,³¯§”ñu³(a\J\ÎâZŸ½HaãV<ÏN¢(ÅyÙç“É3ÒŞT *yæ9˜Ø‹ä,ån. ÏEÅØÉsOEö!¸ÃaOğy;ˆò”äpç~!HJ°?UÈ³Taö¥yvªL9ŠÓÚœ“™È
+üÃ¾ço>tÎ
+¹‡×ùSìw¾e;;ù™/ÙÌlåk~å
+sşæIFó¯ØüÏø‹Ïù?8‚Êe:»ØÂWüB^äZNá'~ã¶‘gÈ®œIOòLØÓ9–\Ã2îå"òÜØ™SéM[Îæd:ò¥œ1<ÅÏäyµgqG:çC£
+y~<3èA5;q
+çgËs9.´5çT&ñ­Åêr­øØ9/æ>–“çİæIò[ŸC¨ÎÑÔâ0á+sşáiÆ’gífA
+òŒ[ÃiÊQ®á †ó0y^®É¡4¢ØËLæ4‹5¡µÉ3öMÜÍƒÜÀıÜÉu¬s
++˜Ê%LÏíLe"÷r+ãøZÎ8áò<?{¸…ú®á®à`ò|}=wñ ×r
+·q“™ÆL ½9§s³#Ö
+Âzç¼”i¼Á(±Ë8>c(ÒŸâ®âsşåY®a¬Ø\Ä FÓ—ó¹œ®¡*W2ƒáb¹˜+é 6›ë9ƒ‘bWs)ƒYÅZ>âSŞdğ\Ã›ÜÏe,[Á{ùŒ%¬ã^ã[9ãy_Y-öó6
+]ÃLFP•bkøOXÊë¼Ëz–³‘÷yƒæœÉ
+¼ÂB±ÇxltÎËy€•Ì›Ã3Ìd/ğñ
+ğ/ñ9ÿñ<X$¶˜çyœù<Ê³Ì¥‘k¨ÎHe¶ØÃ<É‹t{•9+c±—yšÌñğ
+0ƒ}äÌqŞUÔ0~Ilñ}Ä‡°‰ä¼*6—G™É÷bÍ;šä,{™‡yœÇÄï$µ“ó¦X®a«XÂ‹dÎë¤öJV3ŸÅ¼ÍR»±5¹‹ÇùLl=™›œäÙÀ\×´ï9«Sû
+6ñ	]|ö›ø'¤ö[bKYÇ§ïKæ&'k—s,c/ğ™“µKí¬Ñl–³–EdMS{(CèGösÎyê¾E-ãËÄÆ0ˆ>ôÆ§{rF‰f øAüXó!9cÅ.§/ƒyBünR;9“Är
+#˜Ì5's&Úy§É»ÌH®&ï/SHí&jÔædºØ}dnr®%ç˜ÆTæ»¦r{æ¬1Níë¹Ÿ 8Îg¿‹Fjß$6{yáâıÉÜädír‰\Á0Æ‘9Y»ÔÎ]Éuäï*²¦©İˆ†Ô û;çu×RÇ¸¾XkêPâW°™ä´kEmj²Sìxóš’œ6b
+¨N]¿—ÔNN ±\CSòÓ‰¼eN;R»ÇÑŒäı%ï1©İLºÜÇÓœ+ÖƒÌMN{r^ôd¡k*¿gÎÛÆ©İ•³9‡|ö‡øR;ïgméNo®Hæ&'k—stæòÎÚ‘ÌÉÚ¥vÖ¨	]È;^s²¦©}ˆuhNKpÎEïpˆq
+ÇÃiMS1‚­$§.‡ÒŠì¢«yÍIÎÔ¤mxF|*©œŠb¹†Ã8¼ÓT'sÊ‘Ú•¨L=¢* ‘Ú-Ô8”i<Kq1‡İs“s 9G
+±˜
+2ç]ãÔ®€¥ØıŞÔMüOãm¤vÇıÈ¿bŒd0™›œ¬]Î±?µ¨Æ>dNÖ.µ³Fµ)ÏÁIÖ4µ 9Ç@±˜Š¼&ş‡÷£óXÀyâW±}ON±Ìe?ŠŸèØ’äœãØŸ…Ìç9î'µ“S†\Ã`ÊR‚¾dN)R»…9›s)NQR»õx€¼çLvÎëÈÜä”&ç¸^ìF–PÉß™ó¾qjd¢qŞ›òô—ãç¤vJrƒ¿'q5ç“¹ÉÉÚå{3€>ìEædíR;kÔ4F1zÓ‹Ô.«)ÊP•ƒ8Pl©Ô¼wn\J¬HâÌâ£Ø±'§ X!*Q‘ŸÄO6¯5É)*Vš*Tæñ IíäüK®¡$ÿÿA	ãÌùË8µw9şBaãâüfü©İÆ1ï@Óy‘m|Næ&çr/ØÁë®©²cæä]-µw²™-œÂßâ_Ú?ò'ÛÙÊhñ
+ÉÜädír¿ÙÛx/~7Îœ¬]jg²ù~6ş•bÆYÓÔ>Ñ±=éE±eÒ?"ïJÇ‹µ§7İ¹H|_îÉi+Ös8›¼sj^[’ÓAìzp./‰?Dj'§X®á$šÑ”ãÈœ–¤vCÑ‰.4¡1©İN¼=ÌËÔ«Fæ&§59G
+ê²Ü5´gÎÇÆ©İ€êÔä4Ÿı#ş©}´X
+êP‹±â“¹ÉÉÚå­èÊ±4's²v©İ–Ôç:“5Mí›™ÂƒLç`ç\¡î:êß 6‰©ÜÏ%âãøšäL»–û¸—_ÄN7¯=É™,v#0YâÚÉ+–k¸…¼ç\ÎõdÎhR{8y—¹†	\ÍHR»ƒ
+˜Ál‹õ%s“3†œc ıxÃ5Uİ3g½qj£?9ÃgÿŠCjEqø¥dnr²v9Çnâ:ò¾—9Y»ÔÎ#ï}W1¬ij¯fŸòÕœóMu7Ğ0c±el`—‰çÛ=9KÄ–²uü*~¦yIÎr±•|ÂF^ŸIj'g‘X®ám3—5dÎ|R{6y—y7ÈûKŞcR»“x”W™!ö(™›œ…äó+]Sõ=s6§ö,âaÎòÙâß‘Úy?›ÇLa‚øådnr²v9ÇÖòsÈœ¬]jg^#ï}yÇ[AÖ4µçş¿÷“y—ørÌ®±             ½Á        LayerElementMaterialI    
+Á         VersionIe   #Á        NameS    RÁ        MappingInformationTypeS    AllSame‰Á        ReferenceInformationTypeS
+   IndexToDirect°Á        	Materialsi                           6Ã        LayerI    íÁ         VersionId   WÂ          LayerElement.Â        TypeS   LayerElementNormalJÂ        
+TypedIndexI                 ½Â          LayerElement”Â        TypeS   LayerElementUV°Â        
+TypedIndexI                 )Ã          LayerElement Ã        TypeS   LayerElementMaterialÃ        
+TypedIndexI                              ÙÃ        LayerI   fÃ         VersionId   ÌÃ          LayerElement£Ã        TypeS   LayerElementUV¿Ã        
+TypedIndexI                                          Æ     +   ModelLç
+é+    S   Wooden Ladder ModelS   Mesh<Ä         VersionIè   ˆÅ          Properties70«Ä      H   PS   Lcl RotationS   Lcl RotationS    S   ADÒ'' €VÀD        D        ÿÄ      F   PS
+   Lcl ScalingS
+   Lcl ScalingS    S   AD      Y@D      Y@D      Y@EÅ     8   PS   DefaultAttributeIndexS   intS    IntegerS    I    {Å     (   PS
+   InheritTypeS   enumS    S    I                ¤Å        
+MultiLayerI    ¿Å        	MultiTakeI    ÕÅ         ShadingCøÅ         CullingS
+   CullingOff             8É     %   MaterialLøõ¹    S   Wood.120 MaterialS    XÆ         VersionIf   {Æ     
+   ShadingModelS   Phong—Æ        
+MultiLayerI    +É          Properties70ÿÆ      A   PS   DiffuseColorS   ColorS    S   AD        D        D        NÇ      A   PS   AmbientColorS   ColorS    S   AD   @nª?D   @nª?D   @nª?Ç     1   PS
+   AmbientFactorS   NumberS    S   AD        ÎÇ     3   PS
+   BumpFactorS   doubleS   NumberS    D        È      B   PS
+   SpecularColorS   ColorS    S   AD        D        D        ^È     2   PS   SpecularFactorS   NumberS    S   AD      Ğ?™È     -   PS	   ShininessS   NumberS    S   AD      9@ÜÈ     5   PS   ShininessExponentS   NumberS    S   AD      9@É     4   PS   ReflectionFactorS   NumberS    S   AD                                  ~Ë     .    TextureL·Uµ,    S   base_color_texture TextureS     É        TypeS   TextureVideoClip¹É         VersionIÊ   ñÉ         
+TextureNameS   base_color_texture Texture&Ê     #   MediaS   wood-5-dark_diffuse.jpg Video}Ê     B   FileNameS=   C:\Users\kacpe\Documents\Untitled.fbm\wood-5-dark_diffuse.jpgÃÊ     )   RelativeFilenameS$   Untitled.fbm\wood-5-dark_diffuse.jpgqË          Properties70.Ë      D   PS    ScalingS   Vector3DS   VectorS    DUUUUUUÕ?DUUUUUUÕ?DUUUUUUÕ?dË     (   PS
+   UseMaterialS   boolS    S    I                             °Í     -    TextureLùö5    S   roughness_texture TextureS    åË        TypeS   TextureVideoClipşË         VersionIÊ   5Ì        
+TextureNameS   roughness_texture TexturedÌ        MediaS   wood-5_smooth.jpg VideoµÌ     <   FileNameS7   C:\Users\kacpe\Documents\Untitled.fbm\wood-5_smooth.jpgõÌ     #   RelativeFilenameS   Untitled.fbm\wood-5_smooth.jpg£Í          Properties70`Í      D   PS    ScalingS   Vector3DS   VectorS    DUUUUUUÕ?DUUUUUUÕ?DUUUUUUÕ?–Í     (   PS
+   UseMaterialS   boolS    S    I                             nÏ     5   VideoL˜Ã„    S   wood-5-dark_diffuse.jpg VideoS   ClipÎ     	   TypeS   Clip©Î          Properties70œÎ     d   PS   PathS    KStringS   UrlS    S=   C:\Users\kacpe\Documents\Untitled.fbm\wood-5-dark_diffuse.jpg             ÄÎ        	UseMipMapI    Ï     B   FilenameS=   C:\Users\kacpe\Documents\Untitled.fbm\wood-5-dark_diffuse.jpgaÏ     )   RelativeFilenameS$   Untitled.fbm\wood-5-dark_diffuse.jpg             Ñ     /   VideoLÈŸ    S   wood-5_smooth.jpg VideoS   ClipÉÏ     	   TypeS   Clip[Ğ          Properties70NĞ     ^   PS   PathS    KStringS   UrlS    S7   C:\Users\kacpe\Documents\Untitled.fbm\wood-5_smooth.jpg             vĞ        	UseMipMapI    ÇĞ     <   FilenameS7   C:\Users\kacpe\Documents\Untitled.fbm\wood-5_smooth.jpg Ñ     #   RelativeFilenameS   Untitled.fbm\wood-5_smooth.jpg                          ¥Ò          
+Connections`Ñ        CS   OOLç
+é+    L        ‡Ñ        CS   OOLú~    Lç
+é+    ®Ñ        CS   OOLøõ¹    Lç
+é+    æÑ     *   CS   OPL·Uµ,    Løõ¹    S   DiffuseColor#Ò     /   CS   OPLùö5    Løõ¹    S   ShininessExponentJÒ        CS   OOL˜Ã„    L·Uµ,    qÒ        CS   OOLÈŸ    Lùö5    ˜Ò        CS   OOLÈŸ    Lùö5                 İÒ          TakesĞÒ         CurrentS                              ú¼«	ĞÈÔf±vûƒ÷&~      è                                                                                                                          øZŒjŞõÙ~ìéãu)

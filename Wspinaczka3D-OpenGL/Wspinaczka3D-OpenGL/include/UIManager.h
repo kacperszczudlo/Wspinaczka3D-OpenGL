@@ -14,7 +14,7 @@ public:
 
     UIManager(float scrWidth, float scrHeight, unsigned int texID) {
         textureID = texID;
-        uiShader = new Shader("ui_vertex.glsl", "ui_fragment.glsl");
+        uiShader = new Shader("assets/shaders/ui_vertex.glsl", "assets/shaders/ui_fragment.glsl");
 
         UpdateProjection(scrWidth, scrHeight);
 

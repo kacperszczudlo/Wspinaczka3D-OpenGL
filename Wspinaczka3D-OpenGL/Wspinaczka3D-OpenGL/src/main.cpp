@@ -153,16 +153,16 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     Skybox skybox({
-        "models/skybox/Daylight Box_Right.bmp",
-        "models/skybox/Daylight Box_Left.bmp",
-        "models/skybox/Daylight Box_Top.bmp",
-        "models/skybox/Daylight Box_Bottom.bmp",
-        "models/skybox/Daylight Box_Front.bmp",
-        "models/skybox/Daylight Box_Back.bmp"
+        "assets/skybox/Daylight Box_Right.bmp",
+        "assets/skybox/Daylight Box_Left.bmp",
+        "assets/skybox/Daylight Box_Top.bmp",
+        "assets/skybox/Daylight Box_Bottom.bmp",
+        "assets/skybox/Daylight Box_Front.bmp",
+        "assets/skybox/Daylight Box_Back.bmp"
         });
 
-    Shader ourShader("vertex_shader.glsl", "fragment_shader.glsl");
-    Shader shadowShader("shadow_depth.vs.glsl", "shadow_depth.fs.glsl");
+    Shader ourShader("assets/shaders/vertex_shader.glsl", "assets/shaders/fragment_shader.glsl");
+    Shader shadowShader("assets/shaders/shadow_depth.vs.glsl", "assets/shaders/shadow_depth.fs.glsl");
 
     // --- init shadow framebuffer + depth texture ---
     glGenFramebuffers(1, &depthMapFBO);
@@ -184,22 +184,22 @@ int main() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     gameCamera = new Camera((float)SCR_WIDTH, (float)SCR_HEIGHT);
-    uiManager = new UIManager((float)SCR_WIDTH, (float)SCR_HEIGHT, loadTexture("menu_prompt.png"));
+    uiManager = new UIManager((float)SCR_WIDTH, (float)SCR_HEIGHT, loadTexture("assets/models/menu_prompt.png"));
     player = new Player();
     CloudManager cloudManager;
     WinZone winZone;
 
-    Ground ground("models/textures/grass_albedo.png", 120.0f, 100.0f, -0.01f);
-    Model tableModel("models/table.obj");
-    Model ladderModel("models/Ladder.fbx");
-    Model tileModel("models/glass_tile.obj");
-    Model trampolineModel("models/trampoline.obj");
-    Model pillowModel("models/pillow.obj");
-    Model rampModel("models/ramp.obj");
-    Model flyoverModel("models/flyover.obj");
-    Model ballModel("models/ball.obj");
+    Ground ground("assets/textures/grass_albedo.png", 120.0f, 100.0f, -0.01f);
+    Model tableModel("assets/models/table.obj");
+    Model ladderModel("assets/models/Ladder.fbx");
+    Model tileModel("assets/models/glass_tile.obj");
+    Model trampolineModel("assets/models/trampoline.obj");
+    Model pillowModel("assets/models/pillow.obj");
+    Model rampModel("assets/models/ramp.obj");
+    Model flyoverModel("assets/models/flyover.obj");
+    Model ballModel("assets/models/ball.obj");
 
-    ladderTexture = loadTexture("models/wood_ladder.jpg");
+    ladderTexture = loadTexture("assets/models/wood_ladder.jpg");
 
     // Drabina (23, 15, 27)
     myLadder = new Ladder(glm::vec3(23.0f, 15.0f, 27.0f), 10.0f, &ladderModel);

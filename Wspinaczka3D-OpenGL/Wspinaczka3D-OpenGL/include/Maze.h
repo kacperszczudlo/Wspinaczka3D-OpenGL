@@ -91,8 +91,8 @@ public:
         cubeMesh = new Mesh(vertices, indices, textures);
 
         // --- TEXTURES (zmieñ œcie¿ki jak chcesz) ---
-        wallTextureID = loadTexture2D("models/textures/maze_wall.png");   // np. ceg³a/kamieñ
-        floorTextureID = loadTexture2D("models/textures/maze_floor.png");  // np. p³ytki/kamieñ
+        wallTextureID = loadTexture2D("assets/textures/maze_wall.png");   // np. ceg³a/kamieñ
+        floorTextureID = loadTexture2D("assets/textures/maze_floor.png");  // np. p³ytki/kamieñ
 
         // --- FLOOR MESH (plane z tilingiem) ---
         float halfW = mazeWidth * 0.5f;
