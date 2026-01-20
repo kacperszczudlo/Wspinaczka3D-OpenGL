@@ -864,5 +864,3 @@ static unsigned int loadTexture(const char* path) {
     stbi_image_free(d);
     return id;
 }
-
-//done
