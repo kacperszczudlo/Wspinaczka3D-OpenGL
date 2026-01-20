@@ -44,7 +44,7 @@ UIManager* uiManager = nullptr;
 //OG SCIEZKA NIE USUWAC
 glm::vec3 eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
 //glm::vec3 eggPosition = glm::vec3(23.0f, 15.8f, 25.0f);
-//lm::vec3 eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
+//glm::vec3 eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
 
 glm::vec3 previousEggPosition = eggPosition;
 float deltaTime = 0.0f, lastFrame = 0.0f;
@@ -135,11 +135,14 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    SCR_WIDTH = 1280;
-    SCR_HEIGHT = 720;
+    // Pobierz monitor
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
+    SCR_WIDTH = mode->width;
+    SCR_HEIGHT = mode->height;
+
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", monitor, NULL);
     if (!window) return -1;
 
     glfwMakeContextCurrent(window);
@@ -246,6 +249,31 @@ int main() {
         &flyoverModel
     );
 
+    float winQuadVertices[] = {
+        -1.0f,  1.0f, 0.0f,    0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f,    0.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,    1.0f, 0.0f,
+
+         1.0f, -1.0f, 0.0f,    1.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,    1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f,    0.0f, 1.0f
+    };
+
+    unsigned int winTexture = loadTexture("assets/models/win.png");
+
+    unsigned int winVAO, winVBO;
+    glGenVertexArrays(1, &winVAO);
+    glGenBuffers(1, &winVBO);
+    glBindVertexArray(winVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, winVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(winQuadVertices), &winQuadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glBindVertexArray(0);
+
     float titleTimer = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
@@ -280,7 +308,7 @@ int main() {
             eggPosition = glm::vec3(0.0f, 0.7f, 5.0f);
             //eggPosition = glm::vec3(-46.0f, 24.3f, 57.0f);
             //physics.Reset();
-			maxFallHeight = 0.7f;
+            maxFallHeight = 0.7f;
             maxFallHeight = eggPosition.y;
             crackCount = 0;
             player->UpdateCracks(0);
@@ -660,15 +688,35 @@ int main() {
             glassBridge->Draw(ourShader);
             glDisable(GL_BLEND);
         }
-
         skybox.Draw(view, projection);
 
-        if (currentState != GAME_STATE_PLAYING) {
+        if (currentState != GAME_STATE_PLAYING && !gameWon) {
             uiManager->Draw();
-            if (gameWon) {
-                std::string winTitle = "=== GRATULACJE! UKONCZYLES PARKOUR! ===";
-                glfwSetWindowTitle(window, winTitle.c_str());
-            }
+        }
+
+        if (gameWon) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+
+            ourShader.use();
+            ourShader.setMat4("projection", glm::mat4(1.0f));
+            ourShader.setMat4("view", glm::mat4(1.0f));
+            ourShader.setMat4("model", glm::mat4(1.0f));
+            ourShader.setInt("useTexture", 1);
+
+            glVertexAttrib3f(1, 0.0f, 0.0f, 1.0f);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, winTexture);
+            ourShader.setInt("texture1", 0);
+
+            glBindVertexArray(winVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+
+            glEnable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
         }
 
         glfwSwapBuffers(window);
