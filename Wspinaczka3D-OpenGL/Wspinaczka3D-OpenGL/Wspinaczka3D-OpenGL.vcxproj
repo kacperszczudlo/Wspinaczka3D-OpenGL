@@ -111,7 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\dependencies\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)\dependencies\ASSIMP\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,25 +139,42 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dependencies\GLAD\src\glad.c" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="src\BallManager.cpp" />
+    <ClCompile Include="src\FlyOverBridge.cpp" />
+    <ClCompile Include="src\GlassBridge.cpp" />
+    <ClCompile Include="src\Ground.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MazeTextures.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\MovingWallCourse.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\Trampoline.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment_shader.glsl" />
-    <None Include="ui_fragment.glsl" />
-    <None Include="ui_vertex.glsl" />
-    <None Include="vertex_shader.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\Downloads\stb_image.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Shader.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\Downloads\menu_prompt.png" />
+    <ClInclude Include="include\BallManager.h" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\Clouds.h" />
+    <ClInclude Include="include\FinalWinZone.h" />
+    <ClInclude Include="include\FlyoverBridge.h" />
+    <ClInclude Include="include\GlassBridge.h" />
+    <ClInclude Include="include\Ground.h" />
+    <ClInclude Include="include\Ladder.h" />
+    <ClInclude Include="include\Maze.h" />
+    <ClInclude Include="include\Mesh.h" />
+    <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\MovingWallCourse.h" />
+    <ClInclude Include="include\Physics.h" />
+    <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\Skybox.h" />
+    <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\Trampoline.h" />
+    <ClInclude Include="include\UIManager.h" />
+    <ClInclude Include="include\WindParticles.h" />
+    <ClInclude Include="include\WindyTileBridge.h" />
+    <ClInclude Include="include\WinZone.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
