@@ -1,41 +1,49 @@
-# Wspinaczka 3D - OpenGL
+# Wspinaczka 3D - Projekt Zaliczeniowy OpenGL
 
-Projekt gry zręcznościowej 3D stworzony w języku C++ z wykorzystaniem biblioteki graficznej OpenGL. Gracz steruje postacią, której celem jest wspinaczka na szczyt po platformach, unikając upadku w przepaść.
+## 1. Opis Projektu
+"Wspinaczka 3D" to gra zręcznościowa, w której gracz steruje sferycznym obiektem (piłką). Celem gry jest pokonanie toru przeszkód zawieszonego w przestrzeni i dotarcie do strefy końcowej ("Meta").
 
-## 📌 O projekcie
+Główną inspiracją dla projektu były mechaniki znane z gier takich jak *Icy Tower* czy *Chained Together*, przeniesione w trójwymiarowe środowisko. Projekt skupia się na implementacji silnika graficznego od podstaw (własny potok renderowania), fizyce ruchu oraz obsłudze modeli 3D i zaawansowanego oświetlenia.
 
-Główną inspiracją dla projektu były mechaniki znane z gier takich jak *Icy Tower* czy *Chained Together*, przeniesione w trójwymiarowe środowisko. Projekt skupia się na implementacji silnika graficznego od podstaw, fizyce ruchu oraz obsłudze modeli 3D i oświetlenia.
-
-### Kluczowe funkcjonalności (zrealizowane):
-- **Silnik renderujący**: Własny potok renderowania oparty na shaderach (GLSL).
-- **Kamera TPP**: Kamera trzecioosobowa z systemem kolizji (zapobieganie przenikaniu przez ściany).
-- **Fizyka gracza**: System poruszania się, skakania oraz grawitacji.
-- **Mechanika Sprintu**: Możliwość chwilowego przyspieszenia ruchu (Boost).
-- **Obsługa modeli 3D**: Importowanie zewnętrznych modeli oraz nakładanie tekstur.
-- **Stany gry**: Zaimplementowany ekran startowy oraz pętla gry.
-
-## 🛠 Technologie
-
-Projekt został zrealizowany przy użyciu następujących technologii i bibliotek:
-
-*   **Język**: C++
-*   **API Graficzne**: OpenGL 3.3+
-*   **GLFW**: Obsługa okna, kontekstu OpenGL oraz wejścia (klawiatura/mysz).
-*   **GLAD**: Ładowanie wskaźników do funkcji OpenGL.
-*   **GLM**: Biblioteka matematyczna (wektory, macierze, przekształcenia).
-*   **STB Image** (lub inna użyta): Obsługa ładowania tekstur.
-
-## 🎮 Sterowanie
-
+## 2. Sterowanie
 | Klawisz | Akcja |
 | :---: | :--- |
-| **W, A, S, D** | Poruszanie się postacią |
-| **Mysz** | Obrót kamery wokół postaci |
-| **Spacja** | Skok |
-| **Shift** | Sprint (Przyspieszenie) |
+| **W / S** | Ruch do przodu / do tyłu |
+| **A / D** | Ruch w lewo / w prawo |
+| **Mysz** | Rozglądanie się (obrót kamery wokół postaci) |
+| **SPACJA** | Skok |
+| **LEWY SHIFT** | Sprint (chwilowe przyspieszenie / Boost) |
+| **ESC** | Wyjście z gry / Pauza |
 
-## 🚀 Instalacja i Uruchomienie
+## 3. Zaimplementowane Mechaniki i Elementy Graficzne
 
-1. **Sklonuj repozytorium:**
-   ```bash
-   git clone https://github.com/kacperszczudlo/Wspinaczka3D-OpenGL.git
+### Silnik i Grafika:
+* **System Oświetlenia:** Model oświetlenia Phong/Blinn-Phong oraz elementy PBR dla tekstur (Albedo, Metallic, Roughness).
+* **Cienie:** Dynamiczne cienie generowane przy użyciu techniki Shadow Mapping (Depth Map).
+* **Skybox:** Renderowanie sześcianu otoczenia (cubemap) imitującego niebo.
+* **Modele 3D:** Obsługa importu modeli (formaty .obj, .fbx) przy użyciu biblioteki Assimp.
+* **Kamera TPP:** Kamera trzecioosobowa z systemem kolizji (zapobieganie przenikaniu kamery przez ściany).
+
+### Fizyka i Gameplay:
+* **Fizyka AABB:** Detekcja kolizji (Axis-Aligned Bounding Box) dla obiektów statycznych i dynamicznych.
+* **Mechanika Ruchu:** System poruszania się, grawitacji oraz mechanika sprintu (Boost).
+* **Obiekty Interaktywne:**
+    * *Trampoliny:* Wybijają gracza w górę przy kontakcie.
+    * *Ruchome Ściany:* Przeszkody przemieszczające się w pętli, które mogą zrzucić gracza.
+    * *Szklany Most:* Przezroczyste kafelki, z których wybrane są "fałszywe" i zapadają się pod graczem (mechanika inspirowana "Squid Game").
+    * *Wiatr:* Strefy wpływające na wektor ruchu gracza, spychające go w określonym kierunku.
+
+## 4. Wykorzystane Biblioteki i Technologie
+Projekt został zrealizowany w języku **C++** przy użyciu **OpenGL 3.3+**.
+
+1.  **GLFW** - Obsługa okna, kontekstu OpenGL oraz wejścia (klawiatura/mysz).
+2.  **GLAD** - Ładowanie wskaźników do funkcji OpenGL.
+3.  **GLM** - Biblioteka matematyczna (wektory, macierze, przekształcenia).
+4.  **Assimp** - Importowanie modeli 3D.
+5.  **stb_image** - Wczytywanie tekstur.
+
+## 5. Autorzy
+* **Kacper Szczudło**
+* **Norbert Armatys**
+* **Piotr Cebula**
+* **Krzysztof Łyszczarz**
