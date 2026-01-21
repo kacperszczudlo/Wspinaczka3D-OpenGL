@@ -135,14 +135,20 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Pobierz monitor
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    //// Pobierz monitor
+    //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    SCR_WIDTH = mode->width;
-    SCR_HEIGHT = mode->height;
+    //SCR_WIDTH = mode->width;
+    //SCR_HEIGHT = mode->height;
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", monitor, NULL);
+    //GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", monitor, NULL);
+
+    SCR_WIDTH = 1280;
+    SCR_HEIGHT = 720;
+
+    // Czwarty argument NULL oznacza tryb okienkowy (zamiast monitora)
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Wspinaczka3D", NULL, NULL);
     if (!window) return -1;
 
     glfwMakeContextCurrent(window);
